@@ -1,0 +1,117 @@
+import { NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
+import { paymentsStore } from "@/lib/payments-store";
+import { slotsStore } from "@/lib/slots-store";
+import { store } from "@/lib/store";
+
+export const dynamic = "force-dynamic";
+
+const MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+function monthKey(dateStr: string) {
+  const d = new Date(dateStr);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+export async function GET() {
+  try {
+    const session = await getSession();
+    if (!session || session.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const payments = paymentsStore.getAll();
+    const paid = payments.filter((p) => p.status === "paid");
+    const pendingPayments = payments.filter((p) => p.status === "awaiting_approval" || p.status === "pending");
+    const revenue = paid.reduce((s, p) => s + p.amount, 0);
+    const slots = slotsStore.getAll();
+    const pendingSlots = slots.filter((s) => s.status === "pending").length;
+    const legacyPending = store.bookings.getAll().filter((b) => b.status === "pending").length;
+    const orders = store.orders.getAll();
+    const users = store.users.getAll().filter((u) => u.role === "user");
+
+    const serviceCounts: Record<string, number> = {};
+    const categoryRevenue: Record<string, number> = { product: 0, service: 0, course: 0, pooja: 0 };
+    const categoryCounts: Record<string, number> = { product: 0, service: 0, course: 0, pooja: 0 };
+    const methodRevenue = { razorpay: 0, admin_approval: 0 };
+    const methodCounts = { razorpay: 0, admin_approval: 0 };
+
+    paid.forEach((p) => {
+      if (p.method === "razorpay") {
+        methodRevenue.razorpay += p.amount;
+        methodCounts.razorpay += 1;
+      } else if (p.method === "admin_approval") {
+        methodRevenue.admin_approval += p.amount;
+        methodCounts.admin_approval += 1;
+      }
+      (p.items ?? []).forEach((i) => {
+        serviceCounts[i.name] = (serviceCounts[i.name] || 0) + i.quantity;
+        const cat = i.itemType || "product";
+        categoryRevenue[cat] = (categoryRevenue[cat] || 0) + i.price * i.quantity;
+        categoryCounts[cat] = (categoryCounts[cat] || 0) + i.quantity;
+      });
+    });
+
+    const topItems = Object.entries(serviceCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8)
+      .map(([name, count]) => ({ name, count }));
+
+    const now = new Date();
+    const monthlyMap: Record<string, number> = {};
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      monthlyMap[monthKey(d.toISOString())] = 0;
+    }
+    paid.forEach((p) => {
+      const key = monthKey(p.createdAt);
+      if (key in monthlyMap) monthlyMap[key] += p.amount;
+    });
+    const monthlyRevenue = Object.entries(monthlyMap).map(([key, amount]) => {
+      const [, m] = key.split("-");
+      return { month: MONTH_LABELS[parseInt(m, 10) - 1], amount };
+    });
+
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const newUsersThisMonth = users.filter((u) => new Date(u.createdAt) >= thirtyDaysAgo).length;
+
+    const bookingStats = {
+      total: slots.filter((s) => s.status === "booked" || s.status === "pending").length + store.bookings.getAll().length,
+      pending: pendingSlots + legacyPending,
+      confirmed: slots.filter((s) => s.status === "booked").length + store.bookings.getAll().filter((b) => b.status === "confirmed").length,
+      completed: store.bookings.getAll().filter((b) => b.status === "completed").length,
+    };
+
+    const avgOrderValue = paid.length > 0 ? Math.round(revenue / paid.length) : 0;
+    const conversionRate = payments.length > 0 ? Math.round((paid.length / payments.length) * 100) : 0;
+
+    return NextResponse.json({
+      revenue,
+      paidCount: paid.length,
+      pendingPayments: pendingPayments.length,
+      pendingBookings: pendingSlots + legacyPending,
+      totalOrders: orders.length,
+      totalUsers: users.length,
+      newUsersThisMonth,
+      avgOrderValue,
+      conversionRate,
+      topItems,
+      methodRevenue,
+      methodCounts,
+      categoryRevenue,
+      categoryCounts,
+      monthlyRevenue,
+      bookingStats,
+      recentRevenue: paid.slice(0, 10).map((p) => ({
+        id: p.id,
+        userName: p.userName,
+        amount: p.amount,
+        method: p.method,
+        createdAt: p.createdAt,
+      })),
+    });
+  } catch (err) {
+    console.error("[admin/analytics]", err);
+    return NextResponse.json({ error: "Failed to load analytics" }, { status: 500 });
+  }
+}

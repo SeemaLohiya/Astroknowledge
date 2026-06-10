@@ -1,0 +1,386 @@
+[
+  {
+    "id": "pay-ord-ord-1",
+    "type": "order",
+    "referenceId": "ord-1",
+    "userId": "user-1",
+    "userName": "Demo User",
+    "userEmail": "",
+    "userPhone": "",
+    "description": "5 Mukhi Rudraksha Mala",
+    "amount": 2100,
+    "status": "paid",
+    "items": [
+      {
+        "id": "ord-1",
+        "itemType": "product",
+        "name": "5 Mukhi Rudraksha Mala",
+        "price": 2100,
+        "quantity": 1,
+        "image": "/images/products/p1.jpg"
+      }
+    ],
+    "createdAt": "2026-05-20"
+  },
+  {
+    "id": "pay-1780828097319",
+    "type": "checkout",
+    "referenceId": "ord-1780829217160",
+    "userId": "user-1780828060028",
+    "userName": "Esha Lohiya",
+    "userEmail": "eshatibrewal30@gmail.com",
+    "userPhone": "09680102276",
+    "description": "Astrology Course, Kundali Vishleshan (Horoscope Reading), 7 Mukhi Rudraksha Pendant, Satyanarayan Katha",
+    "amount": 40100,
+    "status": "paid",
+    "method": "admin_approval",
+    "items": [
+      {
+        "id": "vedic-astrology-cert",
+        "itemType": "course",
+        "name": "Astrology Course",
+        "price": 25000,
+        "quantity": 1,
+        "image": "/images/courses/vedic-astrology-course.jpg"
+      },
+      {
+        "id": "kundali-vishleshan",
+        "itemType": "service",
+        "name": "Kundali Vishleshan (Horoscope Reading)",
+        "price": 5500,
+        "quantity": 1,
+        "image": "/images/ref/services/kundali-vishleshan.png"
+      },
+      {
+        "id": "p2",
+        "itemType": "product",
+        "name": "7 Mukhi Rudraksha Pendant",
+        "price": 4500,
+        "quantity": 1,
+        "image": "/images/products/p2.jpg"
+      },
+      {
+        "id": "pu1",
+        "itemType": "pooja",
+        "name": "Satyanarayan Katha",
+        "price": 5100,
+        "quantity": 1,
+        "image": "/images/astro/pooja.jpg"
+      }
+    ],
+    "createdAt": "2026-06-07T10:28:17.319Z"
+  },
+  {
+    "id": "pay-1780830415134",
+    "type": "checkout",
+    "referenceId": "ord-1780830553143",
+    "userId": "user-1",
+    "userName": "Demo User",
+    "userEmail": "user@demo.com",
+    "userPhone": "+919998887766",
+    "description": "Kundali Vishleshan (Horoscope Reading)",
+    "amount": 5500,
+    "status": "paid",
+    "method": "admin_approval",
+    "transactionRefId": "vevv",
+    "items": [
+      {
+        "id": "kundali-vishleshan",
+        "itemType": "service",
+        "name": "Kundali Vishleshan (Horoscope Reading)",
+        "price": 5500,
+        "quantity": 1,
+        "image": "/images/ref/services/kundali-vishleshan.png"
+      }
+    ],
+    "createdAt": "2026-06-07T11:06:55.134Z"
+  },
+  {
+    "id": "pay-1780837455901",
+    "type": "checkout",
+    "referenceId": "ord-1780837844148",
+    "userId": "user-1780837455209",
+    "userName": "Esha Lohiya",
+    "userEmail": "eshatibrewal30@gmail.com",
+    "userPhone": "09680102276",
+    "description": "Palmistry Reading, Numerology Mastery, Satyanarayan Katha, 5 Mukhi Rudraksha Mala",
+    "amount": 22400,
+    "status": "paid",
+    "method": "admin_approval",
+    "transactionRefId": "ububo",
+    "items": [
+      {
+        "id": "palmistry",
+        "itemType": "service",
+        "name": "Palmistry Reading",
+        "price": 3200,
+        "quantity": 1,
+        "image": "/images/ref/services/kundali-vishleshan.png"
+      },
+      {
+        "id": "numerology-mastery",
+        "itemType": "course",
+        "name": "Numerology Mastery",
+        "price": 12000,
+        "quantity": 1,
+        "image": "/images/courses/numerology-course.jpg"
+      },
+      {
+        "id": "pu1",
+        "itemType": "pooja",
+        "name": "Satyanarayan Katha",
+        "price": 5100,
+        "quantity": 1,
+        "image": "/images/astro/pooja.jpg"
+      },
+      {
+        "id": "p1",
+        "itemType": "product",
+        "name": "5 Mukhi Rudraksha Mala",
+        "price": 2100,
+        "quantity": 1,
+        "image": "/images/blank.svg"
+      }
+    ],
+    "createdAt": "2026-06-07T13:04:15.901Z"
+  },
+  {
+    "id": "pay-1780837579990",
+    "type": "checkout",
+    "referenceId": "ord-1780837817457",
+    "userId": "user-1",
+    "userName": "Demo User",
+    "userEmail": "user@demo.com",
+    "userPhone": "+919998887766",
+    "description": "Kundali Vishleshan (Horoscope Reading), Astrology Course, 7 Mukhi Rudraksha Pendant, Navgraha Shanti Puja",
+    "amount": 67500,
+    "status": "paid",
+    "method": "admin_approval",
+    "transactionRefId": "h h",
+    "items": [
+      {
+        "id": "kundali-vishleshan",
+        "itemType": "service",
+        "name": "Kundali Vishleshan (Horoscope Reading)",
+        "price": 5500,
+        "quantity": 1,
+        "image": "/images/ref/services/kundali-vishleshan.png"
+      },
+      {
+        "id": "vedic-astrology-cert",
+        "itemType": "course",
+        "name": "Astrology Course",
+        "price": 25000,
+        "quantity": 2,
+        "image": "/images/courses/vedic-astrology-course.jpg"
+      },
+      {
+        "id": "p2",
+        "itemType": "product",
+        "name": "7 Mukhi Rudraksha Pendant",
+        "price": 4500,
+        "quantity": 1,
+        "image": "/images/products/p2.jpg"
+      },
+      {
+        "id": "pu2",
+        "itemType": "pooja",
+        "name": "Navgraha Shanti Puja",
+        "price": 7500,
+        "quantity": 1,
+        "image": "/images/astro/planets.jpg"
+      }
+    ],
+    "createdAt": "2026-06-07T13:06:19.990Z"
+  },
+  {
+    "id": "pay-1780898328251",
+    "type": "checkout",
+    "referenceId": "ord-1780898367081",
+    "userId": "user-1780898326482",
+    "userName": "Esha Lohiya",
+    "userEmail": "eshatibrewal30@gmail.com",
+    "userPhone": "09680102276",
+    "description": "Kundali Vishleshan (Horoscope Reading), Numerology Mastery, 7 Mukhi Rudraksha Pendant, Mangal Dosh Nivaran",
+    "amount": 28500,
+    "status": "paid",
+    "method": "razorpay",
+    "items": [
+      {
+        "id": "kundali-vishleshan",
+        "itemType": "service",
+        "name": "Kundali Vishleshan (Horoscope Reading)",
+        "price": 5500,
+        "quantity": 1,
+        "image": "/images/ref/services/kundali-vishleshan.png"
+      },
+      {
+        "id": "numerology-mastery",
+        "itemType": "course",
+        "name": "Numerology Mastery",
+        "price": 12000,
+        "quantity": 1,
+        "image": "/images/courses/numerology-course.jpg"
+      },
+      {
+        "id": "p2",
+        "itemType": "product",
+        "name": "7 Mukhi Rudraksha Pendant",
+        "price": 4500,
+        "quantity": 1,
+        "image": "/images/products/p2.jpg"
+      },
+      {
+        "id": "pu5",
+        "itemType": "pooja",
+        "name": "Mangal Dosh Nivaran",
+        "price": 6500,
+        "quantity": 1,
+        "image": "/images/astro/zodiac.jpg"
+      }
+    ],
+    "createdAt": "2026-06-08T05:58:48.252Z"
+  },
+  {
+    "id": "pay-1780898440069",
+    "type": "checkout",
+    "referenceId": "ord-1780898827387",
+    "userId": "user-1",
+    "userName": "Esha Lohiya",
+    "userEmail": "eshatibrewal30@gmail.com",
+    "userPhone": "09680102276",
+    "description": "Astrology Course",
+    "amount": 25000,
+    "status": "refunded",
+    "method": "admin_approval",
+    "transactionRefId": "njnion",
+    "items": [
+      {
+        "id": "vedic-astrology-cert",
+        "itemType": "course",
+        "name": "Astrology Course",
+        "price": 25000,
+        "quantity": 1,
+        "image": "/images/courses/vedic-astrology-course.jpg"
+      }
+    ],
+    "createdAt": "2026-06-08T06:00:40.069Z"
+  },
+  {
+    "id": "pay-1781087738359",
+    "type": "checkout",
+    "referenceId": "",
+    "userId": "user-1",
+    "userName": "suchita",
+    "userEmail": "user@demo.com",
+    "userPhone": "6367010131",
+    "description": "Vastu Consultancy, Numerology, Kundali Guidance through Voice Note, Astrology Course",
+    "amount": 33699,
+    "status": "pending",
+    "items": [
+      {
+        "id": "vastu-consultancy",
+        "itemType": "service",
+        "name": "Vastu Consultancy",
+        "price": 5500,
+        "quantity": 1,
+        "image": "/images/ref/services/vastu.png"
+      },
+      {
+        "id": "numerology",
+        "itemType": "service",
+        "name": "Numerology",
+        "price": 999,
+        "quantity": 1,
+        "image": "/images/ref/services/numerology.png"
+      },
+      {
+        "id": "voice-note-guidance",
+        "itemType": "service",
+        "name": "Kundali Guidance through Voice Note",
+        "price": 2200,
+        "quantity": 1,
+        "image": "/images/ref/services/voice-note-consultation.png"
+      },
+      {
+        "id": "vedic-astrology-cert",
+        "itemType": "course",
+        "name": "Astrology Course",
+        "price": 25000,
+        "quantity": 1,
+        "image": "/images/courses/vedic-astrology-course.jpg"
+      }
+    ],
+    "createdAt": "2026-06-10T10:35:38.359Z"
+  },
+  {
+    "id": "pay-1781087745312",
+    "type": "checkout",
+    "referenceId": "",
+    "userId": "user-1",
+    "userName": "suchita",
+    "userEmail": "user@demo.com",
+    "userPhone": "6367010131",
+    "description": "Vastu Consultancy, Numerology, Kundali Guidance through Voice Note, Astrology Course",
+    "amount": 33699,
+    "status": "pending",
+    "items": [
+      {
+        "id": "vastu-consultancy",
+        "itemType": "service",
+        "name": "Vastu Consultancy",
+        "price": 5500,
+        "quantity": 1,
+        "image": "/images/ref/services/vastu.png"
+      },
+      {
+        "id": "numerology",
+        "itemType": "service",
+        "name": "Numerology",
+        "price": 999,
+        "quantity": 1,
+        "image": "/images/ref/services/numerology.png"
+      },
+      {
+        "id": "voice-note-guidance",
+        "itemType": "service",
+        "name": "Kundali Guidance through Voice Note",
+        "price": 2200,
+        "quantity": 1,
+        "image": "/images/ref/services/voice-note-consultation.png"
+      },
+      {
+        "id": "vedic-astrology-cert",
+        "itemType": "course",
+        "name": "Astrology Course",
+        "price": 25000,
+        "quantity": 1,
+        "image": "/images/courses/vedic-astrology-course.jpg"
+      }
+    ],
+    "createdAt": "2026-06-10T10:35:45.312Z"
+  },
+  {
+    "id": "pay-1781092722935",
+    "type": "checkout",
+    "referenceId": "",
+    "userId": "user-1781091313437",
+    "userName": "ishant",
+    "userEmail": "123@gmail.com",
+    "userPhone": "35467876543",
+    "description": "Astrology Course",
+    "amount": 50000,
+    "status": "pending",
+    "items": [
+      {
+        "id": "vedic-astrology-cert",
+        "itemType": "course",
+        "name": "Astrology Course",
+        "price": 25000,
+        "quantity": 2,
+        "image": "/images/courses/vedic-astrology-course.jpg"
+      }
+    ],
+    "createdAt": "2026-06-10T11:58:42.935Z"
+  }
+]

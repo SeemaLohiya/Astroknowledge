@@ -23,6 +23,14 @@
 # misc
 .DS_Store
 *.pem
+Thumbs.db
+
+# user uploads (runtime only)
+/public/images/uploads/
+
+# editor
+.vscode/
+.idea/
 
 # debug
 npm-debug.log*
@@ -32,6 +40,12 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+
+# local user database (contains passwords — use seed on deploy)
+/data/users.json
+
+# temp scrape artifacts
+tmp-products.html
 
 # vercel
 .vercel

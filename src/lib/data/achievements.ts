@@ -1,0 +1,76 @@
+import { AchievementPhoto } from "../types";
+
+export const certifications = [
+  { title: "Shastracharya", subtitle: "Vedic Astrology & Jyotish Shastra" },
+  { title: "Certified Jyotish Acharya", subtitle: "Advanced Birth Chart & Dasha Analysis" },
+  { title: "Vastu Shastra Specialist", subtitle: "Residential & Commercial Vastu" },
+  { title: "Numerology Expert", subtitle: "Name Correction & Life Path Analysis" },
+  { title: "Ritual & Pooja Specialist", subtitle: "Sacred Ceremony & Anushthan" },
+  { title: "Kundli Milan Expert", subtitle: "Marriage Compatibility & Muhurat" },
+];
+
+export const achievementPhotos: AchievementPhoto[] = [
+  {
+    id: "p1",
+    image: "/images/achievements/events/01-aiivs-conference.png",
+    title: "AIIAVS World Astrology Conference",
+    titleHindi: "AIIAVS विश्व ज्योतिष सम्मेलन",
+    alt: "Speaking at the All India Institute for Astrological and Vedic Sciences conference",
+  },
+  {
+    id: "p2",
+    image: "/images/achievements/events/02-vedamritam-summit.png",
+    title: "International Astrology Research Summit 2023",
+    titleHindi: "अंतर्राष्ट्रीय ज्योतिष अनुसंधान समिट २०२३",
+    alt: "Certificate of participation at Vedamritam Astro-Vastu Summit, Jaipur",
+  },
+  {
+    id: "p3",
+    image: "/images/achievements/events/03-nakshatra-2024.png",
+    title: "Nakshatra 2024 — Holistic Wellness",
+    titleHindi: "नक्षत्र २०२४ — समग्र कल्याण",
+    alt: "Award presentation at Nakshatra 2024 holistic wellness convention",
+  },
+  {
+    id: "p4",
+    image: "/images/achievements/events/04-jaipur-jyotish-utsav.png",
+    title: "Jaipur Jyotish Utsav",
+    titleHindi: "जयपुर ज्योतिष उत्सव",
+    alt: "Receiving certificate at Jaipur Jyotish Utsav",
+  },
+  {
+    id: "p5",
+    image: "/images/achievements/events/05-krishna-foundation-award.png",
+    title: "Krishna Charitable Foundation Award",
+    titleHindi: "कृष्णा चैरिटेबल फाउंडेशन पुरस्कार",
+    alt: "Award presentation at Krishna Charitable Foundation, Jaipur",
+  },
+  {
+    id: "p6",
+    image: "/images/achievements/events/06-aiivs-award.png",
+    title: "AIIAVS Award Presentation",
+    titleHindi: "AIIAVS पुरस्कार समारोह",
+    alt: "Receiving AIIAVS award at All India Institute for Astrological and Vedic Sciences",
+  },
+  {
+    id: "p8",
+    image: "/images/achievements/events/08-jaipur-jyotish-award.png",
+    title: "Jaipur Jyotish Utsav Award",
+    titleHindi: "जयपुर ज्योतिष उत्सव पुरस्कार",
+    alt: "Award ceremony at Jaipur Jyotish Utsav with certificate and trophy",
+  },
+  {
+    id: "p9",
+    image: "/images/achievements/events/09-jaipur-jyotish-group.png",
+    title: "Jaipur Jyotish Utsav 2025",
+    titleHindi: "जयपुर ज्योतिष उत्सव २०२५",
+    alt: "Group photo at Jaipur Jyotish Utsav, December 2025",
+  },
+  {
+    id: "p10",
+    image: "/images/achievements/events/10-vip-guest-award.png",
+    title: "VIP Guest Recognition",
+    titleHindi: "विशिष्ट अतिथि सम्मान",
+    alt: "VIP Guest award presented to Acharya Seema Lohiya",
+  },
+];

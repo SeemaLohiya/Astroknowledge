@@ -1,0 +1,42 @@
+[
+  {
+    "type": "order_shipped",
+    "userId": "user-1",
+    "userName": "Demo User",
+    "referenceId": "ord-1",
+    "message": "Order delivered for Demo User",
+    "channel": "whatsapp",
+    "id": "notif-1781086983780",
+    "createdAt": "2026-06-10T10:23:03.780Z"
+  },
+  {
+    "type": "order_shipped",
+    "userId": "user-1",
+    "userName": "Demo User",
+    "referenceId": "ord-1",
+    "message": "Order shipped for Demo User",
+    "channel": "whatsapp",
+    "id": "notif-1781080903736",
+    "createdAt": "2026-06-10T08:41:43.736Z"
+  },
+  {
+    "type": "order_shipped",
+    "userId": "user-1",
+    "userName": "Demo User",
+    "referenceId": "ord-1",
+    "message": "Order delivered for Demo User",
+    "channel": "whatsapp",
+    "id": "notif-1781074492340",
+    "createdAt": "2026-06-10T06:54:52.340Z"
+  },
+  {
+    "type": "order_shipped",
+    "userId": "user-1",
+    "userName": "Demo User",
+    "referenceId": "ord-1",
+    "message": "Order shipped for Demo User",
+    "channel": "whatsapp",
+    "id": "notif-1781074490752",
+    "createdAt": "2026-06-10T06:54:50.752Z"
+  }
+]

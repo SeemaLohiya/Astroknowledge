@@ -1,0 +1,114 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
+import { isBirthProfileComplete } from "@/lib/profile";
+import { getPaidServices, hasPaidServiceAccess } from "@/lib/purchases";
+import { logNotification } from "@/lib/notifications-store";
+import { slotsStore } from "@/lib/slots-store";
+import { store } from "@/lib/store";
+
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const session = await getSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { id } = await params;
+  const body = await req.json();
+
+  if (body.action === "book") {
+    if (!hasPaidServiceAccess(session.userId)) {
+      return NextResponse.json(
+        { error: "Purchase and pay for a consultation service first" },
+        { status: 403 }
+      );
+    }
+    const paidServices = getPaidServices(session.userId);
+    if (body.serviceId && !paidServices.some((s) => s.id === body.serviceId)) {
+      return NextResponse.json(
+        { error: "You can only book slots for services you have purchased" },
+        { status: 403 }
+      );
+    }
+    const user = store.users.findById(session.userId);
+    if (!user || !isBirthProfileComplete(user)) {
+      return NextResponse.json({ error: "Complete your birth details before booking a slot" }, { status: 403 });
+    }
+    let paymentAmount = body.paymentAmount;
+    if (!paymentAmount && body.serviceId) {
+      const { catalogStore } = await import("@/lib/catalog-store");
+      const service = catalogStore.getById("services", body.serviceId) as { price?: number } | undefined;
+      paymentAmount = service?.price;
+    }
+    const slot = slotsStore.book(id, {
+      userId: session.userId,
+      userName: body.userName || session.name,
+      userEmail: body.userEmail || session.email,
+      userPhone: body.userPhone || user?.phone || "",
+      serviceId: body.serviceId,
+      serviceName: body.serviceName,
+      paymentAmount,
+      dob: user.dob,
+      birthTime: user.birthTime,
+      birthPlace: user.birthPlace,
+      dobUnknown: user.dobUnknown,
+      birthTimeUnknown: user.birthTimeUnknown,
+      birthPlaceUnknown: user.birthPlaceUnknown,
+    });
+    if (!slot) return NextResponse.json({ error: "Slot unavailable" }, { status: 409 });
+    logNotification({
+      type: "slot_booked",
+      userId: session.userId,
+      userName: slot.userName,
+      referenceId: slot.id,
+      message: `${slot.userName} booked slot ${slot.date} ${slot.time} for ${slot.serviceName || "consultation"}`,
+      channel: "system",
+    });
+    return NextResponse.json({ slot, message: "Booking submitted. Awaiting admin confirmation." });
+  }
+
+  if (session.role !== "admin") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (body.action === "confirm") {
+    const slot = slotsStore.confirm(id);
+    if (!slot) return NextResponse.json({ error: "Cannot confirm" }, { status: 400 });
+    logNotification({
+      type: "slot_confirmed",
+      userId: slot.userId,
+      userName: slot.userName,
+      referenceId: slot.id,
+      message: `Slot confirmed for ${slot.userName} — ${slot.date} ${slot.time}`,
+      channel: "whatsapp",
+    });
+    return NextResponse.json({ slot });
+  }
+
+  if (body.action === "reject") {
+    const slot = slotsStore.reject(id);
+    if (!slot) return NextResponse.json({ error: "Cannot reject" }, { status: 400 });
+    return NextResponse.json({ slot });
+  }
+
+  if (body.paymentStatus) {
+    const slot = slotsStore.updatePaymentStatus(id, body.paymentStatus);
+    if (!slot) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json({ slot });
+  }
+
+  if (body.status) {
+    const slot = slotsStore.updateStatus(id, body.status);
+    if (!slot) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json({ slot });
+  }
+
+  return NextResponse.json({ error: "Invalid action" }, { status: 400 });
+}
+
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const session = await getSession();
+  if (!session || session.role !== "admin") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const { id } = await params;
+  slotsStore.delete(id);
+  return NextResponse.json({ success: true });
+}

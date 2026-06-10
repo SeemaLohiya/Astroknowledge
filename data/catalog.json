@@ -1,0 +1,651 @@
+{
+  "products": [
+    {
+      "id": "p1",
+      "name": "5 Mukhi Rudraksha Mala",
+      "nameHindi": "५ मुखी रुद्राक्ष माला",
+      "description": "Authentic 5 Mukhi Rudraksha mala with 108+1 beads, energized by Vedic rituals.",
+      "price": 2100,
+      "originalPrice": 2800,
+      "category": "rudraksha",
+      "image": "/images/products/p1.png",
+      "rating": 4.9,
+      "reviews": 342,
+      "inStock": true,
+      "energized": true
+    },
+    {
+      "id": "p2",
+      "name": "7 Mukhi Rudraksha Pendant",
+      "nameHindi": "७ मुखी रुद्राक्ष पेंडेंट",
+      "description": "Rare 7 Mukhi Rudraksha in silver capping for wealth and abundance.",
+      "price": 4500,
+      "category": "rudraksha",
+      "image": "/images/products/p2.png",
+      "rating": 4.8,
+      "reviews": 189,
+      "inStock": true,
+      "energized": true
+    },
+    {
+      "id": "p3",
+      "name": "Parad Shivling",
+      "nameHindi": "पारद शिवलिंग",
+      "description": "Sacred Parad Shivling for home worship and spiritual elevation.",
+      "price": 8900,
+      "originalPrice": 12000,
+      "category": "parad",
+      "image": "/images/products/p3.png",
+      "rating": 5,
+      "reviews": 98,
+      "inStock": true,
+      "energized": true
+    },
+    {
+      "id": "p4",
+      "name": "Yellow Sapphire (Pukhraj)",
+      "nameHindi": "पुखराज रत्न",
+      "description": "Lab-certified natural Yellow Sapphire for Jupiter blessings.",
+      "price": 15000,
+      "category": "gemstone",
+      "image": "/images/products/p4.jpg",
+      "rating": 4.7,
+      "reviews": 156,
+      "inStock": true,
+      "energized": true
+    },
+    {
+      "id": "p5",
+      "name": "Blue Sapphire (Neelam)",
+      "nameHindi": "नीलम रत्न",
+      "description": "Premium Ceylon Blue Sapphire for Saturn strength and career growth.",
+      "price": 22000,
+      "category": "gemstone",
+      "image": "/images/products/p5.jpg",
+      "rating": 4.9,
+      "reviews": 87,
+      "inStock": true,
+      "energized": true
+    },
+    {
+      "id": "p6",
+      "name": "Shri Yantra Gold Plated",
+      "nameHindi": "श्री यंत्र",
+      "description": "Energized Shri Yantra for wealth, prosperity and divine blessings.",
+      "price": 3200,
+      "category": "yantra",
+      "image": "/images/products/p6.jpg",
+      "rating": 4.8,
+      "reviews": 234,
+      "inStock": true,
+      "energized": true
+    },
+    {
+      "id": "p7",
+      "name": "Mahamrityunjaya Yantra",
+      "nameHindi": "महामृत्युंजय यंत्र",
+      "description": "Powerful yantra for health protection and overcoming obstacles.",
+      "price": 1800,
+      "category": "yantra",
+      "image": "/images/products/p7.jpg",
+      "rating": 4.6,
+      "reviews": 167,
+      "inStock": true,
+      "energized": true
+    },
+    {
+      "id": "p8",
+      "name": "Silver Lakshmi Ganesh Idol",
+      "nameHindi": "चांदी लक्ष्मी गणेश",
+      "description": "Pure silver Lakshmi Ganesh idol for prosperity and new beginnings.",
+      "price": 6500,
+      "category": "silver",
+      "image": "/images/products/p8.png",
+      "rating": 4.9,
+      "reviews": 201,
+      "inStock": true,
+      "energized": true
+    },
+    {
+      "id": "p9",
+      "name": "Tulsi Mala 108 Beads",
+      "nameHindi": "तुलसी माला",
+      "description": "Sacred Tulsi mala for daily japa and spiritual purification.",
+      "price": 890,
+      "category": "mala",
+      "image": "/images/products/p9.png",
+      "rating": 4.7,
+      "reviews": 445,
+      "inStock": true,
+      "energized": true
+    },
+    {
+      "id": "p10",
+      "name": "Vastu Pyramid Set",
+      "nameHindi": "वास्तु पिरामिड",
+      "description": "Copper Vastu pyramid set for energy correction in home and office.",
+      "price": 2400,
+      "category": "vastu",
+      "image": "/images/products/p10.png",
+      "rating": 4.5,
+      "reviews": 112,
+      "inStock": true,
+      "energized": true
+    },
+    {
+      "id": "p11",
+      "name": "Navgraha Shanti Kit",
+      "nameHindi": "नवग्रह शांति किट",
+      "description": "Complete Navgraha Shanti pooja kit with all essential samagri.",
+      "price": 3500,
+      "category": "pooja-kit",
+      "image": "/images/products/p11.png",
+      "rating": 4.8,
+      "reviews": 178,
+      "inStock": true,
+      "energized": true
+    },
+    {
+      "id": "p12",
+      "name": "Sphatik Crystal Ball",
+      "nameHindi": "स्फटिक गोला",
+      "description": "Natural sphatik crystal ball for meditation and positive energy.",
+      "price": 4200,
+      "category": "sphatik",
+      "image": "/images/products/p12.png",
+      "rating": 4.6,
+      "reviews": 93,
+      "inStock": true,
+      "energized": true
+    },
+    {
+      "id": "p13",
+      "name": "Amethyst Healing Crystal",
+      "nameHindi": "एमेथिस्ट क्रिस्टल",
+      "description": "Natural amethyst for mental peace, intuition and stress relief.",
+      "price": 1600,
+      "category": "crystal",
+      "image": "/images/products/p13.png",
+      "rating": 4.7,
+      "reviews": 156,
+      "inStock": true,
+      "energized": true
+    },
+    {
+      "id": "p14",
+      "name": "Feng Shui Money Frog",
+      "nameHindi": "धन मेंढक",
+      "description": "Golden money frog for attracting wealth and financial prosperity.",
+      "price": 1200,
+      "category": "feng-shui",
+      "image": "/images/products/p14.png",
+      "rating": 4.4,
+      "reviews": 89,
+      "inStock": true,
+      "energized": true
+    },
+    {
+      "id": "p15",
+      "name": "Hanuman Chalisa Yantra Pendant",
+      "nameHindi": "हनुमान चालीसा यंत्र",
+      "description": "Energized Hanuman Chalisa yantra pendant for courage and protection.",
+      "price": 980,
+      "category": "pendant",
+      "image": "/images/products/p15.png",
+      "rating": 4.9,
+      "reviews": 312,
+      "inStock": true,
+      "energized": true
+    },
+    {
+      "id": "p16",
+      "name": "Durga Mata Brass Statue",
+      "nameHindi": "दुर्गा माता प्रतिमा",
+      "description": "Beautiful brass Durga Mata statue for home temple worship.",
+      "price": 5500,
+      "category": "statue",
+      "image": "/images/products/p16.png",
+      "rating": 4.8,
+      "reviews": 67,
+      "inStock": true,
+      "energized": true
+    },
+    {
+      "id": "p17",
+      "name": "Ruby (Manik) Gemstone",
+      "nameHindi": "माणिक्य रत्न",
+      "description": "Natural Burmese Ruby for leadership and confidence.",
+      "price": 28000,
+      "category": "gemstone",
+      "image": "/images/products/p17.png",
+      "rating": 4.9,
+      "reviews": 45,
+      "inStock": true,
+      "energized": true
+    },
+    {
+      "id": "p18",
+      "name": "Emerald (Panna) Gemstone",
+      "nameHindi": "पन्ना रत्न",
+      "description": "Colombian Emerald for intelligence and business acumen.",
+      "price": 18500,
+      "category": "gemstone",
+      "image": "/images/products/p18.jpg",
+      "rating": 4.8,
+      "reviews": 72,
+      "inStock": true,
+      "energized": true
+    },
+    {
+      "id": "p19",
+      "name": "1 Mukhi Rudraksha",
+      "nameHindi": "१ मुखी रुद्राक्ष",
+      "description": "Extremely rare 1 Mukhi Rudraksha, certified authentic.",
+      "price": 35000,
+      "category": "rudraksha",
+      "image": "/images/products/p19.png",
+      "rating": 5,
+      "reviews": 23,
+      "inStock": true,
+      "energized": true
+    },
+    {
+      "id": "p20",
+      "name": "Crystal Healing Set",
+      "nameHindi": "क्रिस्टल हीलिंग सेट",
+      "description": "7 chakra crystal set for complete energy balancing.",
+      "price": 2800,
+      "category": "crystal",
+      "image": "/images/products/p20.png",
+      "rating": 4.6,
+      "reviews": 134,
+      "inStock": true,
+      "energized": true
+    }
+  ],
+  "services": [
+    {
+      "id": "kundali-vishleshan",
+      "title": "Kundali Vishleshan (Horoscope Reading)",
+      "titleHindi": "कुंडली विश्लेषण",
+      "description": "Complete horoscope analysis with dosha identification, planetary positions, and customized Vedic remedies by Acharya Seema Lohiya.",
+      "duration": "30 min",
+      "price": 5500,
+      "image": "/images/ref/services/kundali-vishleshan.png",
+      "features": [
+        "Complete birth chart analysis",
+        "Dosha identification",
+        "Personalized remedies",
+        "Career & marriage guidance"
+      ],
+      "popular": true
+    },
+    {
+      "id": "kundli-milan",
+      "title": "Kundli Milan (Match Making)",
+      "titleHindi": "कुंडली मिलान",
+      "description": "Comprehensive matchmaking using Ashtakoot method with Manglik Dosha, Navamsa chart, and Marriage Muhurat analysis.",
+      "duration": "35 min",
+      "price": 5500,
+      "image": "/images/ref/services/kundli-milan.png",
+      "features": [
+        "8 Gunas analysis",
+        "Manglik Dosha check",
+        "Navamsa chart",
+        "Marriage Muhurat"
+      ],
+      "popular": true
+    },
+    {
+      "id": "ask-question",
+      "title": "Ask A Question",
+      "titleHindi": "प्रश्न पूछें",
+      "description": "Get a precise answer to your specific question based on detailed horoscope analysis.",
+      "duration": "15 min",
+      "price": 2800,
+      "image": "/images/ref/services/ask-question.png",
+      "features": [
+        "Single focused question",
+        "Horoscope-based answer",
+        "Quick turnaround",
+        "Written summary"
+      ]
+    },
+    {
+      "id": "vastu-consultancy",
+      "title": "Vastu Consultancy",
+      "titleHindi": "वास्तु परामर्श",
+      "description": "Home and office Vastu consultation with practical, affordable suggestions without demolition.",
+      "duration": "45 min",
+      "price": 5500,
+      "image": "/images/ref/services/vastu.png",
+      "features": [
+        "Home & office analysis",
+        "No demolition needed",
+        "Practical remedies",
+        "Floor plan review"
+      ]
+    },
+    {
+      "id": "numerology",
+      "title": "Numerology",
+      "titleHindi": "अंक ज्योतिष",
+      "description": "Analysis of date of birth and name numbers covering life purpose, karmic lessons, and strengths.",
+      "duration": "25 min",
+      "price": 999,
+      "image": "/images/ref/services/numerology.png",
+      "features": [
+        "Name correction",
+        "Lucky numbers",
+        "Life path analysis",
+        "Business name guidance"
+      ]
+    },
+    {
+      "id": "voice-note-guidance",
+      "title": "Kundali Guidance through Voice Note",
+      "titleHindi": "वॉयस नोट मार्गदर्शन",
+      "description": "Quick insights and guidance via personalized voice note. Perfect for precise questions.",
+      "duration": "10 min",
+      "price": 2200,
+      "image": "/images/ref/services/voice-note-consultation.png",
+      "features": [
+        "Personalized voice note",
+        "Quick delivery",
+        "Precise guidance",
+        "Listen anytime"
+      ]
+    },
+    {
+      "id": "palmistry",
+      "title": "Palmistry Reading",
+      "titleHindi": "हस्तरेखा विश्लेषण",
+      "description": "Detailed palm reading revealing life path, career potential, relationships, and health indicators.",
+      "duration": "30 min",
+      "price": 3200,
+      "image": "/images/ref/services/kundali-vishleshan.png",
+      "features": [
+        "Life line analysis",
+        "Career indicators",
+        "Relationship insights",
+        "Health markers"
+      ]
+    }
+  ],
+  "courses": [
+    {
+      "id": "vedic-astrology-cert",
+      "title": "Astrology Course",
+      "titleHindi": "वैदिक ज्योतिष प्रमाणन",
+      "description": "Comprehensive Vedic astrology training covering birth charts, dashas, yogas, and remedies — certified by Acharya Seema Lohiya.",
+      "duration": "6 months",
+      "price": 25000,
+      "image": "/images/courses/vedic-astrology-course.jpg",
+      "features": [
+        "Birth chart analysis",
+        "Dosha identification",
+        "Remedy planning",
+        "Certificate on completion"
+      ],
+      "popular": true,
+      "sessionDescription": "This certification program is designed for serious students who want to read birth charts with confidence using authentic Vedic principles.\n\nEach live session walks through real chart examples — Lagna, Moon sign, planetary strengths, house lords, and the logic behind predictions. You will learn how to identify doshas, yogas, and dasha periods, and how to recommend practical remedies aligned with tradition.\n\nThe curriculum is structured in progressive modules: foundations of Jyotish, detailed Kundali analysis, marriage and career readings, health indicators, and muhurta basics. Every module includes guided practice, Q&A, and homework charts reviewed in the next session.\n\nBy the end of the course you will be able to prepare a structured consultation report, explain planetary influences clearly to clients, and apply ethical guidance standards. A certificate is awarded on successful completion of assignments and the final assessment."
+    },
+    {
+      "id": "ritual-specialist",
+      "title": "Ritual Specialist Course",
+      "titleHindi": "अनुष्ठान विशेषज्ञ पाठ्यक्रम",
+      "description": "Learn sacred pooja rituals, mantras, and ceremonial procedures performed by experienced Vedic Pandits.",
+      "duration": "3 months",
+      "price": 15000,
+      "image": "/images/courses/ritual-specialist-course.jpg",
+      "features": [
+        "Pooja procedures",
+        "Mantra chanting",
+        "Ritual timing",
+        "Practical training"
+      ],
+      "sessionDescription": "This course trains you in the step-by-step conduct of Vedic poojas — from sankalp and avahan to homa, aarti, and visarjan — with correct pronunciation and ritual sequence.\n\nSessions cover the philosophy behind each ritual, the role of deities and offerings, and how to adapt procedures for home, temple, and special occasions. You will practice mantra chanting, learn common stotras, and understand auspicious timing (muhurta) for ceremonies.\n\nHands-on modules include Satyanarayan Katha, Navgraha Shanti, Lakshmi-Ganesh pooja, and life-event rituals such as naamkaran and griha pravesh basics. Materials, samagri lists, and safety guidelines are explained in detail.\n\nGraduates gain the confidence to assist in or independently conduct standard poojas with devotion, accuracy, and respect for tradition."
+    },
+    {
+      "id": "numerology-mastery",
+      "title": "Numerology Mastery",
+      "titleHindi": "अंक ज्योतिष विशेषज्ञता",
+      "description": "Master name and date numerology for life path analysis, business naming, and personal guidance.",
+      "duration": "2 months",
+      "price": 12000,
+      "image": "/images/courses/numerology-course.jpg",
+      "features": [
+        "Life path numbers",
+        "Name correction",
+        "Business numerology",
+        "Case studies"
+      ],
+      "sessionDescription": "Numerology Mastery teaches Chaldean and Vedic-inspired number systems applied to names, dates of birth, and important life events.\n\nEach session explores life path, destiny, soul urge, and personality numbers — how they interact and what they reveal about strengths, challenges, and karmic lessons. You will work through case studies for career decisions, relationship compatibility, and personal growth.\n\nA major focus is name correction: when and how to adjust spelling for business brands, newborns, or individuals seeking alignment with favourable vibrations. Business numerology modules cover launch dates, brand names, and partnership numbers.\n\nThe course includes worksheets, live calculations, and feedback on your analyses so you can offer clear, ethical numerology guidance to clients."
+    },
+    {
+      "id": "vastu-fundamentals",
+      "title": "Vastu Shastra Fundamentals",
+      "titleHindi": "वास्तु शास्त्र मूलभूत",
+      "description": "Foundation course in Vastu Shastra for home, office, and commercial space energy correction.",
+      "duration": "2 months",
+      "price": 14000,
+      "image": "/images/courses/vastu-course.jpg",
+      "features": [
+        "Direction analysis",
+        "Remedy application",
+        "Floor plan review",
+        "Practical corrections"
+      ],
+      "popular": true,
+      "sessionDescription": "Vastu Shastra Fundamentals introduces the five elements, directions, and zones that govern harmony in living and working spaces.\n\nSessions explain how to analyse a floor plan: entrance placement, kitchen and bedroom zones, toilet locations, and the flow of prana through a building. You will learn simple, non-destructive remedies using colour, placement, symbols, and elemental balance.\n\nThe course covers residential Vastu in depth, with additional modules on small offices and shops. Common problems — blocked wealth corners, disturbed sleep, recurring obstacles — are diagnosed using standard Vastu grids and practical correction methods.\n\nBy completion you will be able to conduct a basic Vastu survey, prepare a written recommendation report, and suggest remedies clients can implement immediately."
+    }
+  ],
+  "pooja": [
+    {
+      "id": "pu1",
+      "title": "Satyanarayan Katha",
+      "titleHindi": "सत्यनारायण कथा",
+      "description": "Sacred Satyanarayan Katha for prosperity, health and fulfillment of wishes.",
+      "price": 5100,
+      "duration": "3 hours",
+      "benefits": [
+        "Prosperity",
+        "Health blessings",
+        "Wish fulfillment"
+      ],
+      "image": "/images/astro/pooja.jpg"
+    },
+    {
+      "id": "pu2",
+      "title": "Navgraha Shanti Puja",
+      "titleHindi": "नवग्रह शांति पूजा",
+      "description": "Complete Navgraha Shanti puja to pacify all nine planets.",
+      "price": 7500,
+      "duration": "4 hours",
+      "benefits": [
+        "Planetary peace",
+        "Obstacle removal",
+        "Life harmony"
+      ],
+      "image": "/images/astro/planets.jpg"
+    },
+    {
+      "id": "pu3",
+      "title": "Mahamrityunjaya Jaap",
+      "titleHindi": "महामृत्युंजय जाप",
+      "description": "Powerful 125,000 Mahamrityunjaya mantra jaap for health and longevity.",
+      "price": 11000,
+      "duration": "7 days",
+      "benefits": [
+        "Health protection",
+        "Longevity",
+        "Fear removal"
+      ],
+      "image": "/images/astro/vedic.jpg"
+    },
+    {
+      "id": "pu4",
+      "title": "Griha Pravesh Puja",
+      "titleHindi": "गृह प्रवेश पूजा",
+      "description": "Auspicious housewarming ceremony for new home blessings.",
+      "price": 4500,
+      "duration": "2 hours",
+      "benefits": [
+        "Home blessings",
+        "Positive energy",
+        "Family harmony"
+      ],
+      "image": "/images/products/p10.jpg"
+    },
+    {
+      "id": "pu5",
+      "title": "Mangal Dosh Nivaran",
+      "titleHindi": "मंगल दोष निवारण",
+      "description": "Special puja to neutralize Mangal Dosha for marriage and career.",
+      "price": 6500,
+      "duration": "3 hours",
+      "benefits": [
+        "Dosha removal",
+        "Marriage ease",
+        "Career stability"
+      ],
+      "image": "/images/astro/zodiac.jpg"
+    },
+    {
+      "id": "pu6",
+      "title": "Rudrabhishek",
+      "titleHindi": "रुद्राभिषेक",
+      "description": "Sacred Rudrabhishek for Lord Shiva's blessings and spiritual elevation.",
+      "price": 8500,
+      "duration": "2.5 hours",
+      "benefits": [
+        "Divine blessings",
+        "Sin removal",
+        "Spiritual growth"
+      ],
+      "image": "/images/products/p3.jpg"
+    }
+  ],
+  "categories": [
+    {
+      "id": "rudraksha",
+      "name": "Rudraksha",
+      "nameHindi": "रुद्राक्ष",
+      "icon": "📿",
+      "description": "Sacred beads for spiritual protection",
+      "image": "/images/ref/categories/rudraksha.jpeg"
+    },
+    {
+      "id": "pendant",
+      "name": "Pendant",
+      "nameHindi": "पेंडेंट",
+      "icon": "💠",
+      "description": "Energized spiritual pendants",
+      "image": "/images/ref/categories/Pendants.jpeg"
+    },
+    {
+      "id": "parad",
+      "name": "Parad",
+      "nameHindi": "पारद",
+      "icon": "🪔",
+      "description": "Sacred mercury items for prosperity",
+      "image": "/images/ref/categories/Parad.jpeg"
+    },
+    {
+      "id": "mala",
+      "name": "Mala / Bracelet",
+      "nameHindi": "माला / कंगन",
+      "icon": "📿",
+      "description": "Prayer malas and bracelets",
+      "image": "/images/ref/categories/Mala.jpeg"
+    },
+    {
+      "id": "silver",
+      "name": "Silver",
+      "nameHindi": "चांदी",
+      "icon": "🥈",
+      "description": "Pure silver spiritual items",
+      "image": "/images/ref/categories/silver-items.jpeg"
+    },
+    {
+      "id": "gemstone",
+      "name": "GemStone",
+      "nameHindi": "रत्न",
+      "icon": "💎",
+      "description": "Certified natural gemstones",
+      "image": "/images/ref/categories/Gemstones.jpeg"
+    },
+    {
+      "id": "yantra",
+      "name": "Yantra",
+      "nameHindi": "यंत्र",
+      "icon": "🔺",
+      "description": "Sacred geometric yantras",
+      "image": "/images/ref/categories/Yantra.jpeg"
+    },
+    {
+      "id": "statue",
+      "name": "God Statue",
+      "nameHindi": "देवी-देवता प्रतिमा",
+      "icon": "🗿",
+      "description": "Divine deity statues",
+      "image": "/images/ref/categories/god-statue.jpeg"
+    },
+    {
+      "id": "vastu",
+      "name": "Vastu Item",
+      "nameHindi": "वास्तु सामग्री",
+      "icon": "🏛️",
+      "description": "Vastu correction items",
+      "image": "/images/ref/categories/Yantra.jpeg"
+    },
+    {
+      "id": "pooja-kit",
+      "name": "Pooja Combo & Kit",
+      "nameHindi": "पूजा सामग्री",
+      "icon": "🎁",
+      "description": "Complete pooja kits",
+      "image": "/images/ref/categories/Mala.jpeg"
+    },
+    {
+      "id": "sphatik",
+      "name": "Sphatik",
+      "nameHindi": "स्फटिक",
+      "icon": "🔮",
+      "description": "Crystal sphatik items",
+      "image": "/images/ref/categories/Sphatik.jpeg"
+    },
+    {
+      "id": "crystal",
+      "name": "Crystal",
+      "nameHindi": "क्रिस्टल",
+      "icon": "✨",
+      "description": "Healing crystals",
+      "image": "/images/ref/categories/Crystal.jpeg"
+    },
+    {
+      "id": "feng-shui",
+      "name": "Feng Shui Item",
+      "nameHindi": "फेंग शुई",
+      "icon": "🎋",
+      "description": "Feng shui prosperity items",
+      "image": "/images/ref/categories/feng-shui.jpeg"
+    },
+    {
+      "id": "special",
+      "name": "Special Items",
+      "nameHindi": "विशेष सामग्री",
+      "icon": "⭐",
+      "description": "Rare spiritual artifacts",
+      "image": "/images/ref/categories/Gemstones.jpeg"
+    },
+    {
+      "name": "Sfdgnn",
+      "nameHindi": "",
+      "image": "/images/products/p1.jpg",
+      "id": "sfdgnn",
+      "icon": "",
+      "description": "Sfdgnn"
+    }
+  ]
+}
