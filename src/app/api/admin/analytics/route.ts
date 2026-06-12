@@ -13,6 +13,14 @@ function monthKey(dateStr: string) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
+/** Only count verified paid checkout/order payments (excludes orphan seed rows). */
+function isRealPaidPayment(p: ReturnType<typeof paymentsStore.getAll>[number]) {
+  if (p.status !== "paid") return false;
+  if (!p.method) return false;
+  if (!p.userId || !p.amount || p.amount <= 0) return false;
+  return true;
+}
+
 export async function GET() {
   try {
     const session = await getSession();
@@ -21,18 +29,19 @@ export async function GET() {
     }
 
     const payments = paymentsStore.getAll();
-    const paid = payments.filter((p) => p.status === "paid");
+    const paid = payments.filter(isRealPaidPayment);
     const pendingPayments = payments.filter((p) => p.status === "awaiting_approval" || p.status === "pending");
     const revenue = paid.reduce((s, p) => s + p.amount, 0);
     const slots = slotsStore.getAll();
     const pendingSlots = slots.filter((s) => s.status === "pending").length;
     const legacyPending = store.bookings.getAll().filter((b) => b.status === "pending").length;
-    const orders = store.orders.getAll();
+    const paidOrderIds = new Set(paid.map((p) => p.referenceId).filter(Boolean));
+    const orders = store.orders.getAll().filter((o) => paidOrderIds.has(o.id) || paid.some((p) => p.userId === o.userId && p.amount === o.total));
     const users = store.users.getAll().filter((u) => u.role === "user");
 
     const serviceCounts: Record<string, number> = {};
-    const categoryRevenue: Record<string, number> = { product: 0, service: 0, course: 0, pooja: 0 };
-    const categoryCounts: Record<string, number> = { product: 0, service: 0, course: 0, pooja: 0 };
+    const categoryRevenue: Record<string, number> = { product: 0, service: 0, course: 0, pooja: 0, healing: 0 };
+    const categoryCounts: Record<string, number> = { product: 0, service: 0, course: 0, pooja: 0, healing: 0 };
     const methodRevenue = { razorpay: 0, admin_approval: 0 };
     const methodCounts = { razorpay: 0, admin_approval: 0 };
 
@@ -83,7 +92,8 @@ export async function GET() {
     };
 
     const avgOrderValue = paid.length > 0 ? Math.round(revenue / paid.length) : 0;
-    const conversionRate = payments.length > 0 ? Math.round((paid.length / payments.length) * 100) : 0;
+    const checkoutAttempts = payments.filter((p) => p.type === "checkout" || p.type === "order").length;
+    const conversionRate = checkoutAttempts > 0 ? Math.round((paid.length / checkoutAttempts) * 100) : 0;
 
     return NextResponse.json({
       revenue,

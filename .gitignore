@@ -44,6 +44,10 @@ yarn-error.log*
 
 # local user database (contains passwords — use seed on deploy)
 /data/users.json
+# runtime transaction data (created on server)
+/data/payments.json
+/data/notifications.json
+/data/vouchers.json
 
 # temp scrape artifacts
 tmp-products.html

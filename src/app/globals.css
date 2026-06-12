@@ -128,6 +128,18 @@ iframe {
   }
 }
 
+@media (max-width: 768px) {
+  .blur-3xl {
+    filter: none !important;
+    opacity: 0.35 !important;
+  }
+  .hero-3d-scene,
+  .navgraha-cosmos .navgraha-ambient,
+  .navgraha-cosmos .navgraha-ambient-2 {
+    display: none !important;
+  }
+}
+
 ::selection {
   background: var(--gold);
   color: var(--text-white);

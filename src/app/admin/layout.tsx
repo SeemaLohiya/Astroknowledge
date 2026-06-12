@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const navItems = [
   { href: "/admin", icon: LayoutDashboard, label: "Overview", exact: true },
@@ -64,23 +64,52 @@ function AdminNav({ pathname, onNavigate }: { pathname: string; onNavigate?: () 
   );
 }
 
+async function verifyAdmin(retries = 3) {
+  for (let attempt = 0; attempt < retries; attempt++) {
+    const res = await fetchJson<{ user?: { name: string; role: string } | null }>("/api/auth/me", {
+      cache: "no-store",
+    });
+    if (res.ok && res.data?.user?.role === "admin") return { ok: true as const, user: res.data.user };
+    if (res.status === 401 || res.status === 403) return { ok: false as const, reason: "auth" as const };
+    if (attempt < retries - 1) await new Promise((r) => setTimeout(r, 800 * (attempt + 1)));
+  }
+  return { ok: false as const, reason: "network" as const };
+}
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [user, setUser] = useState<{ name: string } | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [authState, setAuthState] = useState<"loading" | "ok" | "network-error">("loading");
+
+  const checkAuth = useCallback(async () => {
+    const result = await verifyAdmin();
+    if (result.ok) {
+      setUser(result.user);
+      setAuthState("ok");
+      return;
+    }
+    if (result.reason === "auth") {
+      router.push("/login?redirect=/admin");
+      return;
+    }
+    setAuthState("network-error");
+  }, [router]);
 
   useEffect(() => {
-    async function checkAuth() {
-      const res = await fetchJson<{ user?: { name: string; role: string } | null }>("/api/auth/me");
-      if (!res.data?.user || res.data.user.role !== "admin") {
-        router.push("/login");
-        return;
-      }
-      setUser(res.data.user);
-    }
     void checkAuth();
-  }, [router]);
+  }, [checkAuth]);
+
+  useEffect(() => {
+    if (authState !== "ok") return;
+    const refresh = () => {
+      void fetch("/api/auth/refresh", { method: "POST", cache: "no-store" }).catch(() => {});
+    };
+    refresh();
+    const interval = setInterval(refresh, 10 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [authState]);
 
   useEffect(() => {
     setMobileOpen(false);
@@ -90,6 +119,33 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/login");
   };
+
+  if (authState === "loading") {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-20 text-center text-text-muted">
+        Loading admin panel…
+      </div>
+    );
+  }
+
+  if (authState === "network-error") {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-20 text-center">
+        <p className="text-text-primary font-semibold">Connection interrupted</p>
+        <p className="mt-2 text-sm text-text-muted">The server may be waking up. Your session is still valid.</p>
+        <button
+          type="button"
+          onClick={() => {
+            setAuthState("loading");
+            void checkAuth();
+          }}
+          className="mt-6 rounded-xl bg-gold px-6 py-3 text-sm font-semibold text-white"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 md:py-8">

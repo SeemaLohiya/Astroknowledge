@@ -54,6 +54,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   service: "Services",
   course: "Courses",
   pooja: "Pooja",
+  healing: "Healing",
 };
 
 function BarChart({ data, maxValue }: { data: { label: string; value: number }[]; maxValue: number }) {
@@ -137,6 +138,14 @@ export default function AdminPage() {
 
       {error && (
         <p className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
+      )}
+
+      {analytics && analytics.revenue === 0 && analytics.paidCount === 0 && (
+        <RevealOnScroll className="mb-6">
+          <div className="rounded-2xl border border-gold/20 bg-white/80 px-5 py-4 text-sm text-text-body">
+            No verified payments yet — revenue and charts reflect only <strong>paid</strong> Razorpay or admin-approved transactions.
+          </div>
+        </RevealOnScroll>
       )}
 
       {pendingTotal > 0 && (

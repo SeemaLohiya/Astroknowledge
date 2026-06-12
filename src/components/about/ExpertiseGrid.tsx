@@ -4,7 +4,7 @@ import { FadeIn } from "@/components/animations/FadeIn";
 import { ShimmerText } from "@/components/animations/ShimmerText";
 import { expertiseAreas, headlineCertifications } from "@/lib/data/expertise";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "framer-motion";
 import { Award, GraduationCap, Sparkles } from "lucide-react";
 import { useRef } from "react";
 
@@ -26,6 +26,7 @@ function ExpertiseCard({
   index: number;
 }) {
   const { lang } = useLanguage();
+  const reduceMotion = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -39,17 +40,18 @@ function ExpertiseCard({
       whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ delay: (index % 6) * 0.06, duration: 0.5 }}
-      style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-      onMouseMove={(e) => {
-        const rect = ref.current?.getBoundingClientRect();
-        if (!rect) return;
-        x.set(e.clientX - rect.left - rect.width / 2);
-        y.set(e.clientY - rect.top - rect.height / 2);
-      }}
-      onMouseLeave={() => {
-        x.set(0);
-        y.set(0);
-      }}
+      style={reduceMotion ? undefined : { rotateX, rotateY, transformStyle: "preserve-3d" }}
+      onMouseMove={
+        reduceMotion
+          ? undefined
+          : (e) => {
+              const rect = ref.current?.getBoundingClientRect();
+              if (!rect) return;
+              x.set(e.clientX - rect.left - rect.width / 2);
+              y.set(e.clientY - rect.top - rect.height / 2);
+            }
+      }
+      onMouseLeave={reduceMotion ? undefined : () => { x.set(0); y.set(0); }}
       className={`group relative overflow-hidden rounded-2xl border border-gold/20 bg-gradient-to-br ${accent} p-5 shadow-sm transition-shadow hover:shadow-xl hover:shadow-gold/10`}
     >
       <motion.div
