@@ -1,4 +1,4 @@
-import { Booking, BookingSlot, Order, PaymentRecord, User, Voucher } from "../types";
+import { AdminNotification, Booking, BookingSlot, EditableSiteContent, Order, PaymentRecord, SavedAddress, User, Voucher } from "../types";
 import { CatalogType } from "../types";
 import { connectRedis } from "./redis-connect";
 import type { CatalogData } from "./catalog-repo";
@@ -254,4 +254,35 @@ export async function redisGetSlots(): Promise<BookingSlot[]> {
 
 export async function redisSaveSlots(slots: BookingSlot[]) {
   await setJson("slots", slots);
+}
+
+// ── Notifications ──
+
+export async function redisGetNotifications(): Promise<AdminNotification[]> {
+  return getJson<AdminNotification[]>("notifications", []);
+}
+
+export async function redisSaveNotifications(notifications: AdminNotification[]) {
+  await setJson("notifications", notifications);
+}
+
+// ── Addresses ──
+
+export async function redisGetAddresses(): Promise<SavedAddress[]> {
+  return getJson<SavedAddress[]>("addresses", []);
+}
+
+export async function redisSaveAddresses(addresses: SavedAddress[]) {
+  await setJson("addresses", addresses);
+}
+
+// ── Site content ──
+
+export async function redisGetContent(): Promise<EditableSiteContent | null> {
+  const raw = await getJson<EditableSiteContent | null>("content", null);
+  return raw;
+}
+
+export async function redisSaveContent(content: EditableSiteContent) {
+  await setJson("content", content);
 }

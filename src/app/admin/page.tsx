@@ -6,11 +6,9 @@ import { RevealOnScroll } from "@/components/animations/RevealOnScroll";
 import { fetchJson } from "@/lib/fetch-json";
 import { BookingSlot, Order } from "@/lib/types";
 import {
-  AlertCircle,
   ArrowRight,
   BarChart3,
   Calendar,
-  Clock,
   CreditCard,
   IndianRupee,
   Package,
@@ -128,7 +126,6 @@ export default function AdminPage() {
     };
   }, [load]);
 
-  const pendingTotal = analytics ? analytics.pendingPayments + analytics.pendingBookings : 0;
   const maxMonthly = analytics ? Math.max(...analytics.monthlyRevenue.map((m) => m.amount), 1) : 1;
   const maxCategory = analytics
     ? Math.max(...Object.values(analytics.categoryRevenue), 1)
@@ -187,24 +184,6 @@ export default function AdminPage() {
           <div className="rounded-2xl border border-gold/20 bg-white/80 px-5 py-4 text-sm text-text-body">
             No verified payments yet — revenue and charts reflect only <strong>paid</strong> Razorpay or admin-approved transactions.
           </div>
-        </RevealOnScroll>
-      )}
-
-      {pendingTotal > 0 && (
-        <RevealOnScroll className="mb-6">
-          <Link
-            href="/admin/payments"
-            className="flex items-center gap-3 rounded-2xl border border-amber-300/50 bg-gradient-to-r from-amber-50 to-orange/10 px-5 py-4 transition-colors hover:border-gold/40"
-          >
-            <AlertCircle className="h-5 w-5 shrink-0 text-gold" />
-            <div className="flex-1">
-              <p className="font-semibold text-text-primary">{pendingTotal} pending action{pendingTotal !== 1 ? "s" : ""}</p>
-              <p className="text-sm text-text-muted">
-                {analytics?.pendingPayments || 0} payment(s) · {analytics?.pendingBookings || 0} booking(s) need review
-              </p>
-            </div>
-            <ArrowRight className="h-4 w-4 text-gold" />
-          </Link>
         </RevealOnScroll>
       )}
 

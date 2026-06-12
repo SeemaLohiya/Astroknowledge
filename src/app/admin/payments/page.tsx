@@ -29,7 +29,7 @@ export default function AdminPaymentsPage() {
     if (filters.status !== "all") params.set("status", filters.status);
     if (filters.type !== "all") params.set("type", filters.type);
     if (filters.method !== "all") params.set("method", filters.method);
-    const res = await fetchJson<{ payments?: PaymentRecord[] }>(`/api/payments?${params}`);
+    const res = await fetchJson<{ payments?: PaymentRecord[] }>(`/api/payments?${params}`, { cache: "no-store" });
     setPayments(res.data?.payments || []);
     setLoading(false);
   }, [filters]);

@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     });
     if (!payment) return NextResponse.json({ error: "Failed to process" }, { status: 500 });
 
-    logNotification({
+    await logNotification({
       type: "payment_received",
       userId: session.userId,
       userName: session.name,
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
   });
   if (!payment) return NextResponse.json({ error: "Failed to process" }, { status: 500 });
 
-  logNotification({
+  await logNotification({
     type: "payment_submitted",
     userId: session.userId,
     userName: session.name,

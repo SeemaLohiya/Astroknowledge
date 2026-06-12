@@ -33,13 +33,16 @@ export default function AdminBookingsPage() {
   const { items: services } = useCatalog<Service>("services");
 
   const loadSlots = useCallback(async () => {
-    const res = await fetchJson<{ slots?: BookingSlot[]; pendingCount?: number }>("/api/slots");
-    setAllSlots(res.data?.slots || []);
-    setPendingCount(res.data?.pendingCount || 0);
+    const res = await fetchJson<{ slots?: BookingSlot[]; pendingCount?: number }>("/api/slots", { cache: "no-store" });
+    const slots = res.data?.slots || [];
+    const pending = res.data?.pendingCount || 0;
+    setAllSlots(slots);
+    setPendingCount(pending);
+    if (pending > 0) setSlotTab("pending");
   }, []);
 
   const loadLegacy = useCallback(async () => {
-    const res = await fetchJson<{ bookings?: Booking[] }>("/api/bookings");
+    const res = await fetchJson<{ bookings?: Booking[] }>("/api/bookings", { cache: "no-store" });
     setLegacyBookings(res.data?.bookings || []);
   }, []);
 
@@ -103,11 +106,17 @@ export default function AdminBookingsPage() {
   };
 
   const slotAction = async (id: string, body: Record<string, string>) => {
-    await fetch(`/api/slots/${id}`, {
+    const res = await fetch(`/api/slots/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
+    const data = await parseResponseJson<{ error?: string; message?: string }>(res);
+    if (!res.ok) {
+      toast.error(data?.error || "Action failed");
+      return;
+    }
+    toast.success(data?.message || "Slot updated");
     loadSlots();
   };
 

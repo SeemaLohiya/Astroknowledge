@@ -1,12 +1,26 @@
-import { SavedAddress } from "./types";
+import { isRemotePersistEnabled } from "./db/persist";
+import * as redis from "./db/redis-repo";
 import { readJsonFile, writeJsonFile } from "./json-store";
+import { SavedAddress } from "./types";
+
+async function load(): Promise<SavedAddress[]> {
+  if (isRemotePersistEnabled()) return redis.redisGetAddresses();
+  return readJsonFile<SavedAddress[]>("addresses.json", []);
+}
+
+async function save(list: SavedAddress[]) {
+  if (isRemotePersistEnabled()) {
+    await redis.redisSaveAddresses(list);
+    return;
+  }
+  writeJsonFile("addresses.json", list);
+}
 
 export const addressesStore = {
-  getByUser: (userId: string) =>
-    readJsonFile<SavedAddress[]>("addresses.json", []).filter((a) => a.userId === userId),
+  getByUser: async (userId: string) => (await load()).filter((a) => a.userId === userId),
 
-  create: (data: Omit<SavedAddress, "id" | "createdAt">) => {
-    const list = readJsonFile<SavedAddress[]>("addresses.json", []);
+  create: async (data: Omit<SavedAddress, "id" | "createdAt">) => {
+    const list = await load();
     if (data.isDefault) {
       list.forEach((a) => {
         if (a.userId === data.userId) a.isDefault = false;
@@ -18,12 +32,12 @@ export const addressesStore = {
       createdAt: new Date().toISOString(),
     };
     list.push(address);
-    writeJsonFile("addresses.json", list);
+    await save(list);
     return address;
   },
 
-  update: (id: string, userId: string, data: Partial<SavedAddress>) => {
-    const list = readJsonFile<SavedAddress[]>("addresses.json", []);
+  update: async (id: string, userId: string, data: Partial<SavedAddress>) => {
+    const list = await load();
     const idx = list.findIndex((a) => a.id === id && a.userId === userId);
     if (idx === -1) return null;
     if (data.isDefault) {
@@ -32,15 +46,15 @@ export const addressesStore = {
       });
     }
     list[idx] = { ...list[idx], ...data, id: list[idx].id, userId, createdAt: list[idx].createdAt };
-    writeJsonFile("addresses.json", list);
+    await save(list);
     return list[idx];
   },
 
-  delete: (id: string, userId: string) => {
-    const list = readJsonFile<SavedAddress[]>("addresses.json", []);
+  delete: async (id: string, userId: string) => {
+    const list = await load();
     const next = list.filter((a) => !(a.id === id && a.userId === userId));
     if (next.length === list.length) return false;
-    writeJsonFile("addresses.json", next);
+    await save(next);
     return true;
   },
 };

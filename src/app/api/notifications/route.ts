@@ -9,5 +9,5 @@ export async function GET() {
   if (!session || session.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  return NextResponse.json({ notifications: notificationsStore.getAll() });
+  return NextResponse.json({ notifications: await notificationsStore.getAll() });
 }

@@ -16,7 +16,7 @@ export default function AdminOrdersPage() {
   const [statusFilter, setStatusFilter] = useState<"all" | OrderStatus>("all");
   const [search, setSearch] = useState("");
 
-  const load = () => fetchJson<{ orders?: Order[] }>("/api/orders").then((d) => setOrders(d.data?.orders || []));
+  const load = () => fetchJson<{ orders?: Order[] }>("/api/orders", { cache: "no-store" }).then((d) => setOrders(d.data?.orders || []));
   useEffect(() => { load(); }, []);
 
   const filtered = useMemo(() => {

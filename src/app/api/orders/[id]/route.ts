@@ -29,7 +29,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!order) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   if (status === "shipped" || status === "delivered") {
-    logNotification({
+    await logNotification({
       type: "order_shipped",
       userId: order.userId,
       userName: order.userName,

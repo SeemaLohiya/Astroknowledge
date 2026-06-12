@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
   const allBookings = await store.bookings.getAll();
 
   const rows = await Promise.all(users.map(async (u) => {
-    const addrs = addressesStore.getByUser(u.id);
+    const addrs = await addressesStore.getByUser(u.id);
     const payments = await paymentsStore.getByUser(u.id);
     const orders = allOrders.filter((o) => o.userId === u.id);
     const bookings = allBookings.filter((b) => b.userId === u.id);

@@ -17,7 +17,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!booking) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   if (status === "confirmed") {
-    logNotification({
+    await logNotification({
       type: "booking_confirmed",
       userId: booking.userId,
       userName: booking.userName,

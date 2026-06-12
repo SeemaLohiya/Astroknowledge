@@ -75,7 +75,7 @@ export function PromoBanner() {
     { icon: Phone, label: SITE.phone, variant: "phone" as const },
   ];
 
-  const track = [...segments, ...segments];
+  const track = typeof window !== "undefined" && window.innerWidth < 768 ? segments : [...segments, ...segments];
 
   return (
     <div className="promo-banner group/banner relative overflow-hidden border-b border-white/20">

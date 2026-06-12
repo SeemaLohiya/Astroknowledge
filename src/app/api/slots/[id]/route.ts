@@ -53,7 +53,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       birthPlaceUnknown: user.birthPlaceUnknown,
     });
     if (!slot) return NextResponse.json({ error: "Slot unavailable" }, { status: 409 });
-    logNotification({
+    await logNotification({
       type: "slot_booked",
       userId: session.userId,
       userName: slot.userName,
@@ -71,7 +71,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   if (body.action === "confirm") {
     const slot = await slotsStore.confirm(id);
     if (!slot) return NextResponse.json({ error: "Cannot confirm" }, { status: 400 });
-    logNotification({
+    await logNotification({
       type: "slot_confirmed",
       userId: slot.userId,
       userName: slot.userName,

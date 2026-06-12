@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     birthPlaceUnknown: useProfileBirth ? !!user.birthPlaceUnknown : !!body.birthPlaceUnknown,
   });
 
-  logNotification({
+  await logNotification({
     type: "booking_submitted",
     userId: booking.userId,
     userName: booking.userName,

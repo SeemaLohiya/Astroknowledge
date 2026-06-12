@@ -37,8 +37,7 @@ export async function GET() {
     const pendingSlots = slots.filter((s) => s.status === "pending").length;
     const allBookings = await store.bookings.getAll();
     const legacyPending = allBookings.filter((b) => b.status === "pending").length;
-    const paidOrderIds = new Set(paid.map((p) => p.referenceId).filter(Boolean));
-    const orders = (await store.orders.getAll()).filter((o) => paidOrderIds.has(o.id) || paid.some((p) => p.userId === o.userId && p.amount === o.total));
+    const allOrders = await store.orders.getAll();
     const users = (await store.users.getAll()).filter((u) => u.role === "user");
 
     const serviceCounts: Record<string, number> = {};
@@ -102,7 +101,9 @@ export async function GET() {
       paidCount: paid.length,
       pendingPayments: pendingPayments.length,
       pendingBookings: pendingSlots + legacyPending,
-      totalOrders: orders.length,
+      totalOrders: allOrders.length,
+      totalPayments: payments.length,
+      awaitingApproval: payments.filter((p) => p.status === "awaiting_approval").length,
       totalUsers: users.length,
       newUsersThisMonth,
       avgOrderValue,

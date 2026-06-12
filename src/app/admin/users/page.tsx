@@ -29,7 +29,7 @@ export default function AdminUsersPage() {
     setLoading(true);
     const params = new URLSearchParams({ role: "user" });
     if (search) params.set("search", search);
-    const res = await fetchJson<{ users?: SafeUser[] }>(`/api/users?${params}`);
+    const res = await fetchJson<{ users?: SafeUser[] }>(`/api/users?${params}`, { cache: "no-store" });
     setUsers(res.data?.users || []);
     setLoading(false);
   }, [search]);

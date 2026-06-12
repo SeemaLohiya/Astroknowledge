@@ -30,7 +30,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (body.action === "approve") {
     const payment = await paymentsStore.approvePayment(id, adminComment);
     if (!payment) return NextResponse.json({ error: "Cannot approve" }, { status: 400 });
-    logNotification({
+    await logNotification({
       type: "payment_approved",
       userId: payment.userId,
       userName: payment.userName,
@@ -46,7 +46,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (body.action === "reject") {
     const payment = await paymentsStore.rejectPayment(id, adminComment);
     if (!payment) return NextResponse.json({ error: "Cannot reject" }, { status: 400 });
-    logNotification({
+    await logNotification({
       type: "payment_rejected",
       userId: payment.userId,
       userName: payment.userName,

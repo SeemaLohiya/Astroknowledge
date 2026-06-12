@@ -5,14 +5,14 @@ import { addressesStore } from "@/lib/addresses-store";
 export async function GET() {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  return NextResponse.json({ addresses: addressesStore.getByUser(session.userId) });
+  return NextResponse.json({ addresses: await addressesStore.getByUser(session.userId) });
 }
 
 export async function POST(req: NextRequest) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const body = await req.json();
-  const address = addressesStore.create({
+  const address = await addressesStore.create({
     userId: session.userId,
     label: body.label?.trim() || "Home",
     name: body.name?.trim() || session.name,

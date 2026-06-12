@@ -11,7 +11,7 @@ export default function AdminNotificationsPage() {
   const [notifications, setNotifications] = useState<AdminNotification[]>([]);
 
   useEffect(() => {
-    void fetchJson<{ notifications?: AdminNotification[] }>("/api/notifications").then((d) => {
+    void fetchJson<{ notifications?: AdminNotification[] }>("/api/notifications", { cache: "no-store" }).then((d) => {
       setNotifications(d.data?.notifications || []);
     });
   }, []);
