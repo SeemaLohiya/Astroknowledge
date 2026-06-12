@@ -37,43 +37,43 @@ export default function HomePage() {
         <TrustBadges />
       </SectionBand>
       <SectionPartition />
-      <LazySection minHeight="420px" revealVariant="fade-up">
+      <LazySection minHeight="200px" revealVariant="fade-up">
         <SectionBand variant="sky">
           <ServicesSection />
         </SectionBand>
       </LazySection>
       <SectionPartition />
-      <LazySection minHeight="420px" revealVariant="fade-left">
+      <LazySection minHeight="200px" revealVariant="fade-left">
         <SectionBand variant="peach">
           <CoursesSection />
         </SectionBand>
       </LazySection>
       <SectionPartition />
-      <LazySection minHeight="480px" revealVariant="zoom">
+      <LazySection minHeight="220px" revealVariant="zoom">
         <SectionBand variant="lavender">
           <CosmicElementsSection />
         </SectionBand>
       </LazySection>
       <SectionPartition />
-      <LazySection minHeight="400px" revealVariant="fade-right">
+      <LazySection minHeight="200px" revealVariant="fade-right">
         <SectionBand variant="mint">
           <ProductsSection />
         </SectionBand>
       </LazySection>
       <SectionPartition />
-      <LazySection minHeight="360px" revealVariant="scale">
+      <LazySection minHeight="180px" revealVariant="scale">
         <SectionBand variant="coral">
           <ProblemsSection />
         </SectionBand>
       </LazySection>
       <SectionPartition />
-      <LazySection minHeight="320px" revealVariant="blur-up">
+      <LazySection minHeight="160px" revealVariant="blur-up">
         <SectionBand variant="cream">
           <AchievementsSection />
         </SectionBand>
       </LazySection>
       <SectionPartition />
-      <LazySection minHeight="360px" revealVariant="fade-up">
+      <LazySection minHeight="180px" revealVariant="fade-up">
         <SectionBand variant="sky">
           <ReviewsSection />
         </SectionBand>

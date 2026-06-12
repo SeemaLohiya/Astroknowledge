@@ -94,6 +94,10 @@ export const paymentsStore = {
     userPhone: string;
     items: CartItem[];
     total: number;
+    subtotal?: number;
+    discountAmount?: number;
+    voucherCode?: string;
+    voucherId?: string;
   }) => {
     const payments = readPayments();
     const payment: PaymentRecord = {
@@ -106,6 +110,10 @@ export const paymentsStore = {
       userPhone: data.userPhone,
       description: data.items.map((i) => i.name).join(", "),
       amount: data.total,
+      subtotal: data.subtotal ?? data.total,
+      discountAmount: data.discountAmount,
+      voucherCode: data.voucherCode,
+      voucherId: data.voucherId,
       status: "pending",
       items: data.items.map((i) => ({
         id: i.id,

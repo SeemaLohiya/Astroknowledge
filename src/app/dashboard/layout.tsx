@@ -6,7 +6,7 @@ import { cn } from "@/lib/cn";
 import { fetchJson } from "@/lib/fetch-json";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { motion } from "framer-motion";
-import { Calendar, Clock, LayoutDashboard, LogOut, Package, User } from "lucide-react";
+import { Calendar, Clock, Gift, LayoutDashboard, LogOut, Package, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -21,6 +21,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const navItems = useMemo(() => [
     { href: "/dashboard", icon: LayoutDashboard, label: d.overview },
     { href: "/dashboard/purchases", icon: Package, label: d.purchases },
+    { href: "/dashboard/vouchers", icon: Gift, label: "Vouchers" },
     { href: "/dashboard/bookings", icon: Calendar, label: d.yourBookings },
     { href: "/dashboard/slots", icon: Clock, label: d.bookConsultation },
     { href: "/dashboard/profile", icon: User, label: c.common.profile },

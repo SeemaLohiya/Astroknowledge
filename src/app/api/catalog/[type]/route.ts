@@ -5,7 +5,7 @@ import { CatalogType } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
-const VALID_TYPES: CatalogType[] = ["products", "services", "courses", "pooja"];
+const VALID_TYPES: CatalogType[] = ["products", "services", "courses", "pooja", "healing"];
 
 function isValidType(type: string): type is CatalogType {
   return VALID_TYPES.includes(type as CatalogType);

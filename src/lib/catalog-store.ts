@@ -2,15 +2,17 @@ import fs from "fs";
 import path from "path";
 import { poojaServices } from "./data/content";
 import { courses } from "./data/courses";
+import { healingServices } from "./data/healing";
 import { productCategories, products } from "./data/products";
 import { services } from "./data/services";
-import { CatalogType, Course, PoojaService, Product, ProductCategory, Service } from "./types";
+import { CatalogType, Course, HealingService, PoojaService, Product, ProductCategory, Service } from "./types";
 
 interface CatalogData {
   products: Product[];
   services: Service[];
   courses: Course[];
   pooja: PoojaService[];
+  healing: HealingService[];
   categories: ProductCategory[];
 }
 
@@ -26,6 +28,7 @@ function seedCatalog(): CatalogData {
     services: JSON.parse(JSON.stringify(services)),
     courses: JSON.parse(JSON.stringify(courses)),
     pooja: JSON.parse(JSON.stringify(poojaServices)),
+    healing: JSON.parse(JSON.stringify(healingServices)),
     categories: JSON.parse(JSON.stringify(productCategories)),
   };
 }
@@ -45,6 +48,7 @@ function readCatalog(): CatalogData {
 
     const data = JSON.parse(fs.readFileSync(CATALOG_PATH, "utf-8")) as CatalogData;
     if (!data.categories) data.categories = JSON.parse(JSON.stringify(productCategories));
+    if (!data.healing) data.healing = JSON.parse(JSON.stringify(healingServices));
     for (const course of data.courses) {
       if (!course.sessionDescription) {
         const seed = courses.find((s) => s.id === course.id);
@@ -133,6 +137,18 @@ export const catalogStore = {
         inStock: true,
         energized: true,
       } satisfies Partial<Product>;
+    }
+    if (type === "healing") {
+      return {
+        id: `heal-${Date.now()}`,
+        title: "New Healing Session",
+        titleHindi: "नई हीलिंग सेवा",
+        description: "Healing session description",
+        price: 2500,
+        duration: "60 min",
+        benefits: ["Energy balance"],
+        image: "/images/healing/reiki.jpg",
+      } satisfies Partial<HealingService>;
     }
     if (type === "pooja") {
       return {

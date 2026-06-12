@@ -102,6 +102,7 @@ export const uiStrings = {
         service: "Service",
         course: "Course",
         pooja: "Pooja",
+        healing: "Healing",
       },
     },
     checkout: {
@@ -473,6 +474,7 @@ export const uiStrings = {
         service: "सेवा",
         course: "पाठ्यक्रम",
         pooja: "पूजा",
+        healing: "हीलिंग",
       },
     },
     checkout: {

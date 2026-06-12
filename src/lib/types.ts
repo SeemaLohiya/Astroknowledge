@@ -46,7 +46,7 @@ export interface Course {
   popular?: boolean;
 }
 
-export type CatalogType = "products" | "services" | "courses" | "pooja";
+export type CatalogType = "products" | "services" | "courses" | "pooja" | "healing";
 
 export interface BookingSlot {
   id: string;
@@ -73,7 +73,42 @@ export interface BookingSlot {
   createdAt: string;
 }
 
-export type CartItemType = "product" | "service" | "course" | "pooja";
+export type CartItemType = "product" | "service" | "course" | "pooja" | "healing";
+
+export type VoucherDiscountType = "percent" | "fixed";
+
+export interface Voucher {
+  id: string;
+  code: string;
+  label: string;
+  description?: string;
+  discountType: VoucherDiscountType;
+  discountValue: number;
+  minOrderAmount?: number;
+  maxDiscount?: number;
+  validFrom: string;
+  validUntil: string;
+  assignedUserIds: string[];
+  applicableItemTypes?: CartItemType[];
+  applicableItemIds?: string[];
+  usageLimit?: number;
+  usedCount: number;
+  active: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface HealingService {
+  id: string;
+  title: string;
+  titleHindi: string;
+  description: string;
+  duration: string;
+  price: number;
+  image: string;
+  benefits: string[];
+  popular?: boolean;
+}
 
 export type PaymentMethod = "razorpay" | "admin_approval";
 
@@ -89,6 +124,10 @@ export interface PaymentRecord {
   userPhone: string;
   description: string;
   amount: number;
+  subtotal?: number;
+  discountAmount?: number;
+  voucherCode?: string;
+  voucherId?: string;
   status: PaymentStatus;
   method?: PaymentMethod;
   transactionRefId?: string;

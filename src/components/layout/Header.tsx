@@ -21,12 +21,13 @@ import { Button } from "../ui/Button";
 import { LanguageToggle } from "./LanguageToggle";
 
 const DIRECT_LINKS = [
+  { href: "/healing", key: "healing" as const },
   { href: "/pooja", key: "pooja" as const },
   { href: "/about", key: "about" as const },
   { href: "/contact", key: "contact" as const },
 ] as const;
 
-const HIGHLIGHT_NAV_KEYS = new Set(["pooja", "about", "contact"]);
+const HIGHLIGHT_NAV_KEYS = new Set(["healing", "pooja", "about", "contact"]);
 
 function highlightNavClass(key: string, active: boolean) {
   if (!HIGHLIGHT_NAV_KEYS.has(key)) return "";
@@ -75,7 +76,7 @@ export function Header() {
             <SiteLogo size="sm" tagline={c.common.vedicWisdom} className="group-hover:[&_span]:text-gold transition-colors" />
           </Link>
 
-          <nav className="hidden xl:flex items-center gap-0.5">
+          <nav className="hidden lg:flex items-center gap-0.5">
             {navDropdowns.map((dropdown) => (
               <NavDropdownMenu
                 key={dropdown.href}
@@ -124,7 +125,7 @@ export function Header() {
             )}
             <AnimatedProfileButton href={user ? (user.role === "admin" ? "/admin" : "/dashboard") : "/login"} />
             <BookNowButton label={t("bookNow")} variant="secondary" size="sm" className="hidden lg:inline-flex" onNavigate={() => setMobileOpen(false)} />
-            <button onClick={() => setMobileOpen(!mobileOpen)} className="xl:hidden p-2 text-text-primary" aria-label={c.menuAria}>
+            <button onClick={() => setMobileOpen(!mobileOpen)} className="lg:hidden p-2 text-text-primary" aria-label={c.menuAria}>
               {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
@@ -138,7 +139,7 @@ export function Header() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
             transition={{ type: "spring", stiffness: 320, damping: 32 }}
-            className="fixed inset-0 z-50 bg-cream/98 overflow-y-auto xl:hidden"
+            className="fixed inset-0 z-50 bg-cream/98 overflow-y-auto lg:hidden"
           >
             <div className="flex flex-col p-6 pt-20 pb-32">
               <div className="mb-4 flex justify-end">

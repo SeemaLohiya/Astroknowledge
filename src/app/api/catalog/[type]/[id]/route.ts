@@ -3,7 +3,7 @@ import { getSession } from "@/lib/auth";
 import { catalogStore } from "@/lib/catalog-store";
 import { CatalogType } from "@/lib/types";
 
-const VALID_TYPES: CatalogType[] = ["products", "services", "courses", "pooja"];
+const VALID_TYPES: CatalogType[] = ["products", "services", "courses", "pooja", "healing"];
 
 function isValidType(type: string): type is CatalogType {
   return VALID_TYPES.includes(type as CatalogType);

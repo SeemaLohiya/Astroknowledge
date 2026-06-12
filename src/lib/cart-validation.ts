@@ -6,6 +6,7 @@ const TYPE_MAP: Record<CartItemType, CatalogType> = {
   service: "services",
   course: "courses",
   pooja: "pooja",
+  healing: "healing",
 };
 
 function catalogName(item: Record<string, unknown>): string {

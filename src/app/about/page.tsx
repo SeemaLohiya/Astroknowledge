@@ -10,7 +10,8 @@ import { SITE } from "@/lib/constants";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { motion } from "framer-motion";
 import { AchievementsSection } from "@/components/home/AchievementsSection";
-import { CertificationsList } from "@/components/about/CertificationsList";
+import { ExpertiseGrid } from "@/components/about/ExpertiseGrid";
+import { YouTubeSection } from "@/components/about/YouTubeSection";
 import { Award, Heart, Sparkles, Star, Users } from "lucide-react";
 import { SafeImage } from "@/components/ui/SafeImage";
 
@@ -106,7 +107,9 @@ export default function AboutPage() {
             </div>
           </FadeIn>
 
-          <CertificationsList />
+          <ExpertiseGrid />
+
+          <YouTubeSection />
 
           <AchievementsSection />
 

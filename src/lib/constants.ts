@@ -23,7 +23,7 @@ export const SITE = {
   discountCode: "ASTRO10OFF",
   discountPercent: 10,
   consultationHours: "Mon - Sat: 9:00 AM - 8:00 PM",
-  youtube: "https://youtube.com/@astroknowledge",
+  youtube: "https://youtube.com/@seemalohiya3037?si=Td3IQUWbenZGt3wM",
   instagram: "https://www.instagram.com/astroknowledge.seema/",
   facebook: "https://facebook.com/astroknowledge",
   upiId: "8949268569@ptyes",

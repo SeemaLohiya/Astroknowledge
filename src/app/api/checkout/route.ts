@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { validateCartItems } from "@/lib/cart-validation";
+import { validateVoucherForUser } from "@/lib/voucher-validation";
+import { vouchersStore } from "@/lib/vouchers-store";
 import { getPaidServices, hasPaidServiceAccess } from "@/lib/purchases";
 import { paymentsStore } from "@/lib/payments-store";
 import { CartItem } from "@/lib/types";
@@ -10,12 +12,13 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ error: "Please login to continue" }, { status: 401 });
 
   const body = await req.json();
-  const { userName, userPhone, userEmail, items, total } = body as {
+  const { userName, userPhone, userEmail, items, total, voucherCode } = body as {
     userName: string;
     userPhone: string;
     userEmail?: string;
     items: CartItem[];
     total: number;
+    voucherCode?: string;
   };
 
   if (!userName?.trim() || !userPhone?.trim() || !items?.length) {
@@ -35,7 +38,25 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (typeof total === "number" && Math.abs(total - serverTotal) > 1) {
+  let finalTotal = serverTotal;
+  let discountAmount = 0;
+  let voucherId: string | undefined;
+
+  if (voucherCode?.trim()) {
+    try {
+      const applied = validateVoucherForUser(voucherCode, session.userId, validatedItems, serverTotal);
+      finalTotal = applied.total;
+      discountAmount = applied.discountAmount;
+      voucherId = applied.voucher.id;
+    } catch (e) {
+      return NextResponse.json(
+        { error: e instanceof Error ? e.message : "Invalid voucher" },
+        { status: 400 }
+      );
+    }
+  }
+
+  if (typeof total === "number" && Math.abs(total - finalTotal) > 1) {
     return NextResponse.json({ error: "Cart total mismatch — please refresh and try again" }, { status: 400 });
   }
 
@@ -45,8 +66,14 @@ export async function POST(req: NextRequest) {
     userEmail: userEmail?.trim() || session.email,
     userPhone: userPhone.trim(),
     items: validatedItems,
-    total: serverTotal,
+    total: finalTotal,
+    subtotal: serverTotal,
+    discountAmount: discountAmount || undefined,
+    voucherCode: voucherCode?.trim().toUpperCase(),
+    voucherId,
   });
+
+  if (voucherId) vouchersStore.incrementUsage(voucherId);
 
   return NextResponse.json({ payment }, { status: 201 });
 }

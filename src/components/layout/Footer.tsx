@@ -6,7 +6,7 @@ import { FadeIn } from "../animations/FadeIn";
 import { FounderImage } from "../animations/FounderImage";
 import { motion } from "framer-motion";
 import { InstagramIcon, WhatsAppIcon } from "@/components/ui/SocialIcons";
-import { ExternalLink, Mail, MapPin, Phone } from "lucide-react";
+import { ExternalLink, Mail, MapPin, Phone, Video } from "lucide-react";
 import Link from "next/link";
 
 export function Footer() {
@@ -30,6 +30,8 @@ export function Footer() {
     ],
     quick: [
       { label: c.footer.links.about, href: "/about" },
+      { label: "Healing", href: "/healing" },
+      { label: "YouTube", href: SITE.youtube },
       { label: c.footer.links.contact, href: "/contact" },
       { label: c.footer.links.bookConsultation, href: "/booking" },
     ],
@@ -71,6 +73,16 @@ export function Footer() {
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-gold/30 text-[#E4405F] hover:bg-[#E4405F]/10"
               >
                 <InstagramIcon className="h-5 w-5" />
+              </motion.a>
+              <motion.a
+                href={SITE.youtube}
+                target="_blank"
+                rel="noopener"
+                aria-label="YouTube"
+                whileHover={{ scale: 1.15 }}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-gold/30 text-[#FF0000] hover:bg-red-500/10"
+              >
+                <Video className="h-5 w-5" />
               </motion.a>
             </div>
           </div>

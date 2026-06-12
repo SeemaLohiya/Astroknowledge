@@ -53,6 +53,7 @@ export default function PurchasesPage() {
     service: { label: c.cart.itemTypes.service, icon: Sparkles, color: "bg-gold/20 text-gold" },
     course: { label: c.cart.itemTypes.course, icon: BookOpen, color: "bg-blue-500/15 text-blue-700" },
     pooja: { label: c.cart.itemTypes.pooja, icon: ShoppingBag, color: "bg-rose-500/15 text-rose-700" },
+    healing: { label: c.cart.itemTypes.healing, icon: Sparkles, color: "bg-emerald-500/15 text-emerald-700" },
   }), [c]);
 
   const loadOrders = () => {
@@ -100,7 +101,7 @@ export default function PurchasesPage() {
   }, [flatItems, tab, orderStatusFilter, orders]);
 
   const counts = useMemo(() => {
-    const cnt: Record<FilterTab, number> = { all: flatItems.length, product: 0, service: 0, course: 0, pooja: 0 };
+    const cnt: Record<FilterTab, number> = { all: flatItems.length, product: 0, service: 0, course: 0, pooja: 0, healing: 0 };
     flatItems.forEach((f) => { cnt[f.item.itemType]++; });
     return cnt;
   }, [flatItems]);
@@ -115,7 +116,7 @@ export default function PurchasesPage() {
       </FadeIn>
 
       <div className="mb-4 flex flex-wrap gap-2">
-        {(["all", "service", "product", "course", "pooja"] as FilterTab[]).map((t) => (
+        {(["all", "service", "product", "course", "pooja", "healing"] as FilterTab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}

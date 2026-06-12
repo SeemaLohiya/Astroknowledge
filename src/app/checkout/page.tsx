@@ -11,15 +11,18 @@ import { useCartHydrated } from "@/lib/use-cart-hydrated";
 import { parseResponseJson } from "@/lib/fetch-json";
 import { CartItem } from "@/lib/types";
 import { SafeImage } from "@/components/ui/SafeImage";
-import { IndianRupee } from "lucide-react";
+import { Gift, IndianRupee, Tag } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { Voucher } from "@/lib/types";
+import Link from "next/link";
 
 async function proceedToPayment(
   form: { userName: string; userPhone: string; userEmail: string },
   items: CartItem[],
-  total: number
+  total: number,
+  voucherCode?: string
 ) {
   if (form.userName.trim() && form.userPhone.trim()) {
     await fetch("/api/users/profile", {
@@ -38,6 +41,7 @@ async function proceedToPayment(
       userEmail: form.userEmail.trim(),
       items,
       total,
+      voucherCode: voucherCode || undefined,
     }),
   });
   const data = await parseResponseJson<{ payment?: { id: string }; error?: string }>(res);
@@ -56,12 +60,58 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const showEmpty = items.length === 0;
   const [form, setForm] = useState({ userName: "", userPhone: "", userEmail: "" });
+  const [voucherInput, setVoucherInput] = useState("");
+  const [appliedCode, setAppliedCode] = useState("");
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [myVouchers, setMyVouchers] = useState<Voucher[]>([]);
+  const [validatingVoucher, setValidatingVoucher] = useState(false);
+
+  const subtotal = total;
+  const finalTotal = Math.max(0, subtotal - discountAmount);
 
   useEffect(() => {
     if (!profileLoading && !user) {
       router.replace("/login?redirect=/checkout");
     }
   }, [user, profileLoading, router]);
+
+  useEffect(() => {
+    if (!user) return;
+    fetch("/api/vouchers")
+      .then((r) => r.json())
+      .then((d: { vouchers?: Voucher[] }) => setMyVouchers(d.vouchers || []));
+  }, [user]);
+
+  const applyVoucher = async (code?: string) => {
+    const toApply = (code || voucherInput).trim();
+    if (!toApply) return;
+    setValidatingVoucher(true);
+    try {
+      const res = await fetch("/api/vouchers/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: toApply, items }),
+      });
+      const data = await parseResponseJson<{ valid?: boolean; discountAmount?: number; error?: string }>(res);
+      if (!res.ok || !data?.valid) throw new Error(data?.error || "Invalid voucher");
+      setAppliedCode(toApply.toUpperCase());
+      setDiscountAmount(data?.discountAmount || 0);
+      setVoucherInput(toApply.toUpperCase());
+      toast.success("Voucher applied!");
+    } catch (e) {
+      setAppliedCode("");
+      setDiscountAmount(0);
+      toast.error(e instanceof Error ? e.message : "Invalid voucher");
+    } finally {
+      setValidatingVoucher(false);
+    }
+  };
+
+  const removeVoucher = () => {
+    setAppliedCode("");
+    setDiscountAmount(0);
+    setVoucherInput("");
+  };
 
   const userDefaults = user
     ? { userName: user.name || "", userEmail: user.email || "", userPhone: user.phone || "" }
@@ -88,7 +138,7 @@ export default function CheckoutPage() {
 
     setLoading(true);
     try {
-      const paymentId = await proceedToPayment(resolvedForm, items, total);
+      const paymentId = await proceedToPayment(resolvedForm, items, finalTotal, appliedCode || undefined);
       router.push(`/payment?id=${paymentId}`);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : ch.checkoutFailed);
@@ -159,10 +209,55 @@ export default function CheckoutPage() {
                   </div>
                 ))}
               </div>
+              {discountAmount > 0 && (
+                <div className="mt-3 flex justify-between text-sm text-emerald-600">
+                  <span className="flex items-center gap-1"><Tag className="h-3.5 w-3.5" /> Voucher ({appliedCode})</span>
+                  <span>-₹{discountAmount.toLocaleString("en-IN")}</span>
+                </div>
+              )}
               <div className="mt-4 flex justify-between border-t border-gold/15 pt-4 text-lg font-bold">
                 <span className="text-text-primary">{c.cart.total}</span>
-                <span className="flex items-center text-gold"><IndianRupee className="h-5 w-5" />{total.toLocaleString("en-IN")}</span>
+                <span className="flex items-center text-gold"><IndianRupee className="h-5 w-5" />{finalTotal.toLocaleString("en-IN")}</span>
               </div>
+            </FadeIn>
+
+            <FadeIn delay={0.15} className="rounded-2xl glass-card p-6">
+              <h2 className="font-semibold text-text-primary mb-3 flex items-center gap-2">
+                <Gift className="h-5 w-5 text-gold" /> Private Voucher
+              </h2>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <input
+                  value={voucherInput}
+                  onChange={(e) => setVoucherInput(e.target.value.toUpperCase())}
+                  placeholder="Enter your voucher code"
+                  className="flex-1 rounded-xl border border-gold/20 bg-orange/5 px-4 py-3 text-sm font-mono uppercase"
+                />
+                {appliedCode ? (
+                  <Button type="button" variant="outline" onClick={removeVoucher}>Remove</Button>
+                ) : (
+                  <Button type="button" variant="secondary" disabled={validatingVoucher} onClick={() => applyVoucher()}>
+                    {validatingVoucher ? "..." : "Apply"}
+                  </Button>
+                )}
+              </div>
+              {myVouchers.length > 0 && (
+                <div className="mt-4">
+                  <p className="text-xs text-text-muted mb-2">Your assigned vouchers:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {myVouchers.map((v) => (
+                      <button
+                        key={v.id}
+                        type="button"
+                        onClick={() => applyVoucher(v.code)}
+                        className="rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-xs font-mono font-semibold text-gold hover:bg-gold/20"
+                      >
+                        {v.code}
+                      </button>
+                    ))}
+                  </div>
+                  <Link href="/dashboard/vouchers" className="mt-2 inline-block text-xs text-gold hover:underline">View all vouchers →</Link>
+                </div>
+              )}
             </FadeIn>
 
             <Button type="submit" variant="secondary" size="lg" className="w-full" disabled={loading}>
