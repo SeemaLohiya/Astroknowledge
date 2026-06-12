@@ -1,5 +1,7 @@
 import fs from "fs";
 import path from "path";
+import { isRemotePersistEnabled } from "./db/persist";
+import * as redis from "./db/redis-repo";
 import { BookingSlot } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -26,14 +28,28 @@ function writeSlots(slots: BookingSlot[]) {
   fs.writeFileSync(SLOTS_PATH, JSON.stringify(slots, null, 2), "utf-8");
 }
 
+async function loadSlots(): Promise<BookingSlot[]> {
+  if (isRemotePersistEnabled()) return redis.redisGetSlots();
+  return readSlots();
+}
+
+async function persistSlots(slots: BookingSlot[]) {
+  if (isRemotePersistEnabled()) {
+    await redis.redisSaveSlots(slots);
+    return;
+  }
+  writeSlots(slots);
+}
+
 export const slotsStore = {
-  getAll: () => readSlots(),
-  getAvailable: () => readSlots().filter((s) => s.status === "available"),
-  getByUser: (userId: string) => readSlots().filter((s) => s.userId === userId && (s.status === "pending" || s.status === "booked")),
-  getPending: () => readSlots().filter((s) => s.status === "pending"),
-  getBooked: () => readSlots().filter((s) => s.status === "booked"),
-  create: (slot: Omit<BookingSlot, "id" | "createdAt">) => {
-    const slots = readSlots();
+  getAll: async () => loadSlots(),
+  getAvailable: async () => (await loadSlots()).filter((s) => s.status === "available"),
+  getByUser: async (userId: string) =>
+    (await loadSlots()).filter((s) => s.userId === userId && (s.status === "pending" || s.status === "booked")),
+  getPending: async () => (await loadSlots()).filter((s) => s.status === "pending"),
+  getBooked: async () => (await loadSlots()).filter((s) => s.status === "booked"),
+  create: async (slot: Omit<BookingSlot, "id" | "createdAt">) => {
+    const slots = await loadSlots();
     const newSlot: BookingSlot = {
       ...slot,
       duration: slot.duration || "30 min",
@@ -41,25 +57,28 @@ export const slotsStore = {
       createdAt: new Date().toISOString(),
     };
     slots.push(newSlot);
-    writeSlots(slots);
+    await persistSlots(slots);
     return newSlot;
   },
-  book: (id: string, data: {
-    userId: string;
-    userName: string;
-    userEmail: string;
-    userPhone: string;
-    serviceId?: string;
-    serviceName?: string;
-    paymentAmount?: number;
-    dob?: string;
-    birthTime?: string;
-    birthPlace?: string;
-    dobUnknown?: boolean;
-    birthTimeUnknown?: boolean;
-    birthPlaceUnknown?: boolean;
-  }) => {
-    const slots = readSlots();
+  book: async (
+    id: string,
+    data: {
+      userId: string;
+      userName: string;
+      userEmail: string;
+      userPhone: string;
+      serviceId?: string;
+      serviceName?: string;
+      paymentAmount?: number;
+      dob?: string;
+      birthTime?: string;
+      birthPlace?: string;
+      dobUnknown?: boolean;
+      birthTimeUnknown?: boolean;
+      birthPlaceUnknown?: boolean;
+    }
+  ) => {
+    const slots = await loadSlots();
     const index = slots.findIndex((s) => s.id === id);
     if (index === -1 || slots[index].status !== "available") return null;
     slots[index] = {
@@ -70,20 +89,20 @@ export const slotsStore = {
       paymentAmount: data.paymentAmount,
       bookedAt: new Date().toISOString(),
     };
-    writeSlots(slots);
+    await persistSlots(slots);
     return slots[index];
   },
-  confirm: (id: string) => {
-    const slots = readSlots();
+  confirm: async (id: string) => {
+    const slots = await loadSlots();
     const slot = slots.find((s) => s.id === id);
     if (!slot || slot.status !== "pending") return null;
     slot.status = "booked";
     slot.confirmedAt = new Date().toISOString();
-    writeSlots(slots);
+    await persistSlots(slots);
     return slot;
   },
-  reject: (id: string) => {
-    const slots = readSlots();
+  reject: async (id: string) => {
+    const slots = await loadSlots();
     const slot = slots.find((s) => s.id === id);
     if (!slot || slot.status !== "pending") return null;
     slot.status = "available";
@@ -103,11 +122,11 @@ export const slotsStore = {
     slot.paymentAmount = undefined;
     slot.bookedAt = undefined;
     slot.confirmedAt = undefined;
-    writeSlots(slots);
+    await persistSlots(slots);
     return slot;
   },
-  updateStatus: (id: string, status: BookingSlot["status"]) => {
-    const slots = readSlots();
+  updateStatus: async (id: string, status: BookingSlot["status"]) => {
+    const slots = await loadSlots();
     const slot = slots.find((s) => s.id === id);
     if (!slot) return null;
     slot.status = status;
@@ -123,24 +142,24 @@ export const slotsStore = {
       slot.bookedAt = undefined;
       slot.confirmedAt = undefined;
     }
-    writeSlots(slots);
+    await persistSlots(slots);
     return slot;
   },
-  updatePaymentStatus: (id: string, paymentStatus: BookingSlot["paymentStatus"]) => {
-    const slots = readSlots();
+  updatePaymentStatus: async (id: string, paymentStatus: BookingSlot["paymentStatus"]) => {
+    const slots = await loadSlots();
     const slot = slots.find((s) => s.id === id);
     if (!slot) return null;
     slot.paymentStatus = paymentStatus;
-    writeSlots(slots);
+    await persistSlots(slots);
     return slot;
   },
-  delete: (id: string) => {
-    const slots = readSlots().filter((s) => s.id !== id);
-    writeSlots(slots);
+  delete: async (id: string) => {
+    const slots = (await loadSlots()).filter((s) => s.id !== id);
+    await persistSlots(slots);
     return true;
   },
-  bulkCreate: (items: { date: string; time: string; duration?: string; status?: BookingSlot["status"] }[]) => {
-    const slots = readSlots();
+  bulkCreate: async (items: { date: string; time: string; duration?: string; status?: BookingSlot["status"] }[]) => {
+    const slots = await loadSlots();
     const created: BookingSlot[] = items.map((item, i) => ({
       date: item.date,
       time: item.time,
@@ -150,7 +169,7 @@ export const slotsStore = {
       createdAt: new Date().toISOString(),
     }));
     slots.push(...created);
-    writeSlots(slots);
+    await persistSlots(slots);
     return created;
   },
 };

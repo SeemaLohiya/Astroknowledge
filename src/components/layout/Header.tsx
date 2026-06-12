@@ -7,7 +7,8 @@ import { useCartStore } from "@/lib/cart-store";
 import { useIsAdmin } from "@/lib/use-is-admin";
 import { useHydrated } from "@/lib/use-hydrated";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
-import { AnimatePresence, motion } from "framer-motion";
+import { useLogout } from "@/lib/use-logout";
+import { LogOut } from "lucide-react";
 import { AnimatedProfileButton } from "./AnimatedProfileButton";
 import { Menu, X, ShoppingCart } from "lucide-react";
 import { PromoBanner } from "./PromoBanner";
@@ -45,6 +46,7 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user } = useProfile();
+  const handleLogout = useLogout();
   const isAdmin = useIsAdmin();
   const pathname = usePathname();
   const isAdminRoute = pathname.startsWith("/admin");
@@ -132,15 +134,8 @@ export function Header() {
         </div>
       </header>
 
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, x: "100%" }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: "100%" }}
-            transition={{ type: "spring", stiffness: 320, damping: 32 }}
-            className="fixed inset-0 z-50 bg-cream/98 overflow-y-auto lg:hidden"
-          >
+      {mobileOpen && (
+          <div className="fixed inset-0 z-50 bg-cream/98 overflow-y-auto lg:hidden animate-fade-in">
             <div className="flex flex-col p-6 pt-20 pb-32">
               <div className="mb-4 flex justify-end">
                 <LanguageToggle />
@@ -180,12 +175,31 @@ export function Header() {
               ))}
               <div className="mt-4 flex flex-col gap-2">
                 <BookNowButton label={t("bookConsultation")} variant="secondary" className="w-full" onNavigate={() => setMobileOpen(false)} />
-                <Button href="/login" variant="ghost" className="w-full">{c.common.loginRegister}</Button>
+                {user ? (
+                  <>
+                    <Link
+                      href={user.role === "admin" ? "/admin" : "/dashboard"}
+                      onClick={() => setMobileOpen(false)}
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-gold-bright px-6 py-3 text-base font-bold text-white shadow-md"
+                    >
+                      {user.role === "admin" ? "Admin Panel" : c.common.profile}
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => { setMobileOpen(false); void handleLogout(); }}
+                      className="flex w-full items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      {c.common.logout}
+                    </button>
+                  </>
+                ) : (
+                  <Button href="/login" variant="ghost" className="w-full">{c.common.loginRegister}</Button>
+                )}
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
     </>
   );
 }

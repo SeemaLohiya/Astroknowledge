@@ -37,7 +37,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       const service = (await catalogStore.getById("services", body.serviceId)) as { price?: number } | undefined;
       paymentAmount = service?.price;
     }
-    const slot = slotsStore.book(id, {
+    const slot = await slotsStore.book(id, {
       userId: session.userId,
       userName: body.userName || session.name,
       userEmail: body.userEmail || session.email,
@@ -69,7 +69,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   }
 
   if (body.action === "confirm") {
-    const slot = slotsStore.confirm(id);
+    const slot = await slotsStore.confirm(id);
     if (!slot) return NextResponse.json({ error: "Cannot confirm" }, { status: 400 });
     logNotification({
       type: "slot_confirmed",
@@ -83,19 +83,19 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   }
 
   if (body.action === "reject") {
-    const slot = slotsStore.reject(id);
+    const slot = await slotsStore.reject(id);
     if (!slot) return NextResponse.json({ error: "Cannot reject" }, { status: 400 });
     return NextResponse.json({ slot });
   }
 
   if (body.paymentStatus) {
-    const slot = slotsStore.updatePaymentStatus(id, body.paymentStatus);
+    const slot = await slotsStore.updatePaymentStatus(id, body.paymentStatus);
     if (!slot) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ slot });
   }
 
   if (body.status) {
-    const slot = slotsStore.updateStatus(id, body.status);
+    const slot = await slotsStore.updateStatus(id, body.status);
     if (!slot) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ slot });
   }
@@ -109,6 +109,6 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const { id } = await params;
-  slotsStore.delete(id);
+  await slotsStore.delete(id);
   return NextResponse.json({ success: true });
 }

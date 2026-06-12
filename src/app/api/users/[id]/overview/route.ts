@@ -18,7 +18,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     bookings: await store.bookings.getByUser(id),
     orders: await store.orders.getByUser(id),
     payments: await paymentsStore.getByUser(id),
-    slots: slotsStore.getAll().filter((s) => s.userId === id),
+    slots: (await slotsStore.getAll()).filter((s) => s.userId === id),
     addresses: addressesStore.getByUser(id),
   });
 }

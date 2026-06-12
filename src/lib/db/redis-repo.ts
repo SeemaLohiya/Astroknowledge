@@ -1,4 +1,4 @@
-import { Booking, Order, PaymentRecord, User, Voucher } from "../types";
+import { Booking, BookingSlot, Order, PaymentRecord, User, Voucher } from "../types";
 import { CatalogType } from "../types";
 import { connectRedis } from "./redis-connect";
 import type { CatalogData } from "./catalog-repo";
@@ -243,4 +243,15 @@ export async function redisSaveOrder(order: Order) {
 export async function redisGetOrderById(id: string) {
   const orders = await redisGetOrders();
   return orders.find((o) => o.id === id) ?? null;
+}
+
+// ── Slots ──
+
+export async function redisGetSlots(): Promise<BookingSlot[]> {
+  const slots = await getJson<BookingSlot[]>("slots", []);
+  return slots.map((s) => ({ ...s, duration: s.duration || "30 min" }));
+}
+
+export async function redisSaveSlots(slots: BookingSlot[]) {
+  await setJson("slots", slots);
 }

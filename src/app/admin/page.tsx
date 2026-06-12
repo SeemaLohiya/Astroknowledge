@@ -14,12 +14,15 @@ import {
   CreditCard,
   IndianRupee,
   Package,
+  RefreshCw,
   ShieldCheck,
   TrendingUp,
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+
+const NO_STORE = { cache: "no-store" as RequestCache };
 
 interface Analytics {
   revenue: number;
@@ -79,28 +82,51 @@ export default function AdminPage() {
   const [recentBookings, setRecentBookings] = useState<BookingSlot[]>([]);
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  const load = useCallback(async (silent = false) => {
+    if (!silent) setRefreshing(true);
+    const [statsRes, slotsRes, ordersRes] = await Promise.all([
+      fetchJson<Analytics>("/api/admin/analytics", NO_STORE),
+      fetchJson<{ slots?: BookingSlot[] }>("/api/slots", NO_STORE),
+      fetchJson<{ orders?: Order[] }>("/api/orders", NO_STORE),
+    ]);
+
+    if (statsRes.ok && statsRes.data) {
+      setAnalytics(statsRes.data);
+      setError(null);
+    } else if (!statsRes.ok) {
+      setError(statsRes.error || "Could not load analytics");
+    }
+
+    const slots = slotsRes.data?.slots || [];
+    const active = slots
+      .filter((s) => s.status === "booked" || s.status === "pending")
+      .sort((a, b) => (b.bookedAt || b.createdAt).localeCompare(a.bookedAt || a.createdAt))
+      .slice(0, 5);
+    setRecentBookings(active);
+
+    const orders = (ordersRes.data?.orders || [])
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      .slice(0, 5);
+    setRecentOrders(orders);
+    setLastUpdated(new Date());
+    setRefreshing(false);
+  }, []);
 
   useEffect(() => {
-    async function load() {
-      const [statsRes, slotsRes, ordersRes] = await Promise.all([
-        fetchJson<Analytics>("/api/admin/analytics"),
-        fetchJson<{ slots?: BookingSlot[] }>("/api/slots"),
-        fetchJson<{ orders?: Order[] }>("/api/orders"),
-      ]);
-
-      if (!statsRes.ok) {
-        setError(statsRes.error || "Could not load analytics");
-        return;
-      }
-      if (statsRes.data) setAnalytics(statsRes.data);
-
-      const slots = slotsRes.data?.slots || [];
-      const active = slots.filter((s) => s.status === "booked" || s.status === "pending");
-      setRecentBookings(active.slice(0, 5));
-      setRecentOrders(ordersRes.data?.orders?.slice(0, 5) || []);
-    }
-    void load();
-  }, []);
+    void load(true);
+    const interval = setInterval(() => void load(true), 30000);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void load(true);
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [load]);
 
   const pendingTotal = analytics ? analytics.pendingPayments + analytics.pendingBookings : 0;
   const maxMonthly = analytics ? Math.max(...analytics.monthlyRevenue.map((m) => m.amount), 1) : 1;
@@ -130,9 +156,25 @@ export default function AdminPage() {
               Revenue, users, products & bookings overview
             </p>
           </div>
-          <p className="rounded-full border border-gold/25 bg-gold/10 px-3 py-1 text-xs font-semibold text-gold">
-            {analytics ? `${analytics.conversionRate}% conversion` : "Live sync"}
-          </p>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => void load()}
+              disabled={refreshing}
+              className="flex items-center gap-1.5 rounded-full border border-gold/25 bg-white px-3 py-1 text-xs font-semibold text-gold hover:bg-gold/10 disabled:opacity-60"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} />
+              Refresh
+            </button>
+            <p className="rounded-full border border-gold/25 bg-gold/10 px-3 py-1 text-xs font-semibold text-gold">
+              {analytics ? `${analytics.conversionRate}% conversion` : "Loading…"}
+            </p>
+            {lastUpdated && (
+              <p className="text-[10px] text-text-muted">
+                Updated {lastUpdated.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+              </p>
+            )}
+          </div>
         </div>
       </RevealOnScroll>
 

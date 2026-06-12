@@ -21,7 +21,7 @@ export async function GET() {
     createdAt: b.createdAt,
   }));
 
-  const slots: UnifiedBookingItem[] = slotsStore.getByUser(session.userId).map((s) => ({
+  const slots: UnifiedBookingItem[] = (await slotsStore.getByUser(session.userId)).map((s) => ({
     id: s.id,
     source: "slot" as const,
     serviceName: s.serviceName || "Consultation",

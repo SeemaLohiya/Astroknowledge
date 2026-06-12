@@ -138,6 +138,28 @@ iframe {
   .navgraha-cosmos .navgraha-ambient-2 {
     display: none !important;
   }
+  .promo-banner-mesh,
+  .promo-banner-shine,
+  .promo-banner-sparks,
+  .promo-banner-gradient {
+    display: none;
+  }
+  .promo-marquee-track {
+    animation-duration: 42s;
+  }
+  .animate-float,
+  .animate-float-slow,
+  .animate-pulse-glow,
+  .animate-spin-slow,
+  .animate-aurora,
+  .whatsapp-fab-pulse {
+    animation: none !important;
+  }
+  .reveal-on-scroll {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
 }
 
 ::selection {

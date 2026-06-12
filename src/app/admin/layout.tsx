@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useLogout } from "@/lib/use-logout";
 import { useCallback, useEffect, useState } from "react";
 
 const navItems = [
@@ -115,10 +116,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     setMobileOpen(false);
   }, [pathname]);
 
-  const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/login");
-  };
+  const handleLogout = useLogout();
 
   if (authState === "loading") {
     return (
@@ -168,7 +166,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="mb-6 rounded-2xl border border-gold/20 bg-cream/95 p-4 shadow-lg lg:hidden">
           <AdminNav pathname={pathname} onNavigate={() => setMobileOpen(false)} />
           <button
-            onClick={handleLogout}
+            onClick={() => void handleLogout()}
             className="mt-2 flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-red-500 hover:bg-red-50"
           >
             <LogOut className="h-4 w-4" />
@@ -204,7 +202,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   View website
                 </Link>
                 <button
-                  onClick={handleLogout}
+                  onClick={() => void handleLogout()}
                   className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-sm text-red-500 transition-colors hover:bg-red-50"
                 >
                   <LogOut className="h-4 w-4" />

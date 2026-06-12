@@ -14,7 +14,7 @@ export async function GET() {
   const userPayments = await paymentsStore.getByUser(session.userId);
   const hasAwaiting = userPayments.some((p) => p.status === "awaiting_approval");
   const bookings = await store.bookings.getByUser(session.userId);
-  const slots = slotsStore.getByUser(session.userId);
+  const slots = await slotsStore.getByUser(session.userId);
   const hasPendingBooking = bookings.some((b) => b.status === "pending") || slots.some((s) => s.status === "pending");
   const hasConfirmedBooking = bookings.some((b) => b.status === "confirmed" || b.status === "completed") || slots.some((s) => s.status === "booked");
 

@@ -33,7 +33,7 @@ export async function GET() {
     const paid = payments.filter(isRealPaidPayment);
     const pendingPayments = payments.filter((p) => p.status === "awaiting_approval" || p.status === "pending");
     const revenue = paid.reduce((s, p) => s + p.amount, 0);
-    const slots = slotsStore.getAll();
+    const slots = await slotsStore.getAll();
     const pendingSlots = slots.filter((s) => s.status === "pending").length;
     const allBookings = await store.bookings.getAll();
     const legacyPending = allBookings.filter((b) => b.status === "pending").length;

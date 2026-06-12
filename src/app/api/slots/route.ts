@@ -13,17 +13,17 @@ export async function GET(req: NextRequest) {
   const service = req.nextUrl.searchParams.get("service");
 
   if (mine === "true" && session) {
-    return NextResponse.json({ slots: slotsStore.getByUser(session.userId) });
+    return NextResponse.json({ slots: await slotsStore.getByUser(session.userId) });
   }
 
-  let slots = session?.role === "admin" ? slotsStore.getAll() : slotsStore.getAvailable();
+  let slots = session?.role === "admin" ? await slotsStore.getAll() : await slotsStore.getAvailable();
 
   if (status && status !== "all") slots = slots.filter((s) => s.status === status);
   if (date) slots = slots.filter((s) => s.date === date);
   if (client) slots = slots.filter((s) => s.userName?.toLowerCase().includes(client));
   if (service && service !== "all") slots = slots.filter((s) => s.serviceId === service || s.serviceName === service);
 
-  return NextResponse.json({ slots, pendingCount: slotsStore.getPending().length });
+  return NextResponse.json({ slots, pendingCount: (await slotsStore.getPending()).length });
 }
 
 export async function POST(req: NextRequest) {
@@ -34,11 +34,11 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
 
   if (body.bulk && Array.isArray(body.slots)) {
-    const created = slotsStore.bulkCreate(body.slots);
+    const created = await slotsStore.bulkCreate(body.slots);
     return NextResponse.json({ slots: created, count: created.length }, { status: 201 });
   }
 
-  const slot = slotsStore.create({
+  const slot = await slotsStore.create({
     date: body.date,
     time: body.time,
     duration: body.duration || "30 min",
