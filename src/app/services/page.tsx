@@ -5,6 +5,7 @@ import { PageTransition } from "@/components/animations/PageTransition";
 import { RevealOnScroll } from "@/components/animations/RevealOnScroll";
 import { StaggerChildren, StaggerItem } from "@/components/animations/StaggerChildren";
 import { QuickConsultCTA } from "@/components/home/QuickConsultCTA";
+import { ZodiacSection } from "@/components/zodiac/ZodiacSection";
 import { CatalogActions } from "@/components/cart/CatalogActions";
 import { PageBanner } from "@/components/ui/PageBanner";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
@@ -111,6 +112,7 @@ export default function ServicesPage() {
         </div>
       </section>
 
+      <ZodiacSection />
       <QuickConsultCTA />
     </PageTransition>
   );

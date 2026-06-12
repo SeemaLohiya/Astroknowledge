@@ -3,6 +3,7 @@
 import { PageTransition } from "@/components/animations/PageTransition";
 import { StaggerChildren, StaggerItem } from "@/components/animations/StaggerChildren";
 import { QuickConsultCTA } from "@/components/home/QuickConsultCTA";
+import { ZodiacSection } from "@/components/zodiac/ZodiacSection";
 import { CatalogActions } from "@/components/cart/CatalogActions";
 import { FounderImage } from "@/components/animations/FounderImage";
 import { PageBanner } from "@/components/ui/PageBanner";
@@ -104,6 +105,7 @@ export default function CoursesPage() {
         </div>
       </section>
 
+      <ZodiacSection />
       <QuickConsultCTA />
     </PageTransition>
   );

@@ -4,6 +4,7 @@ import { FadeIn } from "@/components/animations/FadeIn";
 import { PageTransition } from "@/components/animations/PageTransition";
 import { StaggerChildren, StaggerItem } from "@/components/animations/StaggerChildren";
 import { QuickConsultCTA } from "@/components/home/QuickConsultCTA";
+import { ZodiacSection } from "@/components/zodiac/ZodiacSection";
 import { CategoryFilter } from "@/components/products/CategoryFilter";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { PageBanner } from "@/components/ui/PageBanner";
@@ -140,6 +141,7 @@ function ProductsContent() {
         </div>
       </section>
 
+      <ZodiacSection />
       <QuickConsultCTA />
     </>
   );

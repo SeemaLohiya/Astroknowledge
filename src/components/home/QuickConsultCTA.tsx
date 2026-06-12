@@ -3,7 +3,6 @@
 import { FadeIn } from "@/components/animations/FadeIn";
 import { ShimmerText } from "@/components/animations/ShimmerText";
 import { Button } from "@/components/ui/Button";
-import { ZodiacTabsPanel } from "@/components/zodiac/ZodiacTabsPanel";
 import { SITE } from "@/lib/constants";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { Calendar, Sparkles } from "lucide-react";
@@ -35,10 +34,6 @@ export function QuickConsultCTA() {
               <Button href="/services" variant="outline" size="lg">
                 {c.offerings.exploreNow}
               </Button>
-            </div>
-
-            <div className="mt-8 text-left">
-              <ZodiacTabsPanel compact showTitle />
             </div>
           </div>
         </FadeIn>

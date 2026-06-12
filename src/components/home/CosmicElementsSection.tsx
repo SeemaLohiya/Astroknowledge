@@ -3,7 +3,6 @@
 import { RevealOnScroll } from "@/components/animations/RevealOnScroll";
 import { SectionBackdrop } from "@/components/animations/SectionBackdrop";
 import { NAVGRAHA, NavgrahaPlanet } from "@/lib/data/navgraha";
-import { ZodiacTabsPanel } from "@/components/zodiac/ZodiacTabsPanel";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { cn } from "@/lib/cn";
 import { Calendar, Gem, Sparkles, Star } from "lucide-react";
@@ -268,9 +267,6 @@ export function CosmicElementsSection() {
           </div>
         </RevealOnScroll>
 
-        <RevealOnScroll className="mt-10">
-          <ZodiacTabsPanel />
-        </RevealOnScroll>
       </div>
     </section>
   );
