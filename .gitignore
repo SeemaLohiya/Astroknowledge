@@ -48,6 +48,9 @@ yarn-error.log*
 /data/payments.json
 /data/notifications.json
 /data/vouchers.json
+/data/atlas-credentials.local.json
+/tools/atlas/
+/tools/atlas-cli.zip
 
 # temp scrape artifacts
 tmp-products.html

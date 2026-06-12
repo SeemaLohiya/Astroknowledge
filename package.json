@@ -9,7 +9,10 @@
     "lint": "eslint",
     "clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\"",
     "compress-images": "node scripts/compress-images.mjs",
-    "slim": "npm run clean && npm run compress-images"
+    "slim": "npm run clean && npm run compress-images",
+    "db:download-cli": "powershell -ExecutionPolicy Bypass -File scripts/download-atlas-cli.ps1",
+    "db:provision": "node scripts/provision-atlas-full.mjs",
+    "db:provision:api": "node scripts/provision-atlas-api.mjs"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.13",
@@ -32,6 +35,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.7",
+    "node-pty": "^1.1.0",
     "sharp": "^0.34.2",
     "tailwindcss": "^4",
     "typescript": "^5"
