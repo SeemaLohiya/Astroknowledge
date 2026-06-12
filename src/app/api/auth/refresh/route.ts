@@ -7,7 +7,7 @@ export async function POST() {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
-  const user = store.users.findById(session.userId);
+  const user = await store.users.findById(session.userId);
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 401 });
 
   const token = await createToken(user);

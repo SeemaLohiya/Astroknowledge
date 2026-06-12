@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
   let validatedItems: CartItem[];
   let serverTotal: number;
   try {
-    const validated = validateCartItems(items);
+    const validated = await validateCartItems(items);
     validatedItems = validated.items;
     serverTotal = validated.total;
   } catch (e) {
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
   if (voucherCode?.trim()) {
     try {
-      const applied = validateVoucherForUser(voucherCode, session.userId, validatedItems, serverTotal);
+      const applied = await validateVoucherForUser(voucherCode, session.userId, validatedItems, serverTotal);
       finalTotal = applied.total;
       discountAmount = applied.discountAmount;
       voucherId = applied.voucher.id;
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Cart total mismatch — please refresh and try again" }, { status: 400 });
   }
 
-  const payment = paymentsStore.createCheckout({
+  const payment = await paymentsStore.createCheckout({
     userId: session.userId,
     userName: userName.trim(),
     userEmail: userEmail?.trim() || session.email,
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
     voucherId,
   });
 
-  if (voucherId) vouchersStore.incrementUsage(voucherId);
+  if (voucherId) await vouchersStore.incrementUsage(voucherId);
 
   return NextResponse.json({ payment }, { status: 201 });
 }
@@ -83,8 +83,8 @@ export async function GET() {
   if (!session) return NextResponse.json({ hasPaidAccess: false });
 
   return NextResponse.json({
-    hasPaidAccess: paymentsStore.hasPaidAccess(session.userId),
-    hasPaidServiceAccess: hasPaidServiceAccess(session.userId),
-    paidServices: getPaidServices(session.userId),
+    hasPaidAccess: await paymentsStore.hasPaidAccess(session.userId),
+    hasPaidServiceAccess: await hasPaidServiceAccess(session.userId),
+    paidServices: await getPaidServices(session.userId),
   });
 }

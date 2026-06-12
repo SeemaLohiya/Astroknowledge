@@ -10,11 +10,11 @@ export async function GET() {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   if (session.role === "admin") {
-    return NextResponse.json({ orders: store.orders.getAll(), purchases: [] });
+    return NextResponse.json({ orders: await store.orders.getAll(), purchases: [] });
   }
 
-  const purchases = getUserPurchases(session.userId);
-  const orders = store.orders.getByUser(session.userId);
+  const purchases = await getUserPurchases(session.userId);
+  const orders = await store.orders.getByUser(session.userId);
 
   return NextResponse.json({ orders, purchases });
 }

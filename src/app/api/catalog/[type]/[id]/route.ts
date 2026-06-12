@@ -17,7 +17,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ type
   if (!isValidType(type)) return NextResponse.json({ error: "Invalid catalog type" }, { status: 400 });
 
   const body = await req.json();
-  const item = catalogStore.update(type, id, body);
+  const item = await catalogStore.update(type, id, body);
   if (!item) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json({ item });
 }
@@ -29,7 +29,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   const { type, id } = await params;
   if (!isValidType(type)) return NextResponse.json({ error: "Invalid catalog type" }, { status: 400 });
 
-  const ok = catalogStore.delete(type, id);
+  const ok = await catalogStore.delete(type, id);
   if (!ok) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json({ success: true });
 }

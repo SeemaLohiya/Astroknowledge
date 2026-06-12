@@ -1,5 +1,7 @@
 import { Booking, Order, User } from "./types";
 import { readJsonFile, writeJsonFile } from "./json-store";
+import { isMongoEnabled } from "./db/connect";
+import * as mongo from "./db/app-data-repo";
 
 const SEED_USERS: User[] = [
   {
@@ -24,6 +26,14 @@ const SEED_USERS: User[] = [
 
 const SEED_BOOKINGS: Booking[] = [];
 const SEED_ORDERS: Order[] = [];
+
+let usersSeeded = false;
+
+async function ensureUsersSeeded() {
+  if (!isMongoEnabled() || usersSeeded) return;
+  await mongo.mongoSeedUsers(SEED_USERS);
+  usersSeeded = true;
+}
 
 function readUsers() {
   return readJsonFile<User[]>("users.json", SEED_USERS);
@@ -51,21 +61,47 @@ function trackOrder(order: Order, status: Order["status"], note?: string) {
 
 export const store = {
   users: {
-    getAll: () => readUsers(),
-    findByEmail: (email: string) => readUsers().find((u) => u.email === email),
-    findById: (id: string) => readUsers().find((u) => u.id === id),
-    create: (user: Omit<User, "id" | "createdAt">) => {
-      const users = readUsers();
+    getAll: async () => {
+      if (isMongoEnabled()) {
+        await ensureUsersSeeded();
+        return mongo.mongoGetUsers();
+      }
+      return readUsers();
+    },
+    findByEmail: async (email: string) => {
+      if (isMongoEnabled()) {
+        await ensureUsersSeeded();
+        return mongo.mongoFindUserByEmail(email);
+      }
+      return readUsers().find((u) => u.email === email);
+    },
+    findById: async (id: string) => {
+      if (isMongoEnabled()) {
+        await ensureUsersSeeded();
+        return mongo.mongoFindUserById(id);
+      }
+      return readUsers().find((u) => u.id === id);
+    },
+    create: async (user: Omit<User, "id" | "createdAt">) => {
       const newUser: User = {
         ...user,
         id: `user-${Date.now()}`,
         createdAt: new Date().toISOString().split("T")[0],
       };
+      if (isMongoEnabled()) {
+        await ensureUsersSeeded();
+        return mongo.mongoCreateUser(newUser);
+      }
+      const users = readUsers();
       users.push(newUser);
       writeUsers(users);
       return newUser;
     },
-    update: (id: string, patch: Partial<User>) => {
+    update: async (id: string, patch: Partial<User>) => {
+      if (isMongoEnabled()) {
+        await ensureUsersSeeded();
+        return mongo.mongoUpdateUser(id, patch);
+      }
       const users = readUsers();
       const idx = users.findIndex((u) => u.id === id);
       if (idx === -1) return null;
@@ -73,7 +109,11 @@ export const store = {
       writeUsers(users);
       return users[idx];
     },
-    persist: (user: User) => {
+    persist: async (user: User) => {
+      if (isMongoEnabled()) {
+        await ensureUsersSeeded();
+        return mongo.mongoUpdateUser(user.id, user);
+      }
       const users = readUsers();
       const idx = users.findIndex((u) => u.id === user.id);
       if (idx === -1) return null;
@@ -83,35 +123,52 @@ export const store = {
     },
   },
   bookings: {
-    getAll: () => readBookings(),
-    getByUser: (userId: string) => readBookings().filter((b) => b.userId === userId),
-    create: (booking: Omit<Booking, "id" | "createdAt">) => {
-      const bookings = readBookings();
+    getAll: async () => {
+      if (isMongoEnabled()) return mongo.mongoGetBookings();
+      return readBookings();
+    },
+    getByUser: async (userId: string) => {
+      const bookings = isMongoEnabled() ? await mongo.mongoGetBookings() : readBookings();
+      return bookings.filter((b) => b.userId === userId);
+    },
+    create: async (booking: Omit<Booking, "id" | "createdAt">) => {
       const newBooking: Booking = {
         ...booking,
         id: `bk-${Date.now()}`,
         createdAt: new Date().toISOString().split("T")[0],
       };
+      if (isMongoEnabled()) return mongo.mongoSaveBooking(newBooking);
+      const bookings = readBookings();
       bookings.push(newBooking);
       writeBookings(bookings);
       return newBooking;
     },
-    updateStatus: (id: string, status: Booking["status"]) => {
-      const bookings = readBookings();
+    updateStatus: async (id: string, status: Booking["status"]) => {
+      const bookings = isMongoEnabled() ? await mongo.mongoGetBookings() : readBookings();
       const booking = bookings.find((b) => b.id === id);
       if (booking) {
         booking.status = status;
-        writeBookings(bookings);
+        if (isMongoEnabled()) await mongo.mongoSaveBooking(booking);
+        else writeBookings(bookings);
       }
       return booking || null;
     },
   },
   orders: {
-    getAll: () => readOrders(),
-    getByUser: (userId: string) => readOrders().filter((o) => o.userId === userId),
-    findById: (id: string) => readOrders().find((o) => o.id === id) || null,
-    create: (order: Omit<Order, "id" | "createdAt" | "trackingHistory">) => {
-      const orders = readOrders();
+    getAll: async () => {
+      if (isMongoEnabled()) return mongo.mongoGetOrders();
+      return readOrders();
+    },
+    getByUser: async (userId: string) => {
+      const orders = isMongoEnabled() ? await mongo.mongoGetOrders() : readOrders();
+      return orders.filter((o) => o.userId === userId);
+    },
+    findById: async (id: string) => {
+      if (isMongoEnabled()) return mongo.mongoGetOrderById(id);
+      return readOrders().find((o) => o.id === id) || null;
+    },
+    create: async (order: Omit<Order, "id" | "createdAt" | "trackingHistory">) => {
+      const orders = isMongoEnabled() ? await mongo.mongoGetOrders() : readOrders();
       const newOrder: Order = {
         ...order,
         id: `ord-${Date.now()}`,
@@ -119,18 +176,20 @@ export const store = {
         trackingId: `AK-ORD-${String(orders.length + 1).padStart(4, "0")}`,
         trackingHistory: [{ status: "processing", note: "Order placed", at: new Date().toISOString() }],
       };
+      if (isMongoEnabled()) return mongo.mongoSaveOrder(newOrder);
       orders.push(newOrder);
       writeOrders(orders);
       return newOrder;
     },
-    updateStatus: (id: string, status: Order["status"], note?: string, trackingId?: string) => {
-      const orders = readOrders();
+    updateStatus: async (id: string, status: Order["status"], note?: string, trackingId?: string) => {
+      const orders = isMongoEnabled() ? await mongo.mongoGetOrders() : readOrders();
       const order = orders.find((o) => o.id === id);
       if (!order) return null;
       order.status = status;
       if (trackingId) order.trackingId = trackingId;
       trackOrder(order, status, note);
-      writeOrders(orders);
+      if (isMongoEnabled()) await mongo.mongoSaveOrder(order);
+      else writeOrders(orders);
       return order;
     },
   },

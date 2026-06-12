@@ -12,7 +12,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const { id } = await params;
   const { status } = await req.json();
-  const booking = store.bookings.updateStatus(id, status as Booking["status"]);
+  const booking = await store.bookings.updateStatus(id, status as Booking["status"]);
 
   if (!booking) return NextResponse.json({ error: "Not found" }, { status: 404 });
 

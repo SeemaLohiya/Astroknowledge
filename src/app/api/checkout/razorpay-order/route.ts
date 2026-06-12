@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "paymentId required" }, { status: 400 });
   }
 
-  const payment = paymentsStore.getById(paymentId);
+  const payment = await paymentsStore.getById(paymentId);
   if (!payment || payment.userId !== session.userId) {
     return NextResponse.json({ error: "Payment not found" }, { status: 404 });
   }

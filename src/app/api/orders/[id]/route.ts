@@ -8,7 +8,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
-  const order = store.orders.findById(id);
+  const order = await store.orders.findById(id);
   if (!order) return NextResponse.json({ error: "Not found" }, { status: 404 });
   if (session.role !== "admin" && order.userId !== session.userId) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -24,7 +24,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const { id } = await params;
   const { status, note, trackingId } = await req.json();
-  const order = store.orders.updateStatus(id, status as Order["status"], note, trackingId);
+  const order = await store.orders.updateStatus(id, status as Order["status"], note, trackingId);
 
   if (!order) return NextResponse.json({ error: "Not found" }, { status: 404 });
 

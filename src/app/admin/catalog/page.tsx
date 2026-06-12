@@ -7,7 +7,7 @@ import { SafeImage } from "@/components/ui/SafeImage";
 import { fetchJson } from "@/lib/fetch-json";
 import { CatalogType, ProductCategory } from "@/lib/types";
 import { motion } from "framer-motion";
-import { BookOpen, FolderOpen, IndianRupee, Package, Plus, Save, Sparkles, Trash2, X } from "lucide-react";
+import { BookOpen, FolderOpen, Heart, IndianRupee, Package, Plus, Save, Sparkles, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -16,6 +16,7 @@ const TABS: { type: CatalogType | "categories"; label: string; icon: typeof Pack
   { type: "services", label: "Services", icon: Sparkles },
   { type: "courses", label: "Courses", icon: BookOpen },
   { type: "pooja", label: "Pooja", icon: Sparkles },
+  { type: "healing", label: "Healing", icon: Heart },
   { type: "categories", label: "Categories", icon: FolderOpen },
 ];
 
@@ -73,7 +74,9 @@ export default function AdminCatalogPage() {
         ? { id: `p-${Date.now()}`, name: "", nameHindi: "", description: "", price: 0, category: categories[0]?.id || "rudraksha", image: "/images/products/p1.jpg", rating: 4.5, reviews: 0, inStock: true, energized: true }
         : activeType === "pooja"
           ? { id: `pu-${Date.now()}`, title: "", titleHindi: "", description: "", price: 0, duration: "", benefits: [], image: "/images/astro/pooja.jpg" }
-          : {
+          : activeType === "healing"
+            ? { id: `heal-${Date.now()}`, title: "", titleHindi: "", description: "", price: 0, duration: "", benefits: [], image: "/images/healing/reiki.jpg" }
+            : {
               id: `${activeType}-${Date.now()}`,
               title: "",
               titleHindi: "",
@@ -98,7 +101,7 @@ export default function AdminCatalogPage() {
     try {
       const isNew = !items.some((i) => i.id === editing.id);
       const payload = { ...editing };
-      if (activeType === "pooja" && typeof payload.benefits === "string") {
+      if ((activeType === "pooja" || activeType === "healing") && typeof payload.benefits === "string") {
         payload.benefits = (payload.benefits as string).split(",").map((s) => s.trim()).filter(Boolean);
       }
       if ((activeType === "services" || activeType === "courses") && typeof payload.features === "string") {
@@ -188,7 +191,7 @@ export default function AdminCatalogPage() {
     <PageTransition>
       <FadeIn className="mb-6">
         <h1 className="font-display text-2xl font-bold text-text-primary">Catalog <span className="text-gradient-gold">Manager</span></h1>
-        <p className="text-text-body text-sm mt-1">Add, edit, or remove products, services, courses, pooja, and categories</p>
+        <p className="text-text-body text-sm mt-1">Add, edit, or remove products, services, courses, pooja, healing, and categories</p>
       </FadeIn>
 
       <div className="mb-6 flex flex-wrap gap-2">
@@ -196,7 +199,7 @@ export default function AdminCatalogPage() {
           <button
             key={tab.type}
             onClick={() => setActiveType(tab.type)}
-            className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all ${activeType === tab.type ? "bg-gold text-white" : "glass-card text-text-body hover:text-gold"}`}
+            className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300 ${activeType === tab.type ? "bg-gold text-white tab-pill-active shadow-gold/30 shadow-md" : "glass-card text-text-body hover:text-gold hover:scale-[1.02]"}`}
           >
             <tab.icon className="h-4 w-4" />{tab.label}
           </button>
@@ -377,7 +380,7 @@ export default function AdminCatalogPage() {
                         </label>
                       </>
                     )}
-                    {activeType === "pooja" && (
+                    {(activeType === "pooja" || activeType === "healing") && (
                       <Field label="Benefits (comma-separated)" value={listField("benefits")} onChange={(v) => setField("benefits", v)} />
                     )}
                     {(activeType === "services" || activeType === "courses") && (

@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "paymentId and method required" }, { status: 400 });
   }
 
-  const existing = paymentsStore.getById(paymentId);
+  const existing = await paymentsStore.getById(paymentId);
   if (!existing || existing.userId !== session.userId) {
     return NextResponse.json({ error: "Payment not found" }, { status: 404 });
   }
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Payment verification failed" }, { status: 400 });
     }
 
-    const payment = paymentsStore.confirmRazorpayPayment(paymentId, {
+    const payment = await paymentsStore.confirmRazorpayPayment(paymentId, {
       razorpayOrderId,
       razorpayPaymentId,
       razorpaySignature,
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Payment screenshot is required" }, { status: 400 });
   }
 
-  const payment = paymentsStore.processPayment(paymentId, method, {
+  const payment = await paymentsStore.processPayment(paymentId, method, {
     transactionRefId: transactionRefId.trim(),
     paymentProofImage: paymentProofImage.trim(),
   });

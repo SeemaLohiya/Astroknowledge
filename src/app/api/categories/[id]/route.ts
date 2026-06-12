@@ -9,7 +9,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   }
   const { id } = await params;
   const body = await req.json();
-  const updated = catalogStore.updateCategory(id, body);
+  const updated = await catalogStore.updateCategory(id, body);
   if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json({ category: updated });
 }
@@ -20,6 +20,6 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const { id } = await params;
-  catalogStore.deleteCategory(id);
+  await catalogStore.deleteCategory(id);
   return NextResponse.json({ success: true });
 }

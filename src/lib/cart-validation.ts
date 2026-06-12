@@ -15,7 +15,7 @@ function catalogName(item: Record<string, unknown>): string {
   return "Item";
 }
 
-export function validateCartItems(items: CartItem[]): { items: CartItem[]; total: number } {
+export async function validateCartItems(items: CartItem[]): Promise<{ items: CartItem[]; total: number }> {
   if (!items?.length) throw new Error("Cart is empty");
 
   const validated: CartItem[] = [];
@@ -26,7 +26,7 @@ export function validateCartItems(items: CartItem[]): { items: CartItem[]; total
     const catalogType = TYPE_MAP[item.itemType];
     if (!catalogType) throw new Error(`Unknown item type: ${item.itemType}`);
 
-    const catalogItem = catalogStore.getById(catalogType, item.id) as Record<string, unknown> | undefined;
+    const catalogItem = (await catalogStore.getById(catalogType, item.id)) as Record<string, unknown> | undefined;
     if (!catalogItem) throw new Error(`Item not found: ${item.name || item.id}`);
 
     const price = Number(catalogItem.price);

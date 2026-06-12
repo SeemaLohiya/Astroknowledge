@@ -11,7 +11,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const { id } = await params;
   const body = (await req.json()) as Partial<Voucher>;
-  const updated = vouchersStore.update(id, body);
+  const updated = await vouchersStore.update(id, body);
   if (!updated) return NextResponse.json({ error: "Voucher not found" }, { status: 404 });
   return NextResponse.json({ voucher: updated });
 }
@@ -23,7 +23,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   }
 
   const { id } = await params;
-  const ok = vouchersStore.delete(id);
+  const ok = await vouchersStore.delete(id);
   if (!ok) return NextResponse.json({ error: "Voucher not found" }, { status: 404 });
   return NextResponse.json({ success: true });
 }

@@ -4,7 +4,7 @@ import { store } from "@/lib/store";
 
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json();
-  const user = store.users.findByEmail(email);
+  const user = await store.users.findByEmail(email);
 
   if (!user || user.password !== password) {
     return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });

@@ -9,14 +9,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  if (store.users.findByEmail(email)) {
+  if (await store.users.findByEmail(email)) {
     return NextResponse.json({ error: "Email already registered" }, { status: 409 });
   }
 
   const hasBirth =
     dob || birthTime || birthPlace || dobUnknown || birthTimeUnknown || birthPlaceUnknown;
 
-  const user = store.users.create({
+  const user = await store.users.create({
     name,
     email,
     phone: phone || "",

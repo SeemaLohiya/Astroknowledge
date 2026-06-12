@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
   const status = searchParams.get("status") || "all";
   const userId = searchParams.get("userId") || "";
 
-  let vouchers = vouchersStore.getAll();
+  let vouchers = await vouchersStore.getAll();
 
   if (search) {
     vouchers = vouchers.filter(
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     if (!body.assignedUserIds?.length) {
       return NextResponse.json({ error: "Assign at least one user" }, { status: 400 });
     }
-    const voucher = vouchersStore.create(body);
+    const voucher = await vouchersStore.create(body);
     return NextResponse.json({ voucher }, { status: 201 });
   } catch (e) {
     return NextResponse.json(

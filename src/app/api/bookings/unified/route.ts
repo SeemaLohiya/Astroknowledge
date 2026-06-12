@@ -8,8 +8,8 @@ export async function GET() {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const legacy: UnifiedBookingItem[] = store.bookings
-    .getByUser(session.userId)
+  const legacy: UnifiedBookingItem[] = (await store.bookings
+    .getByUser(session.userId))
     .filter((b) => b.status !== "cancelled")
     .map((b) => ({
     id: b.id,

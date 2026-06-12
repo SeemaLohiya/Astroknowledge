@@ -11,13 +11,13 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const { id } = await params;
-  const user = store.users.findById(id);
+  const user = await store.users.findById(id);
   if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   return NextResponse.json({
-    bookings: store.bookings.getByUser(id),
-    orders: store.orders.getByUser(id),
-    payments: paymentsStore.getByUser(id),
+    bookings: await store.bookings.getByUser(id),
+    orders: await store.orders.getByUser(id),
+    payments: await paymentsStore.getByUser(id),
     slots: slotsStore.getAll().filter((s) => s.userId === id),
     addresses: addressesStore.getByUser(id),
   });

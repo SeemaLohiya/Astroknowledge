@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { paymentsStore } from "@/lib/payments-store";
 import { slotsStore } from "@/lib/slots-store";
 import { store } from "@/lib/store";
+import { PaymentRecord } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +15,7 @@ function monthKey(dateStr: string) {
 }
 
 /** Only count verified paid checkout/order payments (excludes orphan seed rows). */
-function isRealPaidPayment(p: ReturnType<typeof paymentsStore.getAll>[number]) {
+function isRealPaidPayment(p: PaymentRecord) {
   if (p.status !== "paid") return false;
   if (!p.method) return false;
   if (!p.userId || !p.amount || p.amount <= 0) return false;
@@ -28,16 +29,17 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const payments = paymentsStore.getAll();
+    const payments = await paymentsStore.getAll();
     const paid = payments.filter(isRealPaidPayment);
     const pendingPayments = payments.filter((p) => p.status === "awaiting_approval" || p.status === "pending");
     const revenue = paid.reduce((s, p) => s + p.amount, 0);
     const slots = slotsStore.getAll();
     const pendingSlots = slots.filter((s) => s.status === "pending").length;
-    const legacyPending = store.bookings.getAll().filter((b) => b.status === "pending").length;
+    const allBookings = await store.bookings.getAll();
+    const legacyPending = allBookings.filter((b) => b.status === "pending").length;
     const paidOrderIds = new Set(paid.map((p) => p.referenceId).filter(Boolean));
-    const orders = store.orders.getAll().filter((o) => paidOrderIds.has(o.id) || paid.some((p) => p.userId === o.userId && p.amount === o.total));
-    const users = store.users.getAll().filter((u) => u.role === "user");
+    const orders = (await store.orders.getAll()).filter((o) => paidOrderIds.has(o.id) || paid.some((p) => p.userId === o.userId && p.amount === o.total));
+    const users = (await store.users.getAll()).filter((u) => u.role === "user");
 
     const serviceCounts: Record<string, number> = {};
     const categoryRevenue: Record<string, number> = { product: 0, service: 0, course: 0, pooja: 0, healing: 0 };
@@ -85,10 +87,10 @@ export async function GET() {
     const newUsersThisMonth = users.filter((u) => new Date(u.createdAt) >= thirtyDaysAgo).length;
 
     const bookingStats = {
-      total: slots.filter((s) => s.status === "booked" || s.status === "pending").length + store.bookings.getAll().length,
+      total: slots.filter((s) => s.status === "booked" || s.status === "pending").length + allBookings.length,
       pending: pendingSlots + legacyPending,
-      confirmed: slots.filter((s) => s.status === "booked").length + store.bookings.getAll().filter((b) => b.status === "confirmed").length,
-      completed: store.bookings.getAll().filter((b) => b.status === "completed").length,
+      confirmed: slots.filter((s) => s.status === "booked").length + allBookings.filter((b) => b.status === "confirmed").length,
+      completed: allBookings.filter((b) => b.status === "completed").length,
     };
 
     const avgOrderValue = paid.length > 0 ? Math.round(revenue / paid.length) : 0;

@@ -9,7 +9,7 @@ export async function PATCH(req: NextRequest) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const user = store.users.findById(session.userId);
+  const user = await store.users.findById(session.userId);
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
   const body = await req.json();
@@ -71,6 +71,6 @@ export async function PATCH(req: NextRequest) {
     user.birthDetailsUpdatedAt = new Date().toISOString();
   }
 
-  store.users.persist(user);
+  await store.users.persist(user);
   return NextResponse.json({ user: sanitizeUser(user) });
 }

@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 import { Voucher } from "./types";
+import { isMongoEnabled } from "./db/connect";
+import * as mongo from "./db/app-data-repo";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const VOUCHERS_PATH = path.join(DATA_DIR, "vouchers.json");
@@ -24,15 +26,20 @@ function writeVouchers(vouchers: Voucher[]) {
   fs.writeFileSync(VOUCHERS_PATH, JSON.stringify(vouchers, null, 2), "utf-8");
 }
 
+async function getVouchersList(): Promise<Voucher[]> {
+  if (isMongoEnabled()) return mongo.mongoGetVouchers();
+  return readVouchers();
+}
+
 export const vouchersStore = {
-  getAll: () => readVouchers(),
-  getById: (id: string) => readVouchers().find((v) => v.id === id),
-  getByCode: (code: string) =>
-    readVouchers().find((v) => v.code.toUpperCase() === code.trim().toUpperCase()),
-  getForUser: (userId: string) =>
-    readVouchers().filter((v) => v.active && v.assignedUserIds.includes(userId)),
-  create: (data: Omit<Voucher, "id" | "usedCount" | "createdAt">) => {
-    const vouchers = readVouchers();
+  getAll: async () => getVouchersList(),
+  getById: async (id: string) => (await getVouchersList()).find((v) => v.id === id),
+  getByCode: async (code: string) =>
+    (await getVouchersList()).find((v) => v.code.toUpperCase() === code.trim().toUpperCase()),
+  getForUser: async (userId: string) =>
+    (await getVouchersList()).filter((v) => v.active && v.assignedUserIds.includes(userId)),
+  create: async (data: Omit<Voucher, "id" | "usedCount" | "createdAt">) => {
+    const vouchers = await getVouchersList();
     const code = data.code.trim().toUpperCase();
     if (vouchers.some((v) => v.code === code)) throw new Error("Voucher code already exists");
     const voucher: Voucher = {
@@ -42,32 +49,36 @@ export const vouchersStore = {
       usedCount: 0,
       createdAt: new Date().toISOString(),
     };
+    if (isMongoEnabled()) return mongo.mongoSaveVoucher(voucher);
     vouchers.push(voucher);
     writeVouchers(vouchers);
     return voucher;
   },
-  update: (id: string, patch: Partial<Voucher>) => {
-    const vouchers = readVouchers();
+  update: async (id: string, patch: Partial<Voucher>) => {
+    const vouchers = await getVouchersList();
     const idx = vouchers.findIndex((v) => v.id === id);
     if (idx === -1) return null;
     if (patch.code) patch.code = patch.code.trim().toUpperCase();
     vouchers[idx] = { ...vouchers[idx], ...patch, updatedAt: new Date().toISOString() };
+    if (isMongoEnabled()) return mongo.mongoSaveVoucher(vouchers[idx]);
     writeVouchers(vouchers);
     return vouchers[idx];
   },
-  delete: (id: string) => {
+  delete: async (id: string) => {
+    if (isMongoEnabled()) return mongo.mongoDeleteVoucher(id);
     const vouchers = readVouchers();
     const next = vouchers.filter((v) => v.id !== id);
     if (next.length === vouchers.length) return false;
     writeVouchers(next);
     return true;
   },
-  incrementUsage: (id: string) => {
-    const vouchers = readVouchers();
+  incrementUsage: async (id: string) => {
+    const vouchers = await getVouchersList();
     const idx = vouchers.findIndex((v) => v.id === id);
     if (idx === -1) return;
     vouchers[idx].usedCount += 1;
     vouchers[idx].updatedAt = new Date().toISOString();
-    writeVouchers(vouchers);
+    if (isMongoEnabled()) await mongo.mongoSaveVoucher(vouchers[idx]);
+    else writeVouchers(vouchers);
   },
 };

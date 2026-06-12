@@ -8,7 +8,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  const payment = paymentsStore.getById(id);
+  const payment = await paymentsStore.getById(id);
   if (!payment) return NextResponse.json({ error: "Not found" }, { status: 404 });
   if (session.role !== "admin" && payment.userId !== session.userId) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -28,7 +28,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const adminComment = typeof body.adminComment === "string" ? body.adminComment : undefined;
 
   if (body.action === "approve") {
-    const payment = paymentsStore.approvePayment(id, adminComment);
+    const payment = await paymentsStore.approvePayment(id, adminComment);
     if (!payment) return NextResponse.json({ error: "Cannot approve" }, { status: 400 });
     logNotification({
       type: "payment_approved",
@@ -44,7 +44,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 
   if (body.action === "reject") {
-    const payment = paymentsStore.rejectPayment(id, adminComment);
+    const payment = await paymentsStore.rejectPayment(id, adminComment);
     if (!payment) return NextResponse.json({ error: "Cannot reject" }, { status: 400 });
     logNotification({
       type: "payment_rejected",
@@ -60,7 +60,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 
   if (body.status) {
-    const payment = paymentsStore.updateStatus(id, body.status);
+    const payment = await paymentsStore.updateStatus(id, body.status);
     if (!payment) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ payment });
   }

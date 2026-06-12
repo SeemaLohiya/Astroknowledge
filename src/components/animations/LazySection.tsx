@@ -55,7 +55,7 @@ export function LazySection({
                 : "reveal-blur-up";
 
   return (
-    <div ref={ref} style={visible ? undefined : { minHeight }}>
+    <div ref={ref} className="section-lazy" style={visible ? undefined : { minHeight }}>
       <div
         className={cn(
           reveal && visible && "reveal-on-scroll reveal-visible",

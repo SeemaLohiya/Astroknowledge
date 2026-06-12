@@ -14,27 +14,27 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   const body = await req.json();
 
   if (body.action === "book") {
-    if (!hasPaidServiceAccess(session.userId)) {
+    if (!(await hasPaidServiceAccess(session.userId))) {
       return NextResponse.json(
         { error: "Purchase and pay for a consultation service first" },
         { status: 403 }
       );
     }
-    const paidServices = getPaidServices(session.userId);
+    const paidServices = await getPaidServices(session.userId);
     if (body.serviceId && !paidServices.some((s) => s.id === body.serviceId)) {
       return NextResponse.json(
         { error: "You can only book slots for services you have purchased" },
         { status: 403 }
       );
     }
-    const user = store.users.findById(session.userId);
+    const user = await store.users.findById(session.userId);
     if (!user || !isBirthProfileComplete(user)) {
       return NextResponse.json({ error: "Complete your birth details before booking a slot" }, { status: 403 });
     }
     let paymentAmount = body.paymentAmount;
     if (!paymentAmount && body.serviceId) {
       const { catalogStore } = await import("@/lib/catalog-store");
-      const service = catalogStore.getById("services", body.serviceId) as { price?: number } | undefined;
+      const service = (await catalogStore.getById("services", body.serviceId)) as { price?: number } | undefined;
       paymentAmount = service?.price;
     }
     const slot = slotsStore.book(id, {

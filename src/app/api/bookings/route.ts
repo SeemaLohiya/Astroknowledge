@@ -10,8 +10,8 @@ export async function GET() {
 
   const bookings =
     session.role === "admin"
-      ? store.bookings.getAll()
-      : store.bookings.getByUser(session.userId);
+      ? await store.bookings.getAll()
+      : await store.bookings.getByUser(session.userId);
 
   return NextResponse.json({ bookings });
 }
@@ -19,10 +19,10 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const session = await getSession();
   const body = await req.json();
-  const user = session ? store.users.findById(session.userId) : null;
+  const user = session ? await store.users.findById(session.userId) : null;
   const useProfileBirth = user && isBirthProfileComplete(user);
 
-  const booking = store.bookings.create({
+  const booking = await store.bookings.create({
     userId: session?.userId || "guest",
     userName: body.userName || user?.name,
     userEmail: body.userEmail || user?.email,

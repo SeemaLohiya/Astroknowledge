@@ -7,7 +7,7 @@ export async function GET() {
   if (!session) return NextResponse.json({ vouchers: [] });
 
   const now = new Date();
-  const vouchers = vouchersStore.getForUser(session.userId).filter((v) => {
+  const vouchers = (await vouchersStore.getForUser(session.userId)).filter((v) => {
     const until = new Date(v.validUntil);
     until.setHours(23, 59, 59, 999);
     return v.active && now <= until && now >= new Date(v.validFrom);

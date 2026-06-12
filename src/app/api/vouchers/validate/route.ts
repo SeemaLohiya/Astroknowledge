@@ -14,8 +14,8 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { items: validated, total: subtotal } = validateCartItems(items);
-    const result = validateVoucherForUser(code, session.userId, validated, subtotal);
+    const { items: validated, total: subtotal } = await validateCartItems(items);
+    const result = await validateVoucherForUser(code, session.userId, validated, subtotal);
     return NextResponse.json({
       valid: true,
       code: result.voucher.code,

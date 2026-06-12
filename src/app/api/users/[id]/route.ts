@@ -10,7 +10,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const { id } = await params;
   const body = await req.json();
-  const user = store.users.findById(id);
+  const user = await store.users.findById(id);
   if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   if (body.role && (body.role === "admin" || body.role === "user")) {
@@ -42,6 +42,6 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     body.birthPlaceUnknown !== undefined;
   if (birthTouched) user.birthDetailsUpdatedAt = new Date().toISOString();
 
-  store.users.persist(user);
+  await store.users.persist(user);
   return NextResponse.json({ user: sanitizeUser(user) });
 }

@@ -15,13 +15,13 @@ function isWithinDateRange(voucher: Voucher, now = new Date()) {
   return now >= from && now <= until;
 }
 
-export function validateVoucherForUser(
+export async function validateVoucherForUser(
   code: string,
   userId: string,
   items: CartItem[],
   subtotal: number
-): VoucherApplyResult {
-  const voucher = vouchersStore.getByCode(code);
+): Promise<VoucherApplyResult> {
+  const voucher = await vouchersStore.getByCode(code);
   if (!voucher) throw new Error("Invalid voucher code");
   if (!voucher.active) throw new Error("This voucher is no longer active");
   if (!voucher.assignedUserIds.includes(userId)) {

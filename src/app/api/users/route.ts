@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   const search = req.nextUrl.searchParams.get("search")?.toLowerCase() || "";
   const role = req.nextUrl.searchParams.get("role");
 
-  let users = store.users.getAll().map(sanitizeUser);
+  let users = (await store.users.getAll()).map(sanitizeUser);
 
   if (role && role !== "all") {
     users = users.filter((u) => u.role === role);

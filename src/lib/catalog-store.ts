@@ -1,5 +1,7 @@
 import fs from "fs";
 import path from "path";
+import * as mongoCatalog from "./db/catalog-repo";
+import { isMongoEnabled } from "./db/connect";
 import { poojaServices } from "./data/content";
 import { courses } from "./data/courses";
 import { healingServices } from "./data/healing";
@@ -82,17 +84,32 @@ function slugify(text: string) {
     .slice(0, 48);
 }
 
+async function ensureMongoSeeded() {
+  await mongoCatalog.seedCatalogToMongo(readCatalog());
+}
+
 export const catalogStore = {
-  getAll<T extends CatalogType>(type: T): CatalogData[T] {
-    const data = readCatalog();
-    return data[type];
+  async getAll<T extends CatalogType>(type: T): Promise<CatalogData[T]> {
+    if (isMongoEnabled()) {
+      await ensureMongoSeeded();
+      return (await mongoCatalog.mongoGetAll(type)) as CatalogData[T];
+    }
+    return readCatalog()[type];
   },
 
-  getById(type: CatalogType, id: string) {
-    return this.getAll(type).find((item) => item.id === id);
+  async getById(type: CatalogType, id: string) {
+    if (isMongoEnabled()) {
+      await ensureMongoSeeded();
+      return mongoCatalog.mongoGetById(type, id);
+    }
+    return (readCatalog()[type] as { id: string }[]).find((item) => item.id === id);
   },
 
-  create(type: CatalogType, item: Record<string, unknown>) {
+  async create(type: CatalogType, item: Record<string, unknown>) {
+    if (isMongoEnabled()) {
+      await ensureMongoSeeded();
+      return mongoCatalog.mongoCreate(type, item);
+    }
     const data = readCatalog();
     const id = (item.id as string) || `${type.slice(0, 3)}-${Date.now()}`;
     const newItem = { ...item, id };
@@ -101,7 +118,11 @@ export const catalogStore = {
     return newItem;
   },
 
-  update(type: CatalogType, id: string, updates: Record<string, unknown>) {
+  async update(type: CatalogType, id: string, updates: Record<string, unknown>) {
+    if (isMongoEnabled()) {
+      await ensureMongoSeeded();
+      return mongoCatalog.mongoUpdate(type, id, updates);
+    }
     const data = readCatalog();
     const items = data[type] as { id: string }[];
     const index = items.findIndex((item) => item.id === id);
@@ -112,7 +133,11 @@ export const catalogStore = {
     return updated;
   },
 
-  delete(type: CatalogType, id: string) {
+  async delete(type: CatalogType, id: string) {
+    if (isMongoEnabled()) {
+      await ensureMongoSeeded();
+      return mongoCatalog.mongoDelete(type, id);
+    }
     const data = readCatalog();
     const items = data[type] as { id: string }[];
     const index = items.findIndex((item) => item.id === id);
@@ -182,9 +207,19 @@ export const catalogStore = {
     return base;
   },
 
-  getCategories: () => readCatalog().categories || [],
+  async getCategories() {
+    if (isMongoEnabled()) {
+      await ensureMongoSeeded();
+      return (await mongoCatalog.mongoGetCategories()) as ProductCategory[];
+    }
+    return readCatalog().categories || [];
+  },
 
-  createCategory: (cat: Omit<ProductCategory, "id"> & { id?: string }) => {
+  async createCategory(cat: Omit<ProductCategory, "id"> & { id?: string }) {
+    if (isMongoEnabled()) {
+      await ensureMongoSeeded();
+      return (await mongoCatalog.mongoCreateCategory(cat)) as ProductCategory;
+    }
     const data = readCatalog();
     const id = cat.id || slugify(cat.name);
     const newCat = { ...cat, id };
@@ -193,7 +228,11 @@ export const catalogStore = {
     return newCat;
   },
 
-  updateCategory: (id: string, updates: Partial<ProductCategory>) => {
+  async updateCategory(id: string, updates: Partial<ProductCategory>) {
+    if (isMongoEnabled()) {
+      await ensureMongoSeeded();
+      return (await mongoCatalog.mongoUpdateCategory(id, updates)) as ProductCategory | null;
+    }
     const data = readCatalog();
     const index = data.categories.findIndex((c) => c.id === id);
     if (index === -1) return null;
@@ -202,7 +241,11 @@ export const catalogStore = {
     return data.categories[index];
   },
 
-  deleteCategory: (id: string) => {
+  async deleteCategory(id: string) {
+    if (isMongoEnabled()) {
+      await ensureMongoSeeded();
+      return mongoCatalog.mongoDeleteCategory(id);
+    }
     const data = readCatalog();
     data.categories = data.categories.filter((c) => c.id !== id);
     writeCatalog(data);

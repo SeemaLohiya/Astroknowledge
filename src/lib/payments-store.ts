@@ -2,6 +2,8 @@ import fs from "fs";
 import path from "path";
 import { CartItem, PaymentRecord, PaymentStatus } from "./types";
 import { store } from "./store";
+import { isMongoEnabled } from "./db/connect";
+import * as mongo from "./db/app-data-repo";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const PAYMENTS_PATH = path.join(DATA_DIR, "payments.json");
@@ -62,7 +64,20 @@ function writePayments(payments: PaymentRecord[]) {
   fs.writeFileSync(PAYMENTS_PATH, JSON.stringify(payments, null, 2), "utf-8");
 }
 
-function createOrderFromPayment(payment: PaymentRecord) {
+async function getPaymentsList(): Promise<PaymentRecord[]> {
+  if (isMongoEnabled()) return mongo.mongoGetPayments();
+  return readPayments();
+}
+
+async function savePaymentsList(payments: PaymentRecord[]) {
+  if (isMongoEnabled()) {
+    for (const p of payments) await mongo.mongoSavePayment(p);
+    return;
+  }
+  writePayments(payments);
+}
+
+async function createOrderFromPayment(payment: PaymentRecord) {
   return store.orders.create({
     userId: payment.userId,
     userName: payment.userName,
@@ -78,16 +93,19 @@ function createOrderFromPayment(payment: PaymentRecord) {
 }
 
 export const paymentsStore = {
-  getAll: () => readPayments().sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+  getAll: async () => (await getPaymentsList()).sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
 
-  getById: (id: string) => readPayments().find((p) => p.id === id) || null,
+  getById: async (id: string) => {
+    if (isMongoEnabled()) return mongo.mongoGetPaymentById(id);
+    return readPayments().find((p) => p.id === id) || null;
+  },
 
-  getByUser: (userId: string) => readPayments().filter((p) => p.userId === userId),
+  getByUser: async (userId: string) => (await getPaymentsList()).filter((p) => p.userId === userId),
 
-  hasPaidAccess: (userId: string) =>
-    readPayments().some((p) => p.userId === userId && p.status === "paid"),
+  hasPaidAccess: async (userId: string) =>
+    (await getPaymentsList()).some((p) => p.userId === userId && p.status === "paid"),
 
-  createCheckout: (data: {
+  createCheckout: async (data: {
     userId: string;
     userName: string;
     userEmail: string;
@@ -99,7 +117,7 @@ export const paymentsStore = {
     voucherCode?: string;
     voucherId?: string;
   }) => {
-    const payments = readPayments();
+    const payments = await getPaymentsList();
     const payment: PaymentRecord = {
       id: `pay-${Date.now()}`,
       type: "checkout",
@@ -126,16 +144,17 @@ export const paymentsStore = {
       createdAt: new Date().toISOString(),
     };
     payments.push(payment);
-    writePayments(payments);
+    if (isMongoEnabled()) await mongo.mongoSavePayment(payment);
+    else writePayments(payments);
     return payment;
   },
 
-  processPayment: (
+  processPayment: async (
     id: string,
     method: "razorpay" | "admin_approval",
     extras?: { transactionRefId?: string; paymentProofImage?: string }
   ) => {
-    const payments = readPayments();
+    const payments = await getPaymentsList();
     const payment = payments.find((p) => p.id === id);
     if (!payment) return null;
 
@@ -147,62 +166,62 @@ export const paymentsStore = {
     } else {
       payment.method = "razorpay";
       payment.status = "paid";
-      const order = createOrderFromPayment(payment);
+      const order = await createOrderFromPayment(payment);
       payment.referenceId = order.id;
     }
-    writePayments(payments);
+    await savePaymentsList(payments);
     return payment;
   },
 
-  approvePayment: (id: string, adminComment?: string) => {
-    const payments = readPayments();
+  approvePayment: async (id: string, adminComment?: string) => {
+    const payments = await getPaymentsList();
     const payment = payments.find((p) => p.id === id);
     if (!payment || payment.status !== "awaiting_approval") return null;
     payment.status = "paid";
     if (adminComment?.trim()) payment.adminComment = adminComment.trim();
-    const order = createOrderFromPayment(payment);
+    const order = await createOrderFromPayment(payment);
     payment.referenceId = order.id;
-    writePayments(payments);
+    await savePaymentsList(payments);
     return payment;
   },
 
-  rejectPayment: (id: string, adminComment?: string) => {
-    const payments = readPayments();
+  rejectPayment: async (id: string, adminComment?: string) => {
+    const payments = await getPaymentsList();
     const payment = payments.find((p) => p.id === id);
     if (!payment || payment.status !== "awaiting_approval") return null;
     payment.status = "failed";
     if (adminComment?.trim()) payment.adminComment = adminComment.trim();
-    writePayments(payments);
+    await savePaymentsList(payments);
     return payment;
   },
 
-  confirmRazorpayPayment: (
+  confirmRazorpayPayment: async (
     id: string,
     data: { razorpayOrderId: string; razorpayPaymentId: string; razorpaySignature: string }
   ) => {
-    const payments = readPayments();
+    const payments = await getPaymentsList();
     const payment = payments.find((p) => p.id === id);
     if (!payment || payment.status === "paid") return null;
 
     payment.method = "razorpay";
     payment.status = "paid";
     payment.transactionRefId = data.razorpayPaymentId;
-    const order = createOrderFromPayment(payment);
+    const order = await createOrderFromPayment(payment);
     payment.referenceId = order.id;
-    writePayments(payments);
+    await savePaymentsList(payments);
     return payment;
   },
 
-  updateStatus: (id: string, status: PaymentStatus) => {
-    const payments = readPayments();
+  updateStatus: async (id: string, status: PaymentStatus) => {
+    const payments = await getPaymentsList();
     const payment = payments.find((p) => p.id === id);
     if (!payment) return null;
     payment.status = status;
     if (status === "paid" && !payment.referenceId) {
-      const order = createOrderFromPayment(payment);
+      const order = await createOrderFromPayment(payment);
       payment.referenceId = order.id;
     }
-    writePayments(payments);
+    await savePaymentsList(payments);
     return payment;
   },
 };

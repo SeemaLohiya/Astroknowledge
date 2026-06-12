@@ -374,6 +374,18 @@ textarea::placeholder {
 .animate-fade-in-up { animation: fade-in-up 0.45s ease-out both; }
 .animate-scale-in { animation: scale-in 0.4s ease-out both; }
 
+@keyframes tab-pop {
+  0% { transform: scale(0.94); }
+  55% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+.tab-pill-active { animation: tab-pop 0.32s ease-out both; }
+
+.section-lazy {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 420px;
+}
+
 /* ── Scroll reveal animations ── */
 @keyframes reveal-fade-up {
   from { opacity: 0; transform: translateY(28px); }

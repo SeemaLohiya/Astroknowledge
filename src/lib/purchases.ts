@@ -25,11 +25,11 @@ export interface PaidServiceItem {
   price: number;
 }
 
-export function getPaidServices(userId: string): PaidServiceItem[] {
+export async function getPaidServices(userId: string): Promise<PaidServiceItem[]> {
   const seen = new Set<string>();
   const services: PaidServiceItem[] = [];
 
-  for (const purchase of getUserPurchases(userId)) {
+  for (const purchase of await getUserPurchases(userId)) {
     if (purchase.paymentStatus !== "paid") continue;
     for (const item of purchase.items ?? []) {
       if (item.itemType !== "service" || seen.has(item.id)) continue;
@@ -41,14 +41,15 @@ export function getPaidServices(userId: string): PaidServiceItem[] {
   return services;
 }
 
-export function hasPaidServiceAccess(userId: string): boolean {
-  return getPaidServices(userId).length > 0;
+export async function hasPaidServiceAccess(userId: string): Promise<boolean> {
+  const services = await getPaidServices(userId);
+  return services.length > 0;
 }
 
 /** Purchases from real checkout payments only — no orphan seed orders */
-export function getUserPurchases(userId: string): UserPurchase[] {
-  return paymentsStore
-    .getByUser(userId)
+export async function getUserPurchases(userId: string): Promise<UserPurchase[]> {
+  const payments = await paymentsStore.getByUser(userId);
+  return payments
     .filter((p) => p.type === "checkout")
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
     .map(paymentToPurchase);

@@ -20,13 +20,15 @@ export async function GET(req: NextRequest) {
   }
 
   const format = req.nextUrl.searchParams.get("format") || "csv";
-  const users = store.users.getAll().filter((u) => u.role === "user").map(sanitizeUser);
+  const users = (await store.users.getAll()).filter((u) => u.role === "user").map(sanitizeUser);
+  const allOrders = await store.orders.getAll();
+  const allBookings = await store.bookings.getAll();
 
-  const rows = users.map((u) => {
+  const rows = await Promise.all(users.map(async (u) => {
     const addrs = addressesStore.getByUser(u.id);
-    const payments = paymentsStore.getByUser(u.id);
-    const orders = store.orders.getAll().filter((o) => o.userId === u.id);
-    const bookings = store.bookings.getAll().filter((b) => b.userId === u.id);
+    const payments = await paymentsStore.getByUser(u.id);
+    const orders = allOrders.filter((o) => o.userId === u.id);
+    const bookings = allBookings.filter((b) => b.userId === u.id);
     const addrStr = addrs.map((a) => `${a.line1}, ${a.city}, ${a.state}, ${a.country || "India"} ${a.pincode}`).join(" | ");
     return {
       id: u.id,
@@ -44,7 +46,7 @@ export async function GET(req: NextRequest) {
       bookingsCount: bookings.length,
       totalSpent: payments.filter((p) => p.status === "paid").reduce((s, p) => s + p.amount, 0),
     };
-  });
+  }));
 
   if (format === "json") {
     return NextResponse.json({ users: rows, exportedAt: new Date().toISOString() });

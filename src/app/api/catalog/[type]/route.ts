@@ -15,7 +15,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ typ
   const { type } = await params;
   if (!isValidType(type)) return NextResponse.json({ error: "Invalid catalog type" }, { status: 400 });
   return NextResponse.json(
-    { items: catalogStore.getAll(type) },
+    { items: await catalogStore.getAll(type) },
     { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } }
   );
 }
@@ -28,6 +28,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ typ
   if (!isValidType(type)) return NextResponse.json({ error: "Invalid catalog type" }, { status: 400 });
 
   const body = await req.json();
-  const item = catalogStore.create(type, body);
+  const item = await catalogStore.create(type, body);
   return NextResponse.json({ item }, { status: 201 });
 }

@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   const search = req.nextUrl.searchParams.get("search")?.toLowerCase() || "";
   const method = req.nextUrl.searchParams.get("method");
 
-  let payments = paymentsStore.getAll();
+  let payments = await paymentsStore.getAll();
 
   if (status && status !== "all") payments = payments.filter((p) => p.status === status);
   if (type && type !== "all") payments = payments.filter((p) => p.type === type);

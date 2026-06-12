@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   return NextResponse.json(
-    { categories: catalogStore.getCategories() },
+    { categories: await catalogStore.getCategories() },
     { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } }
   );
 }
@@ -17,6 +17,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const body = await req.json();
-  const category = catalogStore.createCategory(body);
+  const category = await catalogStore.createCategory(body);
   return NextResponse.json({ category }, { status: 201 });
 }
