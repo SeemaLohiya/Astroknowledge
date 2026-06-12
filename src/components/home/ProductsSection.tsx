@@ -32,6 +32,7 @@ export function ProductsSection() {
                   <AnimatedCatalogImage
                     src={cat.image || "/images/products/p1.jpg"}
                     alt={cat.name}
+                    index={index}
                     sizes="(max-width:640px) 50vw, 14vw"
                     frameClassName="aspect-square bg-orange/5"
                   />

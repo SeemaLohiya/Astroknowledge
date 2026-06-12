@@ -9,7 +9,6 @@ import { AnimatedCounter } from "@/components/animations/AnimatedCounter";
 import { SITE } from "@/lib/constants";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { motion } from "framer-motion";
-import { ExpertiseGrid } from "@/components/about/ExpertiseGrid";
 import { YouTubeSection } from "@/components/about/YouTubeSection";
 import { Award, Heart, Sparkles, Users } from "lucide-react";
 
@@ -84,8 +83,6 @@ export default function AboutPage() {
               ))}
             </div>
           </FadeIn>
-
-          <ExpertiseGrid />
 
           <YouTubeSection />
 

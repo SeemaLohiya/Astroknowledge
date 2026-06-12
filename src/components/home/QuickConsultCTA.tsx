@@ -1,10 +1,10 @@
 "use client";
 
 import { FadeIn } from "@/components/animations/FadeIn";
-import { RevealOnScroll } from "@/components/animations/RevealOnScroll";
 import { ShimmerText } from "@/components/animations/ShimmerText";
 import { Button } from "@/components/ui/Button";
-import { SITE, ZODIAC_SIGNS } from "@/lib/constants";
+import { ZodiacTabsPanel } from "@/components/zodiac/ZodiacTabsPanel";
+import { SITE } from "@/lib/constants";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { Calendar, Sparkles } from "lucide-react";
 
@@ -29,7 +29,7 @@ export function QuickConsultCTA() {
             </p>
 
             <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <Button href="/booking" variant="secondary" size="lg" className="cta-shimmer-btn">
+              <Button href="/dashboard/slots" variant="secondary" size="lg" className="cta-shimmer-btn">
                 <Calendar className="h-5 w-5" /> {c.hero.bookConsultation}
               </Button>
               <Button href="/services" variant="outline" size="lg">
@@ -37,14 +37,8 @@ export function QuickConsultCTA() {
               </Button>
             </div>
 
-            <div className="mt-8 flex flex-wrap justify-center gap-2">
-              {ZODIAC_SIGNS.map((sign, i) => (
-                <RevealOnScroll key={sign.sign} delay={i * 0.04} variant="scale">
-                  <span className="inline-block rounded-full border border-gold/20 bg-cream px-2.5 py-1 text-xs text-text-body transition-colors hover:border-gold/50 hover:bg-gold/10 hover:scale-110">
-                    {sign.symbol} {sign.sign}
-                  </span>
-                </RevealOnScroll>
-              ))}
+            <div className="mt-8 text-left">
+              <ZodiacTabsPanel compact showTitle />
             </div>
           </div>
         </FadeIn>

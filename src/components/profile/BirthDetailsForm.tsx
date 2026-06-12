@@ -11,6 +11,7 @@ import {
   parseBirthPlace,
   type BirthPlaceValue,
 } from "./BirthPlacePicker";
+import { BirthTimeFields, DobFields } from "./DateTimeFields";
 
 export interface BirthFormState {
   dob: string;
@@ -90,13 +91,11 @@ export function BirthDetailsForm({ onSubmit, loading, initial, submitLabel = "Sa
       </p>
 
       <div>
-        <label className="block text-xs text-text-muted mb-1">Date of Birth *</label>
-        <input
-          type="date"
+        <label className="block text-xs text-text-muted mb-2">Date of Birth *</label>
+        <DobFields
           value={form.dob}
           disabled={form.dobUnknown}
-          onChange={(e) => setForm({ ...form, dob: e.target.value })}
-          className="w-full rounded-xl border border-gold/20 bg-orange/5 px-4 py-3 text-sm disabled:opacity-50"
+          onChange={(dob) => setForm({ ...form, dob })}
         />
         <label className="mt-2 flex items-center gap-2 text-sm text-text-body">
           <input
@@ -109,13 +108,11 @@ export function BirthDetailsForm({ onSubmit, loading, initial, submitLabel = "Sa
       </div>
 
       <div>
-        <label className="block text-xs text-text-muted mb-1">Time of Birth *</label>
-        <input
-          type="time"
+        <label className="block text-xs text-text-muted mb-2">Time of Birth *</label>
+        <BirthTimeFields
           value={form.birthTime}
           disabled={form.birthTimeUnknown}
-          onChange={(e) => setForm({ ...form, birthTime: e.target.value })}
-          className="w-full rounded-xl border border-gold/20 bg-orange/5 px-4 py-3 text-sm disabled:opacity-50"
+          onChange={(birthTime) => setForm({ ...form, birthTime })}
         />
         <label className="mt-2 flex items-center gap-2 text-sm text-text-body">
           <input

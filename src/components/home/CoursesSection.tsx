@@ -41,6 +41,7 @@ export function CoursesSection() {
                   <AnimatedCatalogImage
                     src={course.image}
                     alt={course.title}
+                    index={index}
                     sizes="(max-width:640px) 50vw, 25vw"
                     frameClassName="h-52 bg-orange/5"
                   />

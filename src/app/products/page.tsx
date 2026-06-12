@@ -74,13 +74,14 @@ function ProductsContent() {
             />
           ) : (
             <StaggerChildren className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {filtered.map((product) => (
+              {filtered.map((product, index) => (
                 <StaggerItem key={product.id}>
                   <div className="hover-lift-card group overflow-hidden rounded-2xl border border-gold/15 glass-card glass-card-hover">
                     <Link href={`/products/${product.id}`} className="relative block">
                       <AnimatedCatalogImage
                         src={product.image}
                         alt={localizedTitle(product, lang)}
+                        index={index}
                         sizes="(max-width:640px) 50vw, 25vw"
                         variant="contain"
                         frameClassName="h-48 bg-gradient-to-br from-orange/5 to-gold/5"

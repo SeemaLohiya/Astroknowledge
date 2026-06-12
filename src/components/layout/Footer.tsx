@@ -33,7 +33,7 @@ export function Footer() {
       { label: "Healing", href: "/healing" },
       { label: "YouTube", href: SITE.youtube },
       { label: c.footer.links.contact, href: "/contact" },
-      { label: c.footer.links.bookConsultation, href: "/booking" },
+      { label: c.footer.links.bookConsultation, href: "/dashboard/slots" },
     ],
   };
 

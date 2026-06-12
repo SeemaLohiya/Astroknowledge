@@ -31,7 +31,7 @@ export default function CoursesPage() {
       <section className="py-12 md:py-16">
         <div className="mx-auto max-w-7xl px-4">
           <StaggerChildren className="grid gap-8 md:grid-cols-2">
-              {courses.map((course) => {
+              {courses.map((course, index) => {
                 const sessionDesc = localizedSessionDesc(course, lang);
                 return (
                   <StaggerItem key={course.id}>
@@ -41,7 +41,8 @@ export default function CoursesPage() {
                           <AnimatedCatalogImage
                             src={course.image}
                             alt={localizedTitle(course, lang)}
-                            sizes="224px"
+                            index={index}
+                            sizes="(max-width:640px) 100vw, 224px"
                             frameClassName="h-52 w-full sm:h-56 sm:w-56"
                           />
                           {course.popular && (

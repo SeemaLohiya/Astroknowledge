@@ -24,7 +24,7 @@ const NAV: Record<Lang, NavDropdown[]> = {
         { href: "/services#numerology", label: "Numerology", desc: "Name & number analysis" },
         { href: "/services#palmistry", label: "Palmistry", desc: "Hand reading analysis" },
         { href: "/healing", label: "Healing", desc: "Reiki, crystal & theta healing" },
-        { href: "/booking", label: "Book Consultation", desc: "Schedule a consultation" },
+        { href: "/dashboard/slots", label: "Book Consultation", desc: "Schedule a consultation" },
       ],
     },
     {
@@ -62,7 +62,7 @@ const NAV: Record<Lang, NavDropdown[]> = {
         { href: "/services#numerology", label: "अंक ज्योतिष", desc: "नाम और अंक विश्लेषण" },
         { href: "/services#palmistry", label: "हस्तरेखा", desc: "हाथ की रेखा विश्लेषण" },
         { href: "/healing", label: "हीलिंग", desc: "रेकी, क्रिस्टल और थीटा हीलिंग" },
-        { href: "/booking", label: "परामर्श बुक करें", desc: "परामर्श का समय निर्धारित करें" },
+        { href: "/dashboard/slots", label: "परामर्श बुक करें", desc: "परामर्श का समय निर्धारित करें" },
       ],
     },
     {

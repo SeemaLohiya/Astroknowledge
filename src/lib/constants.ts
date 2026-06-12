@@ -58,7 +58,7 @@ export const NAV_DROPDOWNS = [
       { href: "/services#vastu-consultancy", label: "Vastu Consultancy", desc: "Home & office Vastu" },
       { href: "/services#numerology", label: "Numerology", desc: "Name & number analysis" },
       { href: "/services#palmistry", label: "Palmistry", desc: "Hand reading analysis" },
-      { href: "/booking", label: "Book Consultation", desc: "Schedule a consultation" },
+      { href: "/dashboard/slots", label: "Book Consultation", desc: "Schedule a consultation" },
     ],
   },
   {

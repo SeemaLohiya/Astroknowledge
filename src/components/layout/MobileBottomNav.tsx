@@ -12,7 +12,7 @@ import { usePathname } from "next/navigation";
 const navItems = [
   { href: "/services", icon: Sparkles, labelKey: "services" as const },
   { href: "/courses", icon: BookOpen, labelKey: "courses" as const },
-  { href: "/booking", icon: Calendar, labelKey: "book" as const, accent: true },
+  { href: "/dashboard/slots", icon: Calendar, labelKey: "book" as const, accent: true },
   { href: "/products", icon: ShoppingBag, labelKey: "shop" as const },
   { href: "/login", icon: User, labelKey: "account" as const },
 ];

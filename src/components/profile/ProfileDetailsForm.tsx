@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { BirthFormState, birthFormFromUser, isBirthFormValid } from "./BirthDetailsForm";
 import { BirthPlacePicker, composeBirthPlace, type BirthPlaceValue } from "./BirthPlacePicker";
+import { BirthTimeFields, DobFields } from "./DateTimeFields";
 
 export interface ProfileFormState extends BirthFormState {
   name: string;
@@ -168,8 +169,12 @@ export function ProfileDetailsForm({
         <p className="text-xs text-text-muted">Required for Kundali analysis and consultation accuracy.</p>
 
         <div>
-          <label className="mb-1 block text-xs text-text-muted">Date of Birth *</label>
-          <input type="date" value={form.dob} disabled={form.dobUnknown} onChange={(e) => setForm({ ...form, dob: e.target.value })} className={`${inputCls} disabled:opacity-50`} />
+          <label className="mb-2 block text-xs text-text-muted">Date of Birth *</label>
+          <DobFields
+            value={form.dob}
+            disabled={form.dobUnknown}
+            onChange={(dob) => setForm({ ...form, dob })}
+          />
           <label className="mt-2 flex items-center gap-2 text-sm text-text-body">
             <input type="checkbox" checked={form.dobUnknown} onChange={(e) => setForm({ ...form, dobUnknown: e.target.checked, dob: e.target.checked ? "" : form.dob })} />
             I don&apos;t know my date of birth
@@ -177,10 +182,14 @@ export function ProfileDetailsForm({
         </div>
 
         <div>
-          <label className="mb-1 flex items-center gap-1 text-xs text-text-muted">
+          <label className="mb-2 flex items-center gap-1 text-xs text-text-muted">
             <Clock className="h-3.5 w-3.5 text-gold" /> Time of Birth *
           </label>
-          <input type="time" value={form.birthTime} disabled={form.birthTimeUnknown} onChange={(e) => setForm({ ...form, birthTime: e.target.value })} className={`${inputCls} disabled:opacity-50`} />
+          <BirthTimeFields
+            value={form.birthTime}
+            disabled={form.birthTimeUnknown}
+            onChange={(birthTime) => setForm({ ...form, birthTime })}
+          />
           <label className="mt-2 flex items-center gap-2 text-sm text-text-body">
             <input type="checkbox" checked={form.birthTimeUnknown} onChange={(e) => setForm({ ...form, birthTimeUnknown: e.target.checked, birthTime: e.target.checked ? "" : form.birthTime })} />
             I don&apos;t know my time of birth

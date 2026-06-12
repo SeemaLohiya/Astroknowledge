@@ -3,7 +3,7 @@
 import { RevealOnScroll } from "@/components/animations/RevealOnScroll";
 import { SectionBackdrop } from "@/components/animations/SectionBackdrop";
 import { NAVGRAHA, NavgrahaPlanet } from "@/lib/data/navgraha";
-import { ZODIAC_DETAILS, ZodiacSignDetail } from "@/lib/data/zodiac";
+import { ZodiacTabsPanel } from "@/components/zodiac/ZodiacTabsPanel";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { cn } from "@/lib/cn";
 import { Calendar, Gem, Sparkles, Star } from "lucide-react";
@@ -125,59 +125,9 @@ function PlanetDetail({ planet, burst }: { planet: NavgrahaPlanet; burst: number
   );
 }
 
-function ZodiacDetail({ sign, hi }: { sign: ZodiacSignDetail; hi: boolean }) {
-  return (
-    <div
-      className="mt-4 rounded-2xl border bg-white/80 p-5 md:p-6"
-      style={{ borderColor: `${sign.color}44`, boxShadow: `0 8px 32px ${sign.color}18` }}
-    >
-      <div className="flex flex-wrap items-start gap-4">
-        <div
-          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl text-2xl text-white"
-          style={{ background: `linear-gradient(135deg, ${sign.color}, ${sign.color}99)` }}
-        >
-          {sign.symbol}
-        </div>
-        <div className="min-w-0 flex-1">
-          <h4 className="font-display text-xl font-bold text-text-primary">
-            {hi ? sign.hindi : sign.sign} <span className="text-sm font-normal text-text-muted">({sign.dates})</span>
-          </h4>
-          <p className="mt-1 text-sm font-medium" style={{ color: sign.color }}>
-            {hi ? sign.elementHindi : sign.element} · {hi ? sign.rulerHindi : sign.ruler}
-          </p>
-        </div>
-      </div>
-      <p className="mt-4 text-sm leading-relaxed text-text-body">{hi ? sign.descriptionHindi : sign.description}</p>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <div>
-          <p className="mb-1 text-xs font-bold uppercase tracking-wider text-gold">Strengths</p>
-          <ul className="space-y-1 text-sm text-text-body">
-            {sign.strengths.map((s) => (
-              <li key={s} className="flex gap-2"><Star className="mt-0.5 h-3 w-3 shrink-0 text-gold" />{s}</li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <p className="mb-1 text-xs font-bold uppercase tracking-wider text-gold">Growth areas</p>
-          <ul className="space-y-1 text-sm text-text-body">
-            {sign.challenges.map((s) => (
-              <li key={s} className="flex gap-2"><Star className="mt-0.5 h-3 w-3 shrink-0 text-orange" />{s}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-      <div className="mt-4 flex flex-wrap gap-2 text-xs">
-        <span className="rounded-full border border-gold/20 bg-gold/5 px-3 py-1">Gem: {sign.luckyGem}</span>
-        <span className="rounded-full border border-gold/20 bg-gold/5 px-3 py-1">Day: {sign.luckyDay}</span>
-      </div>
-    </div>
-  );
-}
-
 export function CosmicElementsSection() {
   const { c, lang } = useLanguage();
   const [selected, setSelected] = useState<NavgrahaPlanet>(NAVGRAHA[0]);
-  const [selectedZodiac, setSelectedZodiac] = useState<ZodiacSignDetail>(ZODIAC_DETAILS[0]);
   const [burst, setBurst] = useState(0);
   const [paused, setPaused] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -319,40 +269,7 @@ export function CosmicElementsSection() {
         </RevealOnScroll>
 
         <RevealOnScroll className="mt-10">
-          <div className="relative overflow-hidden rounded-2xl border border-gold/15 bg-white/60 px-4 py-5 md:px-6">
-            <p className="mb-4 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-gold">12 Rashis · Zodiac Wheel</p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {ZODIAC_DETAILS.map((sign) => {
-                const active = selectedZodiac.id === sign.id;
-                return (
-                  <button
-                    key={sign.id}
-                    type="button"
-                    onClick={() => setSelectedZodiac(sign)}
-                    className={cn(
-                      "zodiac-tab flex items-center gap-2 rounded-xl border px-3 py-2 text-left text-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-gold",
-                      active
-                        ? "border-gold/50 bg-white shadow-md scale-[1.02]"
-                        : "border-gold/20 bg-orange/5 hover:border-gold/40 hover:bg-gold/5"
-                    )}
-                    aria-pressed={active}
-                    aria-label={`${sign.sign} zodiac sign`}
-                  >
-                    <span
-                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-base text-white"
-                      style={{ background: sign.color }}
-                    >
-                      {sign.symbol}
-                    </span>
-                    <span className={cn("font-semibold", active ? "text-gold" : "text-text-primary")}>
-                      {lang === "hi" ? sign.hindi : sign.sign}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-            <ZodiacDetail sign={selectedZodiac} hi={lang === "hi"} />
-          </div>
+          <ZodiacTabsPanel />
         </RevealOnScroll>
       </div>
     </section>

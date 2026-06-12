@@ -11,7 +11,7 @@ const TABS = [
   { href: "/courses", key: "courses" as const, icon: BookOpen, color: "from-gold to-orange", ring: "ring-gold/30" },
   { href: "/products", key: "products" as const, icon: Package, color: "from-orange to-gold-bright", ring: "ring-orange/30" },
   { href: "/pooja", key: "pooja" as const, icon: Flame, color: "from-amber-500 to-gold", ring: "ring-amber-300/50", highlight: true },
-  { href: "/booking", key: "book" as const, icon: Calendar, color: "from-teal to-emerald-500", ring: "ring-teal/30", isBook: true },
+  { href: "/dashboard/slots", key: "book" as const, icon: Calendar, color: "from-teal to-emerald-500", ring: "ring-teal/30", isBook: true },
 ];
 
 export function QuickNavStrip() {
@@ -82,7 +82,7 @@ export function QuickNavStrip() {
 
         <RevealOnScroll delay={0.35} variant="zoom" className="mt-4 flex justify-center">
           <Link
-            href="/booking"
+            href="/dashboard/slots"
             className="cta-shimmer-btn inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-orange px-5 py-2 text-sm font-bold text-white shadow-md transition-transform hover:scale-105 hover:shadow-lg animate-border-glow"
           >
             <Calendar className="h-4 w-4" />

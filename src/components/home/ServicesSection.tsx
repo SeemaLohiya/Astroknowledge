@@ -39,6 +39,8 @@ export function ServicesSection() {
                   <AnimatedCatalogImage
                     src={service.image}
                     alt={service.title}
+                    index={index}
+                    sizes="(max-width:640px) 50vw, 280px"
                     variant="contain"
                     frameClassName="relative h-48 bg-gradient-to-br from-orange/10 to-gold/5"
                   />

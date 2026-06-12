@@ -50,6 +50,7 @@ export default function ServicesPage() {
                       <AnimatedCatalogImage
                         src={service.image}
                         alt={localizedTitle(service, lang)}
+                        index={index}
                         sizes="(max-width:640px) 100vw, 208px"
                         variant="contain"
                         frameClassName="h-52 w-full bg-gradient-to-br from-orange/10 to-gold/5 sm:h-full sm:min-h-[13rem]"
@@ -91,12 +92,12 @@ export default function ServicesPage() {
                         name={localizedTitle(service, lang)}
                         price={service.price}
                         image={service.image}
-                        bookHref="/booking"
+                        bookHref="/dashboard/slots"
                         bookLabel={c.hero.bookConsultation}
                         className="mt-4"
                       />
                       <Link
-                        href="/booking"
+                        href="/dashboard/slots"
                         className="mt-2 text-center text-xs font-semibold text-orange transition-colors hover:text-gold sm:hidden"
                       >
                         {c.hero.bookConsultation} →

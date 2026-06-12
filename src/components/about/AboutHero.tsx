@@ -5,13 +5,10 @@ import { ShimmerText } from "@/components/animations/ShimmerText";
 import { Button } from "@/components/ui/Button";
 import { SITE } from "@/lib/constants";
 import { YOUTUBE_CHANNEL_URL } from "@/lib/data/youtube";
-import { headlineCertifications } from "@/lib/data/expertise";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { motion, useReducedMotion } from "framer-motion";
 import { Award, ExternalLink, Sparkles, Star, Video } from "lucide-react";
 import Link from "next/link";
-
-const FLOAT_BADGES = ["✦ Vedic Jyotish", "☽ BNN Expert", "✋ Palmistry", "★ 75,000+ Clients"];
 
 export function AboutHero() {
   const { c } = useLanguage();
@@ -117,7 +114,7 @@ export function AboutHero() {
             transition={{ delay: 0.4 }}
             className="mt-6 flex flex-wrap justify-center gap-3 lg:justify-start"
           >
-            <Button href="/booking" variant="secondary" size="lg">
+            <Button href="/dashboard/slots" variant="secondary" size="lg">
               {c.about.bookConsultation}
             </Button>
             <Button href={YOUTUBE_CHANNEL_URL} variant="outline" size="lg" className="gap-2">
@@ -126,37 +123,6 @@ export function AboutHero() {
               <ExternalLink className="h-3.5 w-3.5 opacity-70" />
             </Button>
           </motion.div>
-
-          <div className="mt-8 grid gap-3 sm:grid-cols-3">
-            {headlineCertifications.map((cert, i) => (
-              <motion.div
-                key={cert.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 * i }}
-                whileHover={reduceMotion ? undefined : { y: -4, scale: 1.02 }}
-                className="rounded-2xl border border-gold/20 bg-white/80 p-4 text-left shadow-sm backdrop-blur-sm"
-              >
-                <p className="text-xs font-bold text-gold">Expert</p>
-                <p className="mt-1 text-sm font-semibold text-text-primary leading-snug">{cert.title.replace("Expert in ", "")}</p>
-              </motion.div>
-            ))}
-          </div>
-
-          <div className="mt-6 flex flex-wrap justify-center gap-2 lg:justify-start">
-            {FLOAT_BADGES.map((badge, i) => (
-              <motion.span
-                key={badge}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.5 + i * 0.08 }}
-                className="rounded-full border border-gold/25 bg-gold/8 px-3 py-1 text-xs font-medium text-gold"
-              >
-                {badge}
-              </motion.span>
-            ))}
-          </div>
 
           <Link
             href="#youtube"
