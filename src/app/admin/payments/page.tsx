@@ -36,7 +36,11 @@ export default function AdminPaymentsPage() {
 
   useEffect(() => {
     const timer = setTimeout(load, 300);
-    return () => clearTimeout(timer);
+    const interval = setInterval(load, 15000);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
   }, [load]);
 
   const stats = useMemo(() => {

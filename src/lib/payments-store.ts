@@ -177,6 +177,7 @@ export const paymentsStore = {
     const payments = await getPaymentsList();
     const payment = payments.find((p) => p.id === id);
     if (!payment || payment.status !== "awaiting_approval") return null;
+    payment.method = payment.method || "admin_approval";
     payment.status = "paid";
     if (adminComment?.trim()) payment.adminComment = adminComment.trim();
     const order = await createOrderFromPayment(payment);
@@ -217,9 +218,12 @@ export const paymentsStore = {
     const payment = payments.find((p) => p.id === id);
     if (!payment) return null;
     payment.status = status;
-    if (status === "paid" && !payment.referenceId) {
-      const order = await createOrderFromPayment(payment);
-      payment.referenceId = order.id;
+    if (status === "paid") {
+      payment.method = payment.method || "admin_approval";
+      if (!payment.referenceId) {
+        const order = await createOrderFromPayment(payment);
+        payment.referenceId = order.id;
+      }
     }
     await savePaymentsList(payments);
     return payment;

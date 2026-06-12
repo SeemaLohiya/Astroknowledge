@@ -14,10 +14,9 @@ function monthKey(dateStr: string) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
-/** Only count verified paid checkout/order payments (excludes orphan seed rows). */
+/** Count verified paid transactions (admin-approved or Razorpay). */
 function isRealPaidPayment(p: PaymentRecord) {
   if (p.status !== "paid") return false;
-  if (!p.method) return false;
   if (!p.userId || !p.amount || p.amount <= 0) return false;
   return true;
 }
@@ -47,10 +46,11 @@ export async function GET() {
     const methodCounts = { razorpay: 0, admin_approval: 0 };
 
     paid.forEach((p) => {
-      if (p.method === "razorpay") {
+      const method = p.method || "admin_approval";
+      if (method === "razorpay") {
         methodRevenue.razorpay += p.amount;
         methodCounts.razorpay += 1;
-      } else if (p.method === "admin_approval") {
+      } else {
         methodRevenue.admin_approval += p.amount;
         methodCounts.admin_approval += 1;
       }
@@ -92,7 +92,13 @@ export async function GET() {
       completed: allBookings.filter((b) => b.status === "completed").length,
     };
 
-    const avgOrderValue = paid.length > 0 ? Math.round(revenue / paid.length) : 0;
+    const orderRevenue = allOrders.reduce((s, o) => s + o.total, 0);
+    const avgOrderValue =
+      allOrders.length > 0
+        ? Math.round(orderRevenue / allOrders.length)
+        : paid.length > 0
+          ? Math.round(revenue / paid.length)
+          : 0;
     const checkoutAttempts = payments.filter((p) => p.type === "checkout" || p.type === "order").length;
     const conversionRate = checkoutAttempts > 0 ? Math.round((paid.length / checkoutAttempts) * 100) : 0;
 
@@ -115,7 +121,10 @@ export async function GET() {
       categoryCounts,
       monthlyRevenue,
       bookingStats,
-      recentRevenue: paid.slice(0, 10).map((p) => ({
+      recentRevenue: [...paid]
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .slice(0, 10)
+        .map((p) => ({
         id: p.id,
         userName: p.userName,
         amount: p.amount,

@@ -115,7 +115,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     void load(true);
-    const interval = setInterval(() => void load(true), 30000);
+    const interval = setInterval(() => void load(true), 15000);
     const onVisible = () => {
       if (document.visibilityState === "visible") void load(true);
     };
@@ -195,9 +195,9 @@ export default function AdminPage() {
                 <card.icon className="mb-3 h-8 w-8 opacity-80" />
                 <p className="text-3xl font-bold">
                   {card.format ? (
-                    <>₹<AnimatedCounter value={card.value} /></>
+                    <>₹<AnimatedCounter key={`${card.label}-${card.value}`} value={card.value} duration={600} /></>
                   ) : (
-                    <AnimatedCounter value={card.value} />
+                    <AnimatedCounter key={`${card.label}-${card.value}`} value={card.value} duration={600} />
                   )}
                 </p>
                 <p className="text-sm opacity-90">{card.label}</p>

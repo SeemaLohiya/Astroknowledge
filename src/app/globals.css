@@ -160,6 +160,31 @@ iframe {
     transform: none !important;
     filter: none !important;
   }
+  .navgraha-lite .navgraha-ambient,
+  .navgraha-lite .navgraha-ambient-2,
+  .navgraha-lite .navgraha-stars,
+  .navgraha-lite .navgraha-constellation,
+  .navgraha-lite .navgraha-panel-ring,
+  .navgraha-lite .navgraha-panel-ring-2,
+  .navgraha-lite .navgraha-shockwave,
+  .navgraha-lite .navgraha-holo-scan,
+  .navgraha-lite .navgraha-satellite,
+  .navgraha-lite .navgraha-tab-ping,
+  .navgraha-lite .navgraha-tab-glow {
+    display: none !important;
+  }
+  .navgraha-lite .navgraha-orbit-crazy,
+  .navgraha-lite .navgraha-core-warp,
+  .navgraha-lite .navgraha-portal-enter,
+  .navgraha-lite .navgraha-influence-pop,
+  .navgraha-lite .navgraha-fact-card,
+  .navgraha-lite .navgraha-text-reveal {
+    animation: none !important;
+  }
+  .catalog-img-shine,
+  .catalog-img-animated {
+    animation: none !important;
+  }
 }
 
 ::selection {
