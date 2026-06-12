@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { Voucher } from "./types";
-import { isMongoEnabled } from "./db/connect";
+import { isRemotePersistEnabled } from "./db/persist";
 import * as mongo from "./db/app-data-repo";
 
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -27,7 +27,7 @@ function writeVouchers(vouchers: Voucher[]) {
 }
 
 async function getVouchersList(): Promise<Voucher[]> {
-  if (isMongoEnabled()) return mongo.mongoGetVouchers();
+  if (isRemotePersistEnabled()) return mongo.mongoGetVouchers();
   return readVouchers();
 }
 
@@ -49,7 +49,7 @@ export const vouchersStore = {
       usedCount: 0,
       createdAt: new Date().toISOString(),
     };
-    if (isMongoEnabled()) return mongo.mongoSaveVoucher(voucher);
+    if (isRemotePersistEnabled()) return mongo.mongoSaveVoucher(voucher);
     vouchers.push(voucher);
     writeVouchers(vouchers);
     return voucher;
@@ -60,12 +60,12 @@ export const vouchersStore = {
     if (idx === -1) return null;
     if (patch.code) patch.code = patch.code.trim().toUpperCase();
     vouchers[idx] = { ...vouchers[idx], ...patch, updatedAt: new Date().toISOString() };
-    if (isMongoEnabled()) return mongo.mongoSaveVoucher(vouchers[idx]);
+    if (isRemotePersistEnabled()) return mongo.mongoSaveVoucher(vouchers[idx]);
     writeVouchers(vouchers);
     return vouchers[idx];
   },
   delete: async (id: string) => {
-    if (isMongoEnabled()) return mongo.mongoDeleteVoucher(id);
+    if (isRemotePersistEnabled()) return mongo.mongoDeleteVoucher(id);
     const vouchers = readVouchers();
     const next = vouchers.filter((v) => v.id !== id);
     if (next.length === vouchers.length) return false;
@@ -78,7 +78,7 @@ export const vouchersStore = {
     if (idx === -1) return;
     vouchers[idx].usedCount += 1;
     vouchers[idx].updatedAt = new Date().toISOString();
-    if (isMongoEnabled()) await mongo.mongoSaveVoucher(vouchers[idx]);
+    if (isRemotePersistEnabled()) await mongo.mongoSaveVoucher(vouchers[idx]);
     else writeVouchers(vouchers);
   },
 };

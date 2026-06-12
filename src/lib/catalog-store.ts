@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import * as mongoCatalog from "./db/catalog-repo";
-import { isMongoEnabled } from "./db/connect";
+import { isRemotePersistEnabled } from "./db/persist";
 import { poojaServices } from "./data/content";
 import { courses } from "./data/courses";
 import { healingServices } from "./data/healing";
@@ -90,7 +90,7 @@ async function ensureMongoSeeded() {
 
 export const catalogStore = {
   async getAll<T extends CatalogType>(type: T): Promise<CatalogData[T]> {
-    if (isMongoEnabled()) {
+    if (isRemotePersistEnabled()) {
       await ensureMongoSeeded();
       return (await mongoCatalog.mongoGetAll(type)) as CatalogData[T];
     }
@@ -98,7 +98,7 @@ export const catalogStore = {
   },
 
   async getById(type: CatalogType, id: string) {
-    if (isMongoEnabled()) {
+    if (isRemotePersistEnabled()) {
       await ensureMongoSeeded();
       return mongoCatalog.mongoGetById(type, id);
     }
@@ -106,7 +106,7 @@ export const catalogStore = {
   },
 
   async create(type: CatalogType, item: Record<string, unknown>) {
-    if (isMongoEnabled()) {
+    if (isRemotePersistEnabled()) {
       await ensureMongoSeeded();
       return mongoCatalog.mongoCreate(type, item);
     }
@@ -119,7 +119,7 @@ export const catalogStore = {
   },
 
   async update(type: CatalogType, id: string, updates: Record<string, unknown>) {
-    if (isMongoEnabled()) {
+    if (isRemotePersistEnabled()) {
       await ensureMongoSeeded();
       return mongoCatalog.mongoUpdate(type, id, updates);
     }
@@ -134,7 +134,7 @@ export const catalogStore = {
   },
 
   async delete(type: CatalogType, id: string) {
-    if (isMongoEnabled()) {
+    if (isRemotePersistEnabled()) {
       await ensureMongoSeeded();
       return mongoCatalog.mongoDelete(type, id);
     }
@@ -208,7 +208,7 @@ export const catalogStore = {
   },
 
   async getCategories() {
-    if (isMongoEnabled()) {
+    if (isRemotePersistEnabled()) {
       await ensureMongoSeeded();
       return (await mongoCatalog.mongoGetCategories()) as ProductCategory[];
     }
@@ -216,7 +216,7 @@ export const catalogStore = {
   },
 
   async createCategory(cat: Omit<ProductCategory, "id"> & { id?: string }) {
-    if (isMongoEnabled()) {
+    if (isRemotePersistEnabled()) {
       await ensureMongoSeeded();
       return (await mongoCatalog.mongoCreateCategory(cat)) as ProductCategory;
     }
@@ -229,7 +229,7 @@ export const catalogStore = {
   },
 
   async updateCategory(id: string, updates: Partial<ProductCategory>) {
-    if (isMongoEnabled()) {
+    if (isRemotePersistEnabled()) {
       await ensureMongoSeeded();
       return (await mongoCatalog.mongoUpdateCategory(id, updates)) as ProductCategory | null;
     }
@@ -242,7 +242,7 @@ export const catalogStore = {
   },
 
   async deleteCategory(id: string) {
-    if (isMongoEnabled()) {
+    if (isRemotePersistEnabled()) {
       await ensureMongoSeeded();
       return mongoCatalog.mongoDeleteCategory(id);
     }

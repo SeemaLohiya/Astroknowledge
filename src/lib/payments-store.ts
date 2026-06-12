@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { CartItem, PaymentRecord, PaymentStatus } from "./types";
 import { store } from "./store";
-import { isMongoEnabled } from "./db/connect";
+import { isRemotePersistEnabled } from "./db/persist";
 import * as mongo from "./db/app-data-repo";
 
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -65,12 +65,12 @@ function writePayments(payments: PaymentRecord[]) {
 }
 
 async function getPaymentsList(): Promise<PaymentRecord[]> {
-  if (isMongoEnabled()) return mongo.mongoGetPayments();
+  if (isRemotePersistEnabled()) return mongo.mongoGetPayments();
   return readPayments();
 }
 
 async function savePaymentsList(payments: PaymentRecord[]) {
-  if (isMongoEnabled()) {
+  if (isRemotePersistEnabled()) {
     for (const p of payments) await mongo.mongoSavePayment(p);
     return;
   }
@@ -96,7 +96,7 @@ export const paymentsStore = {
   getAll: async () => (await getPaymentsList()).sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
 
   getById: async (id: string) => {
-    if (isMongoEnabled()) return mongo.mongoGetPaymentById(id);
+    if (isRemotePersistEnabled()) return mongo.mongoGetPaymentById(id);
     return readPayments().find((p) => p.id === id) || null;
   },
 
@@ -144,7 +144,7 @@ export const paymentsStore = {
       createdAt: new Date().toISOString(),
     };
     payments.push(payment);
-    if (isMongoEnabled()) await mongo.mongoSavePayment(payment);
+    if (isRemotePersistEnabled()) await mongo.mongoSavePayment(payment);
     else writePayments(payments);
     return payment;
   },

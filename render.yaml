@@ -1,4 +1,9 @@
 services:
+  - type: redis
+    name: astroknowledge-kv
+    plan: free
+    region: singapore
+    maxmemoryPolicy: noeviction
   - type: web
     name: astroknowledge
     runtime: node
@@ -18,3 +23,8 @@ services:
         sync: false
       - key: MONGODB_URI
         sync: false
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: astroknowledge-kv
+          property: connectionString

@@ -1,6 +1,6 @@
 import { Booking, Order, User } from "./types";
 import { readJsonFile, writeJsonFile } from "./json-store";
-import { isMongoEnabled } from "./db/connect";
+import { isRemotePersistEnabled } from "./db/persist";
 import * as mongo from "./db/app-data-repo";
 
 const SEED_USERS: User[] = [
@@ -30,7 +30,7 @@ const SEED_ORDERS: Order[] = [];
 let usersSeeded = false;
 
 async function ensureUsersSeeded() {
-  if (!isMongoEnabled() || usersSeeded) return;
+  if (!isRemotePersistEnabled() || usersSeeded) return;
   await mongo.mongoSeedUsers(SEED_USERS);
   usersSeeded = true;
 }
@@ -62,21 +62,21 @@ function trackOrder(order: Order, status: Order["status"], note?: string) {
 export const store = {
   users: {
     getAll: async () => {
-      if (isMongoEnabled()) {
+      if (isRemotePersistEnabled()) {
         await ensureUsersSeeded();
         return mongo.mongoGetUsers();
       }
       return readUsers();
     },
     findByEmail: async (email: string) => {
-      if (isMongoEnabled()) {
+      if (isRemotePersistEnabled()) {
         await ensureUsersSeeded();
         return mongo.mongoFindUserByEmail(email);
       }
       return readUsers().find((u) => u.email === email);
     },
     findById: async (id: string) => {
-      if (isMongoEnabled()) {
+      if (isRemotePersistEnabled()) {
         await ensureUsersSeeded();
         return mongo.mongoFindUserById(id);
       }
@@ -88,7 +88,7 @@ export const store = {
         id: `user-${Date.now()}`,
         createdAt: new Date().toISOString().split("T")[0],
       };
-      if (isMongoEnabled()) {
+      if (isRemotePersistEnabled()) {
         await ensureUsersSeeded();
         return mongo.mongoCreateUser(newUser);
       }
@@ -98,7 +98,7 @@ export const store = {
       return newUser;
     },
     update: async (id: string, patch: Partial<User>) => {
-      if (isMongoEnabled()) {
+      if (isRemotePersistEnabled()) {
         await ensureUsersSeeded();
         return mongo.mongoUpdateUser(id, patch);
       }
@@ -110,7 +110,7 @@ export const store = {
       return users[idx];
     },
     persist: async (user: User) => {
-      if (isMongoEnabled()) {
+      if (isRemotePersistEnabled()) {
         await ensureUsersSeeded();
         return mongo.mongoUpdateUser(user.id, user);
       }
@@ -124,11 +124,11 @@ export const store = {
   },
   bookings: {
     getAll: async () => {
-      if (isMongoEnabled()) return mongo.mongoGetBookings();
+      if (isRemotePersistEnabled()) return mongo.mongoGetBookings();
       return readBookings();
     },
     getByUser: async (userId: string) => {
-      const bookings = isMongoEnabled() ? await mongo.mongoGetBookings() : readBookings();
+      const bookings = isRemotePersistEnabled() ? await mongo.mongoGetBookings() : readBookings();
       return bookings.filter((b) => b.userId === userId);
     },
     create: async (booking: Omit<Booking, "id" | "createdAt">) => {
@@ -137,18 +137,18 @@ export const store = {
         id: `bk-${Date.now()}`,
         createdAt: new Date().toISOString().split("T")[0],
       };
-      if (isMongoEnabled()) return mongo.mongoSaveBooking(newBooking);
+      if (isRemotePersistEnabled()) return mongo.mongoSaveBooking(newBooking);
       const bookings = readBookings();
       bookings.push(newBooking);
       writeBookings(bookings);
       return newBooking;
     },
     updateStatus: async (id: string, status: Booking["status"]) => {
-      const bookings = isMongoEnabled() ? await mongo.mongoGetBookings() : readBookings();
+      const bookings = isRemotePersistEnabled() ? await mongo.mongoGetBookings() : readBookings();
       const booking = bookings.find((b) => b.id === id);
       if (booking) {
         booking.status = status;
-        if (isMongoEnabled()) await mongo.mongoSaveBooking(booking);
+        if (isRemotePersistEnabled()) await mongo.mongoSaveBooking(booking);
         else writeBookings(bookings);
       }
       return booking || null;
@@ -156,19 +156,19 @@ export const store = {
   },
   orders: {
     getAll: async () => {
-      if (isMongoEnabled()) return mongo.mongoGetOrders();
+      if (isRemotePersistEnabled()) return mongo.mongoGetOrders();
       return readOrders();
     },
     getByUser: async (userId: string) => {
-      const orders = isMongoEnabled() ? await mongo.mongoGetOrders() : readOrders();
+      const orders = isRemotePersistEnabled() ? await mongo.mongoGetOrders() : readOrders();
       return orders.filter((o) => o.userId === userId);
     },
     findById: async (id: string) => {
-      if (isMongoEnabled()) return mongo.mongoGetOrderById(id);
+      if (isRemotePersistEnabled()) return mongo.mongoGetOrderById(id);
       return readOrders().find((o) => o.id === id) || null;
     },
     create: async (order: Omit<Order, "id" | "createdAt" | "trackingHistory">) => {
-      const orders = isMongoEnabled() ? await mongo.mongoGetOrders() : readOrders();
+      const orders = isRemotePersistEnabled() ? await mongo.mongoGetOrders() : readOrders();
       const newOrder: Order = {
         ...order,
         id: `ord-${Date.now()}`,
@@ -176,19 +176,19 @@ export const store = {
         trackingId: `AK-ORD-${String(orders.length + 1).padStart(4, "0")}`,
         trackingHistory: [{ status: "processing", note: "Order placed", at: new Date().toISOString() }],
       };
-      if (isMongoEnabled()) return mongo.mongoSaveOrder(newOrder);
+      if (isRemotePersistEnabled()) return mongo.mongoSaveOrder(newOrder);
       orders.push(newOrder);
       writeOrders(orders);
       return newOrder;
     },
     updateStatus: async (id: string, status: Order["status"], note?: string, trackingId?: string) => {
-      const orders = isMongoEnabled() ? await mongo.mongoGetOrders() : readOrders();
+      const orders = isRemotePersistEnabled() ? await mongo.mongoGetOrders() : readOrders();
       const order = orders.find((o) => o.id === id);
       if (!order) return null;
       order.status = status;
       if (trackingId) order.trackingId = trackingId;
       trackOrder(order, status, note);
-      if (isMongoEnabled()) await mongo.mongoSaveOrder(order);
+      if (isRemotePersistEnabled()) await mongo.mongoSaveOrder(order);
       else writeOrders(orders);
       return order;
     },
