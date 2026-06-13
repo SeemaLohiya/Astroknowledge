@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authCookieOptions, createToken, sanitizeUser } from "@/lib/auth";
+import { AUTH_COOKIE, authCookieOptions, createToken, sanitizeUser } from "@/lib/auth";
 import { store } from "@/lib/store";
 
 export async function POST(req: NextRequest) {
@@ -16,6 +16,6 @@ export async function POST(req: NextRequest) {
 
   const token = await createToken(user);
   const response = NextResponse.json({ user: sanitizeUser(user) });
-  response.cookies.set("auth-token", token, authCookieOptions());
+  response.cookies.set(AUTH_COOKIE, token, authCookieOptions());
   return response;
 }

@@ -5,8 +5,8 @@ import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { FadeIn } from "../animations/FadeIn";
 import { FounderImage } from "../animations/FounderImage";
 import { motion } from "framer-motion";
-import { InstagramIcon, WhatsAppIcon } from "@/components/ui/SocialIcons";
-import { ExternalLink, Mail, MapPin, Phone, Video } from "lucide-react";
+import { InstagramIcon, WhatsAppIcon, YouTubeIcon } from "@/components/ui/SocialIcons";
+import { ExternalLink, Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 
 export function Footer() {
@@ -83,7 +83,7 @@ export function Footer() {
                 whileHover={{ scale: 1.15 }}
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-gold/30 text-[#FF0000] hover:bg-red-500/10"
               >
-                <Video className="h-5 w-5" />
+                <YouTubeIcon className="h-5 w-5" />
               </motion.a>
             </div>
           </div>

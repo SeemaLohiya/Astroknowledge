@@ -11,19 +11,23 @@ import { SafeImage } from "@/components/ui/SafeImage";
 import { Award } from "lucide-react";
 
 function AchievementSlide({ photo, lang }: { photo: AchievementPhoto; lang: "en" | "hi" }) {
+  const caption = lang === "hi" ? photo.titleHindi || photo.title : photo.title;
+  const description = photo.description;
+
   return (
     <figure className="w-[min(85vw,320px)] shrink-0 overflow-hidden rounded-2xl glass-card">
       <div className="relative aspect-[4/3] overflow-hidden">
         <SafeImage
           src={photo.image}
-          alt={photo.alt}
+          alt={photo.alt || caption}
           fill
           sizes="320px"
           className="object-cover"
         />
       </div>
       <figcaption className="px-3 py-2.5 text-xs font-medium text-text-body leading-snug">
-        {lang === "hi" ? photo.titleHindi : photo.title}
+        <p>{caption}</p>
+        {description ? <p className="mt-1 text-[11px] font-normal text-text-muted line-clamp-2">{description}</p> : null}
       </figcaption>
     </figure>
   );
@@ -32,7 +36,7 @@ function AchievementSlide({ photo, lang }: { photo: AchievementPhoto; lang: "en"
 export function AchievementsSection() {
   const { t, lang, c } = useLanguage();
   const a = c.achievements;
-  const { content } = useEditableContent();
+  const { content } = useEditableContent({ live: true });
   const achievementPhotos = content?.achievementPhotos || staticPhotos;
   const firstHalf = achievementPhotos.slice(0, 5);
   const secondHalf = achievementPhotos.slice(5);

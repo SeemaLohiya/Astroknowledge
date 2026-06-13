@@ -7,7 +7,8 @@ import { SITE } from "@/lib/constants";
 import { YOUTUBE_CHANNEL_URL } from "@/lib/data/youtube";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { motion, useReducedMotion } from "framer-motion";
-import { Award, ExternalLink, Video } from "lucide-react";
+import { YouTubeIcon } from "@/components/ui/SocialIcons";
+import { Award, ExternalLink } from "lucide-react";
 import Link from "next/link";
 
 export function AboutHero() {
@@ -107,7 +108,7 @@ export function AboutHero() {
               {c.about.bookConsultation}
             </Button>
             <Button href={YOUTUBE_CHANNEL_URL} variant="outline" size="lg" className="gap-2">
-              <Video className="h-4 w-4" />
+              <YouTubeIcon className="h-4 w-4" />
               YouTube
               <ExternalLink className="h-3.5 w-3.5 opacity-70" />
             </Button>

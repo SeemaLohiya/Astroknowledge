@@ -37,7 +37,7 @@ function ProfileDetailsModal({ open, onClose }: ProfileDetailsModalProps) {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (open) void refresh();
+    if (open) void refresh({ silent: true });
   }, [open, refresh]);
 
   useEffect(() => {
@@ -60,7 +60,7 @@ function ProfileDetailsModal({ open, onClose }: ProfileDetailsModalProps) {
       const data = await parseResponseJson<{ error?: string }>(res);
       if (!res.ok) throw new Error(data?.error || d.failedSave);
       toast.success(d.birthUpdatedToast);
-      await refresh();
+      await refresh({ silent: true });
       onClose();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : d.failedSave);
@@ -182,7 +182,7 @@ export function FillDetailsButton({
   const { refresh } = useProfile();
 
   const handleClick = () => {
-    void refresh().then(() => openProfileModal());
+    void refresh({ silent: true }).then(() => openProfileModal());
   };
 
   return (

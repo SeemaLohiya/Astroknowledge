@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { authCookieOptions, createToken, getSession, sanitizeUser } from "@/lib/auth";
+import { AUTH_COOKIE, authCookieOptions, createToken, getSession, sanitizeUser } from "@/lib/auth";
 import { store } from "@/lib/store";
 
 /** Re-issue session cookie for active users (keeps admin logged in). */
@@ -8,10 +8,12 @@ export async function POST() {
   if (!session) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
   const user = await store.users.findById(session.userId);
-  if (!user) return NextResponse.json({ error: "User not found" }, { status: 401 });
+  if (!user || user.accountStatus === "suspended") {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
 
   const token = await createToken(user);
   const response = NextResponse.json({ user: sanitizeUser(user) });
-  response.cookies.set("auth-token", token, authCookieOptions());
+  response.cookies.set(AUTH_COOKIE, token, authCookieOptions());
   return response;
 }

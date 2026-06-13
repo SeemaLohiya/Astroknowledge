@@ -44,7 +44,7 @@ export function BirthOverviewCard({ user }: { user: Omit<User, "password"> }) {
       const data = await parseResponseJson<{ error?: string }>(res);
       if (!res.ok) throw new Error(data?.error || d.failedSave);
       toast.success(d.birthUpdatedToast);
-      await refresh();
+      await refresh({ silent: true });
       setEditing(false);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : d.failedSave);

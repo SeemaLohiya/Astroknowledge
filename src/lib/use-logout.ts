@@ -9,8 +9,8 @@ export function useLogout() {
   const router = useRouter();
 
   return useCallback(async () => {
-    await fetch("/api/auth/logout", { method: "POST", cache: "no-store" });
+    await fetch("/api/auth/logout", { method: "POST", cache: "no-store", credentials: "include" });
     updateUser(null);
-    router.push("/login");
+    router.replace("/login");
   }, [updateUser, router]);
 }

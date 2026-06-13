@@ -1,5 +1,14 @@
 import { AchievementPhoto } from "../types";
 
+export const featuredCertifications = [
+  "Shastracharya in Vedic Astrology",
+  "Expert in KP",
+  "Shastracharya in Vastu",
+  "Expert in BNN",
+  "Shastracharya in Palmistry",
+  "Numerology Expert",
+] as const;
+
 export const certifications = [
   { title: "Shastracharya", subtitle: "Vedic Astrology & Jyotish Shastra" },
   { title: "Certified Jyotish Acharya", subtitle: "Advanced Birth Chart & Dasha Analysis" },

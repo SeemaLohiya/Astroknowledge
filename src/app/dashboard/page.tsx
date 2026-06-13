@@ -8,7 +8,7 @@ import { FillDetailsButton } from "@/components/profile/ProfileDetailsModal";
 import { Button } from "@/components/ui/Button";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { fetchJson } from "@/lib/fetch-json";
-import { User, UnifiedBookingItem } from "@/lib/types";
+import { UnifiedBookingItem } from "@/lib/types";
 import { ProgressTimeline } from "@/components/dashboard/ProgressTimeline";
 import { UnifiedBookingsList } from "@/components/dashboard/UnifiedBookingsList";
 import { isBirthProfileComplete } from "@/lib/profile";
@@ -23,25 +23,23 @@ export default function DashboardPage() {
   const [purchaseCount, setPurchaseCount] = useState(0);
   const [serviceCount, setServiceCount] = useState(0);
   const [bookings, setBookings] = useState<UnifiedBookingItem[]>([]);
-  const [user, setUser] = useState<Omit<User, "password"> | null>(null);
 
   useEffect(() => {
+    if (!profileUser) return;
     void (async () => {
-      const [me, bookingsRes, ordersRes] = await Promise.all([
-        fetchJson<{ user: Omit<User, "password"> | null }>("/api/auth/me"),
+      const [bookingsRes, ordersRes] = await Promise.all([
         fetchJson<{ bookings?: UnifiedBookingItem[] }>("/api/bookings/unified"),
         fetchJson<{ purchases?: { items?: { itemType: string }[] }[] }>("/api/orders"),
       ]);
-      if (me.data?.user) setUser(me.data.user);
       setBookings(bookingsRes.data?.bookings || []);
       const purchases = ordersRes.data?.purchases || [];
       const items = purchases.flatMap((p) => p.items ?? []);
       setPurchaseCount(items.length);
       setServiceCount(items.filter((i) => i.itemType === "service").length);
     })();
-  }, []);
+  }, [profileUser?.id]);
 
-  const displayUser = profileUser || user;
+  const displayUser = profileUser;
   const profileComplete = displayUser && isBirthProfileComplete(displayUser);
 
   return (

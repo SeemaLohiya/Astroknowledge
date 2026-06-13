@@ -7,7 +7,7 @@ import { EditableSiteContent } from "@/lib/types";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-type Tab = "faqs" | "reviews" | "achievements" | "problems";
+type Tab = "faqs" | "reviews" | "problems";
 
 export default function AdminContentPage() {
   const [content, setContent] = useState<EditableSiteContent | null>(null);
@@ -45,7 +45,7 @@ export default function AdminContentPage() {
       <FadeIn className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-bold text-text-primary">Site <span className="text-gradient-gold">Content</span></h1>
-          <p className="text-sm text-text-muted">Edit FAQs, reviews, achievements & problem categories</p>
+          <p className="text-sm text-text-muted">Edit FAQs, reviews & problem categories. Manage achievement photos in Catalog → Clients & Achievements.</p>
         </div>
         <button onClick={save} disabled={saving} className="rounded-full bg-gold px-5 py-2 text-sm font-bold text-white disabled:opacity-50">
           {saving ? "Saving..." : "Save all changes"}
@@ -53,7 +53,7 @@ export default function AdminContentPage() {
       </FadeIn>
 
       <div className="mb-6 flex flex-wrap gap-2">
-        {(["faqs", "reviews", "achievements", "problems"] as Tab[]).map((t) => (
+        {(["faqs", "reviews", "problems"] as Tab[]).map((t) => (
           <button key={t} onClick={() => setTab(t)} className={`rounded-full px-4 py-2 text-sm font-semibold capitalize ${tab === t ? "bg-gold text-white" : "glass-card"}`}>
             {t}
           </button>
@@ -85,17 +85,6 @@ export default function AdminContentPage() {
             <div key={r.id} className="rounded-2xl glass-card p-4 space-y-2">
               <input value={r.name} onChange={(e) => { const reviews = [...content.reviews]; reviews[i] = { ...r, name: e.target.value }; setContent({ ...content, reviews }); }} className="w-full rounded-lg border border-gold/20 px-3 py-2 text-sm" />
               <textarea value={r.comment} onChange={(e) => { const reviews = [...content.reviews]; reviews[i] = { ...r, comment: e.target.value }; setContent({ ...content, reviews }); }} rows={2} className="w-full rounded-lg border border-gold/20 px-3 py-2 text-sm" />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {tab === "achievements" && (
-        <div className="space-y-4">
-          {content.achievementPhotos.map((p, i) => (
-            <div key={p.id} className="rounded-2xl glass-card p-4 space-y-2">
-              <input value={p.title} onChange={(e) => { const achievementPhotos = [...content.achievementPhotos]; achievementPhotos[i] = { ...p, title: e.target.value }; setContent({ ...content, achievementPhotos }); }} className="w-full rounded-lg border border-gold/20 px-3 py-2 text-sm" />
-              <input value={p.image} onChange={(e) => { const achievementPhotos = [...content.achievementPhotos]; achievementPhotos[i] = { ...p, image: e.target.value }; setContent({ ...content, achievementPhotos }); }} className="w-full rounded-lg border border-gold/20 px-3 py-2 text-sm" placeholder="Image path" />
             </div>
           ))}
         </div>

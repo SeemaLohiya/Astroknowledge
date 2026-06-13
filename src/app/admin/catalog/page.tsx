@@ -5,19 +5,22 @@ import { PageTransition } from "@/components/animations/PageTransition";
 import { ImageUploadField } from "@/components/ui/ImageUploadField";
 import { SafeImage } from "@/components/ui/SafeImage";
 import { fetchJson } from "@/lib/fetch-json";
-import { CatalogType, ProductCategory } from "@/lib/types";
+import { AchievementPhoto, CatalogType, ProductCategory } from "@/lib/types";
 import { motion } from "framer-motion";
-import { BookOpen, FolderOpen, Heart, IndianRupee, Package, Plus, Save, Sparkles, Trash2, X } from "lucide-react";
+import { Award, BookOpen, FolderOpen, Heart, IndianRupee, Package, Plus, Save, Sparkles, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-const TABS: { type: CatalogType | "categories"; label: string; icon: typeof Package }[] = [
+type AdminTab = CatalogType | "categories" | "achievements";
+
+const TABS: { type: AdminTab; label: string; icon: typeof Package }[] = [
   { type: "products", label: "Products", icon: Package },
   { type: "services", label: "Services", icon: Sparkles },
   { type: "courses", label: "Courses", icon: BookOpen },
   { type: "pooja", label: "Pooja", icon: Sparkles },
   { type: "healing", label: "Healing", icon: Heart },
   { type: "categories", label: "Categories", icon: FolderOpen },
+  { type: "achievements", label: "Clients & Achievements", icon: Award },
 ];
 
 type CatalogItem = Record<string, unknown>;
@@ -27,12 +30,14 @@ function getTitle(item: CatalogItem) {
 }
 
 export default function AdminCatalogPage() {
-  const [activeType, setActiveType] = useState<CatalogType | "categories">("products");
+  const [activeType, setActiveType] = useState<AdminTab>("products");
   const [items, setItems] = useState<CatalogItem[]>([]);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
+  const [achievementPhotos, setAchievementPhotos] = useState<AchievementPhoto[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<CatalogItem | null>(null);
   const [editingCategory, setEditingCategory] = useState<ProductCategory | null>(null);
+  const [editingAchievement, setEditingAchievement] = useState<AchievementPhoto | null>(null);
   const [saving, setSaving] = useState(false);
 
   const loadCategories = useCallback(async () => {
@@ -53,6 +58,19 @@ export default function AdminCatalogPage() {
     }
   }, []);
 
+  const loadAchievements = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetchJson<{ items?: AchievementPhoto[] }>("/api/content/achievement-photos");
+      setAchievementPhotos(res.data?.items || []);
+    } catch {
+      toast.error("Failed to load achievement photos");
+      setAchievementPhotos([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadCategories();
   }, [loadCategories]);
@@ -60,13 +78,16 @@ export default function AdminCatalogPage() {
   useEffect(() => {
     setEditing(null);
     setEditingCategory(null);
+    setEditingAchievement(null);
     if (activeType === "categories") {
       setLoading(true);
       loadCategories().finally(() => setLoading(false));
+    } else if (activeType === "achievements") {
+      void loadAchievements();
     } else {
       loadItems(activeType);
     }
-  }, [activeType, loadItems, loadCategories]);
+  }, [activeType, loadItems, loadCategories, loadAchievements]);
 
   const handleAdd = () => {
     const defaults: CatalogItem =
@@ -93,6 +114,54 @@ export default function AdminCatalogPage() {
 
   const handleAddCategory = () => {
     setEditingCategory({ id: "", name: "", nameHindi: "", icon: "", description: "", image: "/images/products/p1.jpg" });
+  };
+
+  const handleAddAchievement = () => {
+    setEditingAchievement({
+      id: `ach-${Date.now()}`,
+      image: "",
+      title: "",
+      titleHindi: "",
+      alt: "",
+      description: "",
+    });
+  };
+
+  const handleSaveAchievement = async () => {
+    if (!editingAchievement) return;
+    setSaving(true);
+    try {
+      const isNew = !achievementPhotos.some((p) => p.id === editingAchievement.id);
+      const res = await fetch(
+        isNew ? "/api/content/achievement-photos" : `/api/content/achievement-photos/${editingAchievement.id}`,
+        {
+          method: isNew ? "POST" : "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(editingAchievement),
+        }
+      );
+      if (!res.ok) throw new Error();
+      toast.success(isNew ? "Photo added" : "Photo updated");
+      setEditingAchievement(null);
+      await loadAchievements();
+    } catch {
+      toast.error("Failed to save photo");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteAchievement = async (id: string) => {
+    if (!confirm("Delete this achievement photo?")) return;
+    try {
+      const res = await fetch(`/api/content/achievement-photos/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error();
+      toast.success("Photo deleted");
+      if (editingAchievement?.id === id) setEditingAchievement(null);
+      await loadAchievements();
+    } catch {
+      toast.error("Failed to delete photo");
+    }
   };
 
   const handleSave = async () => {
@@ -186,12 +255,13 @@ export default function AdminCatalogPage() {
   };
 
   const isCategoriesTab = activeType === "categories";
+  const isAchievementsTab = activeType === "achievements";
 
   return (
     <PageTransition>
       <FadeIn className="mb-6">
         <h1 className="font-display text-2xl font-bold text-text-primary">Catalog <span className="text-gradient-gold">Manager</span></h1>
-        <p className="text-text-body text-sm mt-1">Add, edit, or remove products, services, courses, pooja, healing, and categories</p>
+        <p className="text-text-body text-sm mt-1">Add, edit, or remove products, services, courses, pooja, healing, categories, and client achievement photos</p>
       </FadeIn>
 
       <div className="mb-6 flex flex-wrap gap-2">
@@ -270,6 +340,79 @@ export default function AdminCatalogPage() {
               ) : (
                 <div className="flex h-full min-h-[300px] items-center justify-center text-text-muted text-sm">
                   Select a category to edit or click Add Category
+                </div>
+              )}
+            </div>
+          </FadeIn>
+        </div>
+      ) : isAchievementsTab ? (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <FadeIn>
+            <div className="rounded-2xl glass-card p-4">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="font-semibold text-text-primary">Clients & Achievements ({achievementPhotos.length})</h2>
+                <button onClick={handleAddAchievement} className="flex items-center gap-1 rounded-full bg-gold px-3 py-1.5 text-xs font-bold text-white hover:bg-gold-bright">
+                  <Plus className="h-3.5 w-3.5" /> Add Photo
+                </button>
+              </div>
+              {loading ? (
+                <p className="text-text-muted text-sm py-8 text-center">Loading...</p>
+              ) : achievementPhotos.length === 0 ? (
+                <p className="text-text-muted text-sm py-8 text-center">No photos yet. Click Add Photo.</p>
+              ) : (
+                <div className="space-y-2 max-h-[600px] overflow-y-auto">
+                  {achievementPhotos.map((photo) => (
+                    <motion.div
+                      key={photo.id}
+                      className={`flex items-center gap-3 rounded-xl border p-3 cursor-pointer transition-colors ${editingAchievement?.id === photo.id ? "border-gold bg-gold/5" : "border-gold/10 hover:border-gold/30"}`}
+                      onClick={() => setEditingAchievement({ ...photo })}
+                      whileHover={{ x: 2 }}
+                    >
+                      <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-lg border border-gold/15">
+                        <SafeImage src={photo.image || "/images/products/p1.jpg"} alt={photo.title} fill className="object-cover" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-text-primary text-sm truncate">{photo.title}</p>
+                        <p className="text-xs text-gold truncate">{photo.titleHindi}</p>
+                        {photo.description ? <p className="text-[11px] text-text-muted truncate mt-0.5">{photo.description}</p> : null}
+                      </div>
+                      <button onClick={(e) => { e.stopPropagation(); handleDeleteAchievement(photo.id); }} className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg" aria-label="Delete">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </FadeIn>
+
+          <FadeIn delay={0.1}>
+            <div className="rounded-2xl glass-card p-6">
+              {editingAchievement ? (
+                <>
+                  <div className="mb-4 flex items-center justify-between">
+                    <h2 className="font-semibold text-text-primary">Edit Achievement Photo</h2>
+                    <button onClick={() => setEditingAchievement(null)} className="p-1 text-text-muted hover:text-gold"><X className="h-5 w-5" /></button>
+                  </div>
+                  <ImageUploadField
+                    value={editingAchievement.image || ""}
+                    onChange={(url) => setEditingAchievement({ ...editingAchievement, image: url })}
+                    label="Event Photo"
+                  />
+                  <div className="space-y-3 max-h-[480px] overflow-y-auto pr-1 mt-4">
+                    <Field label="ID" value={editingAchievement.id} onChange={(v) => setEditingAchievement({ ...editingAchievement, id: v })} hint="Unique identifier — change only when creating a new photo" />
+                    <Field label="Title (English)" value={editingAchievement.title} onChange={(v) => setEditingAchievement({ ...editingAchievement, title: v })} />
+                    <Field label="Title (Hindi)" value={editingAchievement.titleHindi} onChange={(v) => setEditingAchievement({ ...editingAchievement, titleHindi: v })} />
+                    <Field label="Description" value={editingAchievement.description || ""} onChange={(v) => setEditingAchievement({ ...editingAchievement, description: v })} textarea rows={3} hint="Short caption shown under the photo on Home and About pages" />
+                    <Field label="Alt Text" value={editingAchievement.alt} onChange={(v) => setEditingAchievement({ ...editingAchievement, alt: v })} textarea rows={2} hint="Accessibility description for screen readers" />
+                  </div>
+                  <button onClick={handleSaveAchievement} disabled={saving} className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-gold py-3 text-sm font-bold text-white hover:bg-gold-bright disabled:opacity-50">
+                    <Save className="h-4 w-4" />{saving ? "Saving..." : "Save Photo"}
+                  </button>
+                </>
+              ) : (
+                <div className="flex h-full min-h-[300px] items-center justify-center text-text-muted text-sm">
+                  Select a photo to edit or click Add Photo
                 </div>
               )}
             </div>

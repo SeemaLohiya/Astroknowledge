@@ -116,7 +116,7 @@ export default function DeveloperPage() {
         title="Developer"
         titleAccent="Information"
         subtitle="The architect behind AstroKnowledge — blending code, creativity & AI."
-        breadcrumbs={[{ label: "Home", href: "/" }, { label: "About", href: "/about" }, { label: "Developer" }]}
+        breadcrumbs={[{ label: "Home", href: "/" }, { label: "Studio" }]}
       />
 
       <section className="dev-page relative overflow-hidden pb-20 pt-4">
@@ -350,10 +350,10 @@ export default function DeveloperPage() {
             </div>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link
-                href="/about"
+                href="/"
                 className="rounded-full border border-white/30 px-6 py-2.5 text-sm font-semibold transition-colors hover:bg-white/10"
               >
-                ← Back to About Us
+                ← Back to Home
               </Link>
               <a
                 href={DEVELOPER.whatsapp}

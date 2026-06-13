@@ -2,15 +2,15 @@
 
 import { DashboardBirthGate } from "@/components/profile/DashboardBirthGate";
 import { ProfileDetailsModalProvider } from "@/components/profile/ProfileDetailsModal";
+import { useProfile } from "@/components/profile/ProfileGate";
 import { cn } from "@/lib/cn";
-import { fetchJson } from "@/lib/fetch-json";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useLogout } from "@/lib/use-logout";
 import { motion } from "framer-motion";
 import { Calendar, Clock, Gift, LayoutDashboard, LogOut, Package, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { c } = useLanguage();
@@ -18,7 +18,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const router = useRouter();
   const handleLogout = useLogout();
-  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+  const { user, loading, authReady } = useProfile();
 
   const navItems = useMemo(() => [
     { href: "/dashboard", icon: LayoutDashboard, label: d.overview },
@@ -35,22 +35,33 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     (href === "/dashboard/profile" && pathname === "/dashboard/kundli");
 
   useEffect(() => {
-    void fetchJson<{ user?: { name: string; email: string; role: string } | null }>("/api/auth/me", { cache: "no-store" }).then((res) => {
-      if (!res.data?.user) { router.push("/login"); return; }
-      if (res.data.user.role === "admin") { router.push("/admin"); return; }
-      setUser(res.data.user);
-    });
-  }, [router]);
+    if (!authReady) return;
+    if (!user) {
+      router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
+      return;
+    }
+    if (user.role === "admin") {
+      router.replace("/admin");
+    }
+  }, [user, authReady, router, pathname]);
+
+  if (!authReady || loading) {
+    return (
+      <div className="mx-auto flex min-h-[50vh] max-w-7xl items-center justify-center px-4">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-gold/30 border-t-gold" />
+      </div>
+    );
+  }
+
+  if (!user || user.role === "admin") return null;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 md:py-8">
       <div className="mb-4 md:hidden">
-        {user && (
-          <div className="mb-3 rounded-xl border border-gold/15 bg-white/80 px-4 py-3">
-            <p className="font-semibold text-text-primary">{user.name}</p>
-            <p className="text-xs text-text-muted">{user.email}</p>
-          </div>
-        )}
+        <div className="mb-3 rounded-xl border border-gold/15 bg-white/80 px-4 py-3">
+          <p className="font-semibold text-text-primary">{user.name}</p>
+          <p className="text-xs text-text-muted">{user.email}</p>
+        </div>
         <nav className="flex gap-1 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {navItems.map((item) => {
             const active = isActive(item.href);
@@ -82,12 +93,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="flex gap-8">
         <aside className="hidden w-64 shrink-0 md:block">
           <div className="sticky top-24 rounded-2xl glass-card p-6">
-            {user && (
-              <div className="mb-6 border-b border-white/10 pb-4">
-                <p className="font-semibold text-text-primary">{user.name}</p>
-                <p className="text-xs text-text-muted">{user.email}</p>
-              </div>
-            )}
+            <div className="mb-6 border-b border-white/10 pb-4">
+              <p className="font-semibold text-text-primary">{user.name}</p>
+              <p className="text-xs text-text-muted">{user.email}</p>
+            </div>
             <nav className="space-y-1">
               {navItems.map((item) => (
                 <Link key={item.href} href={item.href}>

@@ -8,7 +8,7 @@ import { useIsAdmin } from "@/lib/use-is-admin";
 import { useHydrated } from "@/lib/use-hydrated";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useLogout } from "@/lib/use-logout";
-import { LogOut } from "lucide-react";
+import { Flame, Heart, Info, LogOut, Mail } from "lucide-react";
 import { AnimatedProfileButton } from "./AnimatedProfileButton";
 import { Menu, X, ShoppingCart } from "lucide-react";
 import { PromoBanner } from "./PromoBanner";
@@ -22,36 +22,31 @@ import { Button } from "../ui/Button";
 import { LanguageToggle } from "./LanguageToggle";
 
 const DIRECT_LINKS = [
-  { href: "/healing", key: "healing" as const },
-  { href: "/pooja", key: "pooja" as const },
-  { href: "/about", key: "about" as const },
-  { href: "/contact", key: "contact" as const },
+  { href: "/healing", key: "healing" as const, icon: Heart },
+  { href: "/pooja", key: "pooja" as const, icon: Flame },
+  { href: "/about", key: "about" as const, icon: Info },
+  { href: "/contact", key: "contact" as const, icon: Mail },
 ] as const;
-
-const HIGHLIGHT_NAV_KEYS = new Set(["healing", "pooja", "about", "contact"]);
-
-function highlightNavClass(key: string, active: boolean) {
-  if (!HIGHLIGHT_NAV_KEYS.has(key)) return "";
-  return cn(
-    "nav-highlight-link relative font-semibold",
-    active
-      ? "text-white bg-gradient-to-r from-gold to-orange shadow-md shadow-gold/25"
-      : "text-gold bg-gradient-to-r from-gold/12 to-orange/10 border border-gold/30 hover:from-gold hover:to-orange hover:text-white hover:scale-105 hover:shadow-lg hover:shadow-gold/20"
-  );
-}
 
 export function Header() {
   const { t, c, lang } = useLanguage();
   const navDropdowns = getNavDropdowns(lang);
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { user } = useProfile();
+  const { user, authReady } = useProfile();
   const handleLogout = useLogout();
   const isAdmin = useIsAdmin();
   const pathname = usePathname();
   const isAdminRoute = pathname.startsWith("/admin");
   const hydrated = useHydrated();
   const cartCount = useCartStore((s) => s.items.reduce((n, i) => n + i.quantity, 0));
+  const profileHref = user
+    ? user.role === "admin"
+      ? "/admin"
+      : "/dashboard"
+    : authReady
+      ? "/login"
+      : "/dashboard";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -90,23 +85,22 @@ export function Header() {
 
             {DIRECT_LINKS.map((link) => {
               const active = pathname === link.href;
+              const Icon = link.icon;
               return (
                 <Link
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    "px-2.5 py-2 text-sm rounded-lg transition-all duration-300",
-                    HIGHLIGHT_NAV_KEYS.has(link.key)
-                      ? highlightNavClass(link.key, active)
-                      : active
-                        ? "text-gold font-semibold bg-gold/8"
-                        : "text-text-body hover:text-gold hover:bg-orange/5"
+                    "relative flex items-center gap-1 px-3 py-2.5 text-sm font-medium transition-all duration-300 rounded-xl",
+                    active
+                      ? "text-gold font-bold bg-gradient-to-r from-gold/12 to-orange/8 shadow-sm"
+                      : "text-text-primary hover:text-gold hover:bg-white/80 hover:shadow-md"
                   )}
                 >
-                  {HIGHLIGHT_NAV_KEYS.has(link.key) ? (
-                    <span className="nav-highlight-label">{t(link.key)}</span>
-                  ) : (
-                    t(link.key)
+                  <Icon className={cn("h-4 w-4 opacity-70 transition-transform duration-300 hover:scale-110", active && "text-gold")} />
+                  {t(link.key)}
+                  {active && (
+                    <span className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-gradient-to-r from-gold to-gold-bright nav-tab-underline" />
                   )}
                 </Link>
               );
@@ -125,7 +119,7 @@ export function Header() {
                 ) : null}
               </Link>
             )}
-            <AnimatedProfileButton href={user ? (user.role === "admin" ? "/admin" : "/dashboard") : "/login"} />
+            <AnimatedProfileButton href={profileHref} />
             <BookNowButton label={t("bookNow")} variant="secondary" size="sm" className="hidden lg:inline-flex" onNavigate={() => setMobileOpen(false)} />
             <button onClick={() => setMobileOpen(!mobileOpen)} className="lg:hidden p-2 text-text-primary" aria-label={c.menuAria}>
               {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -158,21 +152,24 @@ export function Header() {
                   ))}
                 </div>
               ))}
-              {DIRECT_LINKS.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className={cn(
-                    "py-3 text-lg border-b border-orange/15",
-                    HIGHLIGHT_NAV_KEYS.has(link.key)
-                      ? "font-bold text-gold bg-gradient-to-r from-gold/10 to-orange/5 -mx-2 px-2 rounded-lg border border-gold/20"
-                      : "text-text-primary"
-                  )}
-                >
-                  {t(link.key)}
-                </Link>
-              ))}
+              {DIRECT_LINKS.map((link) => {
+                const Icon = link.icon;
+                const active = pathname === link.href;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    className={cn(
+                      "flex items-center gap-2 py-3 text-lg border-b border-orange/15 transition-colors",
+                      active ? "font-semibold text-gold" : "text-text-primary hover:text-gold"
+                    )}
+                  >
+                    <Icon className="h-5 w-5 opacity-70" />
+                    {t(link.key)}
+                  </Link>
+                );
+              })}
               <div className="mt-4 flex flex-col gap-2">
                 <BookNowButton label={t("bookConsultation")} variant="secondary" className="w-full" onNavigate={() => setMobileOpen(false)} />
                 {user ? (

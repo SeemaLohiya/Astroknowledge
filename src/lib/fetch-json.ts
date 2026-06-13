@@ -18,7 +18,7 @@ export async function parseResponseJson<T>(res: Response): Promise<T | null> {
 
 export async function fetchJson<T>(url: string, init?: RequestInit): Promise<FetchJsonResult<T>> {
   try {
-    const res = await fetch(url, init);
+    const res = await fetch(url, { credentials: "include", ...init });
     const data = await parseResponseJson<T>(res);
     if (data === null) {
       return {

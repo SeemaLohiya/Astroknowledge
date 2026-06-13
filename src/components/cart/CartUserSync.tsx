@@ -7,18 +7,18 @@ import { useEffect, useRef } from "react";
 
 /** Rehydrate cart when logged-in user changes — prevents stale items from another account */
 export function CartUserSync() {
-  const { user, loading } = useProfile();
-  const prevId = useRef<string | null>(null);
+  const { user, authReady } = useProfile();
+  const prevId = useRef<string | null | undefined>(undefined);
 
   useEffect(() => {
-    if (loading) return;
+    if (!authReady) return;
     const nextId = user?.id || "guest";
     if (prevId.current === nextId) return;
     prevId.current = nextId;
     setCartUserId(user?.id || null);
     useCartStore.setState({ items: [] });
     void useCartStore.persist.rehydrate();
-  }, [user?.id, loading]);
+  }, [user?.id, authReady]);
 
   return null;
 }

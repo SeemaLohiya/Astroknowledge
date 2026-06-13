@@ -155,6 +155,7 @@ export interface AchievementPhoto {
   title: string;
   titleHindi: string;
   alt: string;
+  description?: string;
 }
 
 export interface Product {

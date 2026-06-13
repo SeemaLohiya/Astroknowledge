@@ -4,36 +4,45 @@ import { FadeIn } from "@/components/animations/FadeIn";
 import { FounderImage } from "@/components/animations/FounderImage";
 import { PageTransition } from "@/components/animations/PageTransition";
 import { Button } from "@/components/ui/Button";
+import { useProfile } from "@/components/profile/ProfileGate";
 import { parseResponseJson } from "@/lib/fetch-json";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
+import { User } from "@/lib/types";
 import { BookOpen, Shield, Sparkles, Star } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 function LoginContent() {
   const { c } = useLanguage();
   const a = c.auth;
   const router = useRouter();
+  const { updateUser, user, authReady, loading } = useProfile();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || "";
   const [tab, setTab] = useState<"login" | "register">("login");
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", password: "", confirmPassword: "" });
+
+  useEffect(() => {
+    if (!authReady || loading) return;
+    if (!user) return;
+    router.replace(user.role === "admin" ? "/admin" : redirect || "/dashboard");
+  }, [authReady, loading, user, router, redirect]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setSubmitting(true);
     try {
       if (tab === "register") {
         if (form.password !== form.confirmPassword) {
           toast.error(a.passwordMismatch);
-          setLoading(false);
+          setSubmitting(false);
           return;
         }
         if (form.password.length < 6) {
           toast.error(c.checkout.passwordMin);
-          setLoading(false);
+          setSubmitting(false);
           return;
         }
       }
@@ -42,23 +51,35 @@ function LoginContent() {
       const body = tab === "login"
         ? { email: form.email, password: form.password }
         : { name: form.name, email: form.email, phone: form.phone, password: form.password };
-      const res = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-      const data = await parseResponseJson<{ error?: string; user?: { role: string } }>(res);
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(body),
+      });
+      const data = await parseResponseJson<{ error?: string; user?: Omit<User, "password"> }>(res);
       if (!res.ok || !data?.user) { toast.error(data?.error || a.loginFailed); return; }
+      updateUser(data.user);
       toast.success(tab === "login" ? a.welcomeBack : a.accountCreated);
-      if (data.user.role === "admin") {
-        router.push("/admin");
-      } else if (redirect) {
-        router.push(redirect);
-      } else {
-        router.push("/dashboard");
-      }
+      router.replace(
+        data.user.role === "admin" ? "/admin" : redirect || "/dashboard"
+      );
     } catch {
       toast.error(a.somethingWrong);
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
+
+  if (!authReady || loading) {
+    return (
+      <section className="flex min-h-[80vh] items-center justify-center px-3 py-12">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-gold/30 border-t-gold" />
+      </section>
+    );
+  }
+
+  if (user) return null;
 
   const inputCls = "w-full rounded-xl border border-gold/20 bg-orange/5 px-4 py-3 text-text-primary placeholder:text-text-muted focus:border-gold focus:outline-none";
 
@@ -112,8 +133,8 @@ function LoginContent() {
                   {a.birthDetailsHint}
                 </p>
               )}
-              <Button type="submit" variant="secondary" size="lg" className="w-full" disabled={loading}>
-                {loading ? c.pleaseWait : tab === "login" ? a.login : a.createAccount}
+              <Button type="submit" variant="secondary" size="lg" className="w-full" disabled={submitting}>
+                {submitting ? c.pleaseWait : tab === "login" ? a.login : a.createAccount}
               </Button>
             </form>
           </div>
