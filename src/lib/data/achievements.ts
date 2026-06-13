@@ -1,4 +1,5 @@
 import { AchievementPhoto } from "../types";
+import type { CertificationEntry } from "../types";
 
 export const featuredCertifications = [
   "Shastracharya in Vedic Astrology",
@@ -31,6 +32,51 @@ export const certifications = [
   { title: "Panchang", subtitle: "Tithi, Nakshatra, Yoga & Muhurat" },
   { title: "Swar Vigyan", subtitle: "Sound & Breath-Based Predictive Science" },
 ];
+
+const FEATURED_LOWER = new Set(featuredCertifications.map((t) => t.toLowerCase()));
+
+function overlapsFeatured(title: string, subtitle?: string) {
+  const lower = title.toLowerCase();
+  const combined = `${title} ${subtitle || ""}`.toLowerCase();
+
+  if (FEATURED_LOWER.has(lower)) return true;
+  if (lower.includes("numerology") && lower.includes("expert")) return true;
+  if (lower === "expert in kp" || lower === "expert in bnn") return true;
+  if (lower.includes("palmistry") && lower.includes("expert")) return true;
+  if (lower === "shastracharya") return true;
+  if (lower.includes("vastu") && (lower.includes("specialist") || lower.includes("shastra"))) return true;
+
+  return featuredCertifications.some((featured) => {
+    const f = featured.toLowerCase();
+    return combined.includes(f) || f.includes(lower);
+  });
+}
+
+/** Default certifications list for About page and admin seed data. */
+export function buildSeedCertifications(): CertificationEntry[] {
+  const seen = new Set<string>();
+  const items: CertificationEntry[] = [];
+  let index = 0;
+
+  for (const title of featuredCertifications) {
+    const key = title.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    index += 1;
+    items.push({ id: `cert-${index}`, title });
+  }
+
+  for (const cert of certifications) {
+    if (overlapsFeatured(cert.title, cert.subtitle)) continue;
+    const key = cert.title.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    index += 1;
+    items.push({ id: `cert-${index}`, title: cert.title, subtitle: cert.subtitle });
+  }
+
+  return items;
+}
 
 export const achievementPhotos: AchievementPhoto[] = [
   {

@@ -158,6 +158,13 @@ export interface AchievementPhoto {
   description?: string;
 }
 
+export interface CertificationEntry {
+  id: string;
+  title: string;
+  titleHindi?: string;
+  subtitle?: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -255,6 +262,7 @@ export interface EditableSiteContent {
   faqs: { en: { q: string; a: string }[]; hi: { q: string; a: string }[] };
   reviews: Review[];
   achievementPhotos: AchievementPhoto[];
+  certifications: CertificationEntry[];
   problemCategories: ProblemCategory[];
 }
 

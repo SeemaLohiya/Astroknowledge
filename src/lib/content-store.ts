@@ -1,4 +1,4 @@
-import { achievementPhotos } from "./data/achievements";
+import { achievementPhotos, buildSeedCertifications } from "./data/achievements";
 import { problemCategories } from "./data/content";
 import { reviews } from "./data/content";
 import { isRemotePersistEnabled } from "./db/persist";
@@ -15,19 +15,36 @@ function seedContent(): EditableSiteContent {
     },
     reviews: [...reviews],
     achievementPhotos: [...achievementPhotos],
+    certifications: buildSeedCertifications(),
     problemCategories: [...problemCategories],
   };
+}
+
+function withCertifications(data: EditableSiteContent): EditableSiteContent {
+  if (data.certifications?.length) return data;
+  return { ...data, certifications: buildSeedCertifications() };
 }
 
 async function load(): Promise<EditableSiteContent> {
   if (isRemotePersistEnabled()) {
     const fromMongo = await mongoMeta.mongoGetContent();
-    if (fromMongo) return fromMongo;
+    if (fromMongo) {
+      const normalized = withCertifications(fromMongo);
+      if (!fromMongo.certifications?.length) {
+        await mongoMeta.mongoSaveContent(normalized);
+      }
+      return normalized;
+    }
     const seed = seedContent();
     await mongoMeta.mongoSaveContent(seed);
     return seed;
   }
-  return readJsonFile<EditableSiteContent>("content.json", seedContent());
+  const file = readJsonFile<EditableSiteContent>("content.json", seedContent());
+  const normalized = withCertifications(file);
+  if (!file.certifications?.length) {
+    writeJsonFile("content.json", normalized);
+  }
+  return normalized;
 }
 
 async function save(data: EditableSiteContent) {
@@ -42,7 +59,7 @@ export const contentStore = {
   get: async () => load(),
 
   update: async (data: EditableSiteContent) => {
-    await save(data);
+    await save(withCertifications(data));
     return data;
   },
 

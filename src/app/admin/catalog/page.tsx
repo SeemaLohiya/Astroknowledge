@@ -5,13 +5,13 @@ import { PageTransition } from "@/components/animations/PageTransition";
 import { ImageUploadField } from "@/components/ui/ImageUploadField";
 import { SafeImage } from "@/components/ui/SafeImage";
 import { fetchJson } from "@/lib/fetch-json";
-import { AchievementPhoto, CatalogType, ProductCategory } from "@/lib/types";
+import { AchievementPhoto, CatalogType, CertificationEntry, ProductCategory } from "@/lib/types";
 import { motion } from "framer-motion";
-import { Award, BookOpen, FolderOpen, Heart, IndianRupee, Package, Plus, Save, Sparkles, Trash2, X } from "lucide-react";
+import { Award, BookOpen, FolderOpen, GraduationCap, Heart, IndianRupee, Package, Plus, Save, Sparkles, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-type AdminTab = CatalogType | "categories" | "achievements";
+type AdminTab = CatalogType | "categories" | "achievements" | "certifications";
 
 const TABS: { type: AdminTab; label: string; icon: typeof Package }[] = [
   { type: "products", label: "Products", icon: Package },
@@ -20,6 +20,7 @@ const TABS: { type: AdminTab; label: string; icon: typeof Package }[] = [
   { type: "pooja", label: "Pooja", icon: Sparkles },
   { type: "healing", label: "Healing", icon: Heart },
   { type: "categories", label: "Categories", icon: FolderOpen },
+  { type: "certifications", label: "Certifications & Titles", icon: GraduationCap },
   { type: "achievements", label: "Clients & Achievements", icon: Award },
 ];
 
@@ -34,10 +35,12 @@ export default function AdminCatalogPage() {
   const [items, setItems] = useState<CatalogItem[]>([]);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [achievementPhotos, setAchievementPhotos] = useState<AchievementPhoto[]>([]);
+  const [certificationEntries, setCertificationEntries] = useState<CertificationEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<CatalogItem | null>(null);
   const [editingCategory, setEditingCategory] = useState<ProductCategory | null>(null);
   const [editingAchievement, setEditingAchievement] = useState<AchievementPhoto | null>(null);
+  const [editingCertification, setEditingCertification] = useState<CertificationEntry | null>(null);
   const [saving, setSaving] = useState(false);
 
   const loadCategories = useCallback(async () => {
@@ -71,6 +74,19 @@ export default function AdminCatalogPage() {
     }
   }, []);
 
+  const loadCertifications = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetchJson<{ items?: CertificationEntry[] }>("/api/content/certifications");
+      setCertificationEntries(res.data?.items || []);
+    } catch {
+      toast.error("Failed to load certifications");
+      setCertificationEntries([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadCategories();
   }, [loadCategories]);
@@ -79,15 +95,18 @@ export default function AdminCatalogPage() {
     setEditing(null);
     setEditingCategory(null);
     setEditingAchievement(null);
+    setEditingCertification(null);
     if (activeType === "categories") {
       setLoading(true);
       loadCategories().finally(() => setLoading(false));
     } else if (activeType === "achievements") {
       void loadAchievements();
+    } else if (activeType === "certifications") {
+      void loadCertifications();
     } else {
       loadItems(activeType);
     }
-  }, [activeType, loadItems, loadCategories, loadAchievements]);
+  }, [activeType, loadItems, loadCategories, loadAchievements, loadCertifications]);
 
   const handleAdd = () => {
     const defaults: CatalogItem =
@@ -161,6 +180,52 @@ export default function AdminCatalogPage() {
       await loadAchievements();
     } catch {
       toast.error("Failed to delete photo");
+    }
+  };
+
+  const handleAddCertification = () => {
+    setEditingCertification({
+      id: `cert-${Date.now()}`,
+      title: "",
+      titleHindi: "",
+      subtitle: "",
+    });
+  };
+
+  const handleSaveCertification = async () => {
+    if (!editingCertification) return;
+    setSaving(true);
+    try {
+      const isNew = !certificationEntries.some((c) => c.id === editingCertification.id);
+      const res = await fetch(
+        isNew ? "/api/content/certifications" : `/api/content/certifications/${editingCertification.id}`,
+        {
+          method: isNew ? "POST" : "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(editingCertification),
+        }
+      );
+      if (!res.ok) throw new Error();
+      toast.success(isNew ? "Certification added" : "Certification updated");
+      setEditingCertification(null);
+      await loadCertifications();
+    } catch {
+      toast.error("Failed to save certification");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteCertification = async (id: string) => {
+    if (!confirm("Delete this certification?")) return;
+    try {
+      const res = await fetch(`/api/content/certifications/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error();
+      toast.success("Certification deleted");
+      if (editingCertification?.id === id) setEditingCertification(null);
+      await loadCertifications();
+    } catch {
+      toast.error("Failed to delete certification");
     }
   };
 
@@ -256,12 +321,13 @@ export default function AdminCatalogPage() {
 
   const isCategoriesTab = activeType === "categories";
   const isAchievementsTab = activeType === "achievements";
+  const isCertificationsTab = activeType === "certifications";
 
   return (
     <PageTransition>
       <FadeIn className="mb-6">
         <h1 className="font-display text-2xl font-bold text-text-primary">Catalog <span className="text-gradient-gold">Manager</span></h1>
-        <p className="text-text-body text-sm mt-1">Add, edit, or remove products, services, courses, pooja, healing, categories, and client achievement photos</p>
+        <p className="text-text-body text-sm mt-1">Add, edit, or remove products, services, courses, pooja, healing, categories, certifications, and client achievement photos</p>
       </FadeIn>
 
       <div className="mb-6 flex flex-wrap gap-2">
@@ -340,6 +406,73 @@ export default function AdminCatalogPage() {
               ) : (
                 <div className="flex h-full min-h-[300px] items-center justify-center text-text-muted text-sm">
                   Select a category to edit or click Add Category
+                </div>
+              )}
+            </div>
+          </FadeIn>
+        </div>
+      ) : isCertificationsTab ? (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <FadeIn>
+            <div className="rounded-2xl glass-card p-4">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="font-semibold text-text-primary">Certifications & Titles ({certificationEntries.length})</h2>
+                <button onClick={handleAddCertification} className="flex items-center gap-1 rounded-full bg-gold px-3 py-1.5 text-xs font-bold text-white hover:bg-gold-bright">
+                  <Plus className="h-3.5 w-3.5" /> Add Title
+                </button>
+              </div>
+              {loading ? (
+                <p className="text-text-muted text-sm py-8 text-center">Loading...</p>
+              ) : certificationEntries.length === 0 ? (
+                <p className="text-text-muted text-sm py-8 text-center">No certifications yet. Click Add Title.</p>
+              ) : (
+                <div className="space-y-2 max-h-[600px] overflow-y-auto">
+                  {certificationEntries.map((cert) => (
+                    <motion.div
+                      key={cert.id}
+                      className={`flex items-center gap-3 rounded-xl border p-3 cursor-pointer transition-colors ${editingCertification?.id === cert.id ? "border-gold bg-gold/5" : "border-gold/10 hover:border-gold/30"}`}
+                      onClick={() => setEditingCertification({ ...cert })}
+                      whileHover={{ x: 2 }}
+                    >
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-gold/20 bg-gold/10">
+                        <GraduationCap className="h-5 w-5 text-gold" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-text-primary text-sm truncate">{cert.title}</p>
+                        {cert.titleHindi ? <p className="text-xs text-gold truncate">{cert.titleHindi}</p> : null}
+                        {cert.subtitle ? <p className="text-[11px] text-text-muted truncate mt-0.5">{cert.subtitle}</p> : null}
+                      </div>
+                      <button onClick={(e) => { e.stopPropagation(); handleDeleteCertification(cert.id); }} className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg" aria-label="Delete">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </FadeIn>
+
+          <FadeIn delay={0.1}>
+            <div className="rounded-2xl glass-card p-6">
+              {editingCertification ? (
+                <>
+                  <div className="mb-4 flex items-center justify-between">
+                    <h2 className="font-semibold text-text-primary">Edit Certification</h2>
+                    <button onClick={() => setEditingCertification(null)} className="p-1 text-text-muted hover:text-gold"><X className="h-5 w-5" /></button>
+                  </div>
+                  <div className="space-y-3 max-h-[480px] overflow-y-auto pr-1">
+                    <Field label="ID" value={editingCertification.id} onChange={(v) => setEditingCertification({ ...editingCertification, id: v })} hint="Unique identifier — change only when creating a new entry" />
+                    <Field label="Title (English)" value={editingCertification.title} onChange={(v) => setEditingCertification({ ...editingCertification, title: v })} />
+                    <Field label="Title (Hindi)" value={editingCertification.titleHindi || ""} onChange={(v) => setEditingCertification({ ...editingCertification, titleHindi: v })} />
+                    <Field label="Description / Subtitle" value={editingCertification.subtitle || ""} onChange={(v) => setEditingCertification({ ...editingCertification, subtitle: v })} textarea rows={3} hint="Shown below the title on the About page Certifications section" />
+                  </div>
+                  <button onClick={handleSaveCertification} disabled={saving} className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-gold py-3 text-sm font-bold text-white hover:bg-gold-bright disabled:opacity-50">
+                    <Save className="h-4 w-4" />{saving ? "Saving..." : "Save Certification"}
+                  </button>
+                </>
+              ) : (
+                <div className="flex h-full min-h-[300px] items-center justify-center text-text-muted text-sm">
+                  Select a certification to edit or click Add Title
                 </div>
               )}
             </div>

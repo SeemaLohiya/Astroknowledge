@@ -1,4 +1,4 @@
-import { achievementPhotos } from "./data/achievements";
+import { achievementPhotos, buildSeedCertifications } from "./data/achievements";
 import { poojaServices, problemCategories, reviews } from "./data/content";
 import { courses } from "./data/courses";
 import { healingServices } from "./data/healing";
@@ -25,6 +25,7 @@ export const staticContent: EditableSiteContent = {
   },
   reviews: [...reviews],
   achievementPhotos: [...achievementPhotos],
+  certifications: buildSeedCertifications(),
   problemCategories: [...problemCategories],
 };
 
