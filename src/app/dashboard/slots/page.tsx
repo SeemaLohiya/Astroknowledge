@@ -22,7 +22,7 @@ import toast from "react-hot-toast";
 function SlotsContent() {
   const { c } = useLanguage();
   const d = c.dashboard;
-  const { user } = useProfile();
+  const { user, loading: profileLoading } = useProfile();
   const searchParams = useSearchParams();
   const serviceParam = searchParams.get("service") || "";
   const [slots, setSlots] = useState<BookingSlot[]>([]);
@@ -89,7 +89,7 @@ function SlotsContent() {
     }
   };
 
-  if (accessLoading) {
+  if (accessLoading || profileLoading) {
     return <p className="py-20 text-center text-text-muted">{c.common.loading}</p>;
   }
 
@@ -168,7 +168,7 @@ function SlotsContent() {
         </FadeIn>
       )}
 
-      {!birthComplete && user ? (
+      {!birthComplete ? (
         <FadeIn className="mb-6 rounded-2xl glass-card p-6 text-center">
           <h2 className="font-semibold text-text-primary mb-1">{d.birthRequired}</h2>
           <p className="text-sm text-text-body mb-5">{d.birthRequiredDesc}</p>

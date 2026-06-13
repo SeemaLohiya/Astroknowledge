@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+
+export const dynamic = "force-dynamic";
 import { getSession } from "@/lib/auth";
 import { isBirthProfileComplete } from "@/lib/profile";
 import { paymentsStore } from "@/lib/payments-store";

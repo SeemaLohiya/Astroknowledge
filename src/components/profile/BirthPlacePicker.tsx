@@ -30,8 +30,6 @@ export function parseBirthPlace(place?: string, user?: Partial<BirthPlaceValue> 
   return { birthCity: parts[0] || "", birthState: "", birthCountry: "India" };
 }
 
-type PlaceTab = "country" | "state" | "city";
-
 interface BirthPlacePickerProps {
   value: BirthPlaceValue;
   onChange: (next: BirthPlaceValue) => void;
@@ -40,7 +38,6 @@ interface BirthPlacePickerProps {
 }
 
 export function BirthPlacePicker({ value, onChange, disabled, inputCls = "" }: BirthPlacePickerProps) {
-  const [tab, setTab] = useState<PlaceTab>("country");
   const [stateFilter, setStateFilter] = useState("");
   const [cityFilter, setCityFilter] = useState("");
 
@@ -57,31 +54,10 @@ export function BirthPlacePicker({ value, onChange, disabled, inputCls = "" }: B
 
   const selectCls = `w-full rounded-xl border border-gold/20 bg-orange/5 px-3 py-2.5 text-sm focus:border-gold focus:outline-none disabled:opacity-50 ${inputCls}`;
 
-  const tabs: { key: PlaceTab; label: string }[] = [
-    { key: "country", label: "Country" },
-    { key: "state", label: "State" },
-    { key: "city", label: "City" },
-  ];
-
   return (
     <div className="space-y-3">
-      <div className="flex rounded-full bg-orange/5 p-1">
-        {tabs.map((t) => (
-          <button
-            key={t.key}
-            type="button"
-            disabled={disabled}
-            onClick={() => setTab(t.key)}
-            className={`flex-1 rounded-full py-1.5 text-xs font-semibold transition-all ${
-              tab === t.key ? "bg-gold text-white" : "text-text-body hover:text-gold"
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {tab === "country" && (
+      <div>
+        <label className="mb-1 block text-[10px] font-medium uppercase tracking-wide text-text-muted">Country *</label>
         <select
           disabled={disabled}
           value={value.birthCountry}
@@ -93,55 +69,53 @@ export function BirthPlacePicker({ value, onChange, disabled, inputCls = "" }: B
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
-      )}
+      </div>
 
-      {tab === "state" && (
-        <div className="space-y-2">
-          <input
-            type="text"
-            disabled={disabled || !value.birthCountry}
-            placeholder="Filter states..."
-            value={stateFilter}
-            onChange={(e) => setStateFilter(e.target.value)}
-            className={selectCls}
-          />
-          <select
-            disabled={disabled || !value.birthCountry}
-            value={value.birthState}
-            onChange={(e) => onChange({ ...value, birthState: e.target.value, birthCity: "" })}
-            className={selectCls}
-          >
-            <option value="">Select state</option>
-            {filteredStates.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
-        </div>
-      )}
+      <div>
+        <label className="mb-1 block text-[10px] font-medium uppercase tracking-wide text-text-muted">State *</label>
+        <input
+          type="text"
+          disabled={disabled || !value.birthCountry}
+          placeholder="Filter states..."
+          value={stateFilter}
+          onChange={(e) => setStateFilter(e.target.value)}
+          className={selectCls}
+        />
+        <select
+          disabled={disabled || !value.birthCountry}
+          value={value.birthState}
+          onChange={(e) => onChange({ ...value, birthState: e.target.value, birthCity: "" })}
+          className={`${selectCls} mt-2`}
+        >
+          <option value="">Select state</option>
+          {filteredStates.map((s) => (
+            <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
+      </div>
 
-      {tab === "city" && (
-        <div className="space-y-2">
-          <input
-            type="text"
-            disabled={disabled || !value.birthState}
-            placeholder="Filter cities..."
-            value={cityFilter}
-            onChange={(e) => setCityFilter(e.target.value)}
-            className={selectCls}
-          />
-          <select
-            disabled={disabled || !value.birthState}
-            value={value.birthCity}
-            onChange={(e) => onChange({ ...value, birthCity: e.target.value })}
-            className={selectCls}
-          >
-            <option value="">Select city</option>
-            {filteredCities.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
-        </div>
-      )}
+      <div>
+        <label className="mb-1 block text-[10px] font-medium uppercase tracking-wide text-text-muted">City *</label>
+        <input
+          type="text"
+          disabled={disabled || !value.birthState}
+          placeholder="Filter cities..."
+          value={cityFilter}
+          onChange={(e) => setCityFilter(e.target.value)}
+          className={selectCls}
+        />
+        <select
+          disabled={disabled || !value.birthState}
+          value={value.birthCity}
+          onChange={(e) => onChange({ ...value, birthCity: e.target.value })}
+          className={`${selectCls} mt-2`}
+        >
+          <option value="">Select city</option>
+          {filteredCities.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+      </div>
 
       {(value.birthCity || value.birthState || value.birthCountry) && (
         <p className="text-xs text-text-muted rounded-lg bg-orange/5 px-3 py-2">

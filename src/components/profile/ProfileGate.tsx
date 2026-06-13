@@ -28,7 +28,7 @@ export function useProfile() {
 /** Auth loads after first paint so the UI is not blocked. */
 export function ProfileGate({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<Omit<User, "password"> | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -43,13 +43,7 @@ export function ProfileGate({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const run = () => void refresh();
-    if (typeof requestIdleCallback === "function") {
-      const id = requestIdleCallback(run, { timeout: 2000 });
-      return () => cancelIdleCallback(id);
-    }
-    const t = setTimeout(run, 300);
-    return () => clearTimeout(t);
+    void refresh();
   }, [refresh]);
 
   const isComplete = !user || user.role === "admin" || isBirthProfileComplete(user);

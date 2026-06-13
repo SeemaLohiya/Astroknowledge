@@ -29,6 +29,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { href: "/dashboard/profile", icon: User, label: c.common.profile },
   ], [c, d]);
 
+  const isActive = (href: string) =>
+    pathname === href ||
+    (href === "/dashboard/purchases" && pathname === "/dashboard/orders") ||
+    (href === "/dashboard/profile" && pathname === "/dashboard/kundli");
+
   useEffect(() => {
     void fetchJson<{ user?: { name: string; email: string; role: string } | null }>("/api/auth/me", { cache: "no-store" }).then((res) => {
       if (!res.data?.user) { router.push("/login"); return; }
@@ -48,7 +53,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         )}
         <nav className="flex gap-1 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {navItems.map((item) => {
-            const active = pathname === item.href || (item.href === "/dashboard/purchases" && pathname === "/dashboard/orders");
+            const active = isActive(item.href);
             return (
               <Link
                 key={item.href}
@@ -89,7 +94,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <motion.div
                     className={cn(
                       "flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-colors",
-                      pathname === item.href || (item.href === "/dashboard/purchases" && pathname === "/dashboard/orders")
+                      isActive(item.href)
                         ? "bg-gold/20 text-gold"
                         : "text-text-body hover:bg-orange/5 hover:text-text-primary"
                     )}

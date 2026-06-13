@@ -72,5 +72,7 @@ export async function PATCH(req: NextRequest) {
   }
 
   await store.users.persist(user);
-  return NextResponse.json({ user: sanitizeUser(user) });
+  const saved = await store.users.findById(session.userId);
+  if (!saved) return NextResponse.json({ error: "Could not save profile" }, { status: 500 });
+  return NextResponse.json({ user: sanitizeUser(saved) });
 }

@@ -13,7 +13,17 @@ import { Mail, Pencil, Phone, User as UserIcon } from "lucide-react";
 export default function ProfilePage() {
   const { c } = useLanguage();
   const d = c.dashboard;
-  const { user } = useProfile();
+  const { user, loading } = useProfile();
+
+  if (loading) {
+    return (
+      <PageTransition>
+        <div className="flex min-h-[40vh] items-center justify-center">
+          <div className="h-10 w-10 animate-spin rounded-full border-2 border-gold/30 border-t-gold" />
+        </div>
+      </PageTransition>
+    );
+  }
 
   if (!user) return null;
 

@@ -67,7 +67,12 @@ export async function mongoCreateUser(user: User) {
 
 export async function mongoUpdateUser(id: string, patch: Partial<User>) {
   await connectDB();
-  return (await UserModel.findOneAndUpdate({ id }, { $set: patch }, { new: true }).lean()) as User | null;
+  const doc = { ...patch } as Partial<User> & { _id?: unknown; __v?: unknown };
+  delete doc._id;
+  delete doc.__v;
+  const result = await UserModel.collection.updateOne({ id }, { $set: doc });
+  if (result.matchedCount === 0) return null;
+  return (await UserModel.findOne({ id }).lean()) as User | null;
 }
 
 // ── Payments ──

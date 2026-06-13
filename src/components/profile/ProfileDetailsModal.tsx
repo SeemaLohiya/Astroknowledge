@@ -32,9 +32,13 @@ interface ProfileDetailsModalProps {
 function ProfileDetailsModal({ open, onClose }: ProfileDetailsModalProps) {
   const { c } = useLanguage();
   const d = c.dashboard;
-  const { user, refresh } = useProfile();
+  const { user, refresh, loading } = useProfile();
   const hydrated = useHydrated();
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (open) void refresh();
+  }, [open, refresh]);
 
   useEffect(() => {
     if (open) {
@@ -69,7 +73,7 @@ function ProfileDetailsModal({ open, onClose }: ProfileDetailsModalProps) {
 
   return createPortal(
     <AnimatePresence>
-      {open && user && (
+      {open && (
         <motion.div
           key="profile-modal-backdrop"
           initial={{ opacity: 0 }}
@@ -129,17 +133,26 @@ function ProfileDetailsModal({ open, onClose }: ProfileDetailsModalProps) {
             </div>
 
             <div className="relative overflow-y-auto px-6 py-5 max-h-[calc(90dvh-5.5rem)]">
-              <ProfileDetailsForm
-                key={`${user.id}-${open}`}
-                animated
-                onSubmit={handleSave}
-                loading={saving}
-                initial={user}
-                submitLabel={d.saveChanges}
-              />
-              <Button type="button" variant="ghost" className="mt-3 w-full text-text-muted" onClick={onClose}>
-                {d.cancel}
-              </Button>
+              {loading || !user ? (
+                <div className="flex flex-col items-center justify-center gap-3 py-16">
+                  <div className="h-10 w-10 animate-spin rounded-full border-2 border-gold/30 border-t-gold" />
+                  <p className="text-sm text-text-muted">{c.common.loading}</p>
+                </div>
+              ) : (
+                <>
+                  <ProfileDetailsForm
+                    key={`${user.id}-${open}`}
+                    animated
+                    onSubmit={handleSave}
+                    loading={saving}
+                    initial={user}
+                    submitLabel={d.saveChanges}
+                  />
+                  <Button type="button" variant="ghost" className="mt-3 w-full text-text-muted" onClick={onClose}>
+                    {d.cancel}
+                  </Button>
+                </>
+              )}
             </div>
           </motion.div>
         </motion.div>
@@ -164,8 +177,14 @@ export function FillDetailsButton({
 }) {
   const { c } = useLanguage();
   const { openProfileModal } = useProfileDetailsModal();
+  const { refresh } = useProfile();
+
+  const handleClick = () => {
+    void refresh().then(() => openProfileModal());
+  };
+
   return (
-    <Button variant={variant} size={size} className={className} onClick={openProfileModal}>
+    <Button variant={variant} size={size} className={className} onClick={handleClick}>
       {Icon && <Icon className="h-4 w-4" />}
       {label ?? c.dashboard.fillDetails}
     </Button>
