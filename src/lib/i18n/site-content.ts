@@ -106,6 +106,9 @@ export interface SiteContentLang {
     bio1: string;
     bio2: string;
     bio3: string;
+    developerLinkTitle: string;
+    developerLinkDesc: string;
+    developerLinkCta: string;
   };
   contact: {
     title: string;
@@ -317,6 +320,9 @@ export const siteContent: Record<Lang, SiteContentLang> = {
       bio1: "Acharya Seema Lohiya's journey into astrology is a remarkable blend of intellect, spirituality, and destiny. Beginning her career in Computer Science, she eventually discovered her true calling in the sacred science of astrology.",
       bio2: "With over 12 years of experience, she holds the prestigious title of Shastracharya and provides meaningful guidance on career, relationships, health, finances, and personal growth.",
       bio3: "Her compassionate approach and commitment to authentic Vedic principles have made her a trusted advisor. Through her consultations, she continues to inspire transformation and empower people to align with their true potential.",
+      developerLinkTitle: "Developer",
+      developerLinkDesc: "Meet the technologist behind AstroKnowledge — web development, platform management & AI integration.",
+      developerLinkCta: "View Developer Profile",
     },
     contact: {
       title: "Contact Us",
@@ -526,6 +532,9 @@ export const siteContent: Record<Lang, SiteContentLang> = {
       bio1: "आचार्य सीमा लोहिया की ज्योतिष यात्रा बुद्धि, आध्यात्मिकता और नियति का अद्भुत संगम है। कंप्यूटर विज्ञान में करियर शुरू करने के बाद, उन्होंने ज्योतिष विज्ञान को अपना जीवन उद्देश्य बनाया।",
       bio2: "१२ से अधिक वर्षों के अनुभव के साथ, वे शास्त्राचार्य की उपाधि धारण करती हैं और करियर, संबंध, स्वास्थ्य, वित्त और व्यक्तिगत विकास पर सार्थक मार्गदर्शन देती हैं।",
       bio3: "उनका करुणामय दृष्टिकोण और प्रामाणिक वैदिक सिद्धांतों के प्रति समर्पण उन्हें विश्वसनीय सलाहकार बनाता है। परामर्श के माध्यम से वे परिवर्तन प्रेरित करती हैं और लोगों को उनकी सच्ची क्षमता से जोड़ती हैं।",
+      developerLinkTitle: "डेवलपर",
+      developerLinkDesc: "AstroKnowledge के पीछे के तकनीशियन से मिलें — वेब विकास, प्लेटफ़ॉर्म प्रबंधन और AI एकीकरण।",
+      developerLinkCta: "डेवलपर प्रोफ़ाइल देखें",
     },
     contact: {
       title: "संपर्क करें",

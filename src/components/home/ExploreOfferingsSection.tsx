@@ -5,7 +5,7 @@ import { ShimmerText } from "@/components/animations/ShimmerText";
 import { StaggerChildren, StaggerItem } from "@/components/animations/StaggerChildren";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
-import { ArrowRight, BookOpen, Package, ShoppingBag, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpen, Heart, Package, ShoppingBag, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 const OFFERING_KEYS = [
@@ -13,6 +13,7 @@ const OFFERING_KEYS = [
   { key: "products", href: "/products", icon: Package, color: "from-orange/20 to-gold/15", accent: "text-gold", border: "hover:border-gold/50" },
   { key: "courses", href: "/courses", icon: BookOpen, color: "from-gold/20 to-orange/15", accent: "text-orange", border: "hover:border-orange/40" },
   { key: "pooja", href: "/pooja", icon: ShoppingBag, color: "from-amber-500/20 to-gold/15", accent: "text-amber-600", border: "hover:border-amber-400/50" },
+  { key: "healing", href: "/healing", icon: Heart, color: "from-rose-400/25 to-gold/15", accent: "text-rose-600", border: "hover:border-rose-400/50" },
 ] as const;
 
 export function ExploreOfferingsSection() {
@@ -29,7 +30,7 @@ export function ExploreOfferingsSection() {
           subtitle={o.subtitle}
         />
 
-        <StaggerChildren className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <StaggerChildren className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {OFFERING_KEYS.map((item, index) => {
             const title = o[item.key as keyof typeof o] as string;
             const desc = o[`${item.key}Desc` as keyof typeof o] as string;

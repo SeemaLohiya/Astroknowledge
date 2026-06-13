@@ -15,7 +15,7 @@ export const uiStrings = {
     offerings: {
       title: "What We",
       titleAccent: "Offer",
-      subtitle: "Services, products, courses & pooja — everything for your spiritual journey",
+      subtitle: "Services, products, courses, pooja & healing — everything for your spiritual journey",
       exploreNow: "Explore Now",
       services: "Services",
       servicesDesc: "Vedic consultations — Kundali, Vastu, Numerology & more",
@@ -25,6 +25,8 @@ export const uiStrings = {
       coursesDesc: "Learn Vedic astrology, rituals, numerology & Vastu",
       pooja: "Pooja",
       poojaDesc: "Sacred rituals performed by experienced Vedic Pandits",
+      healing: "Healing",
+      healingDesc: "Reiki, crystal, theta healing & mantra sadhana for inner balance",
     },
     stats: {
       yearsExperience: "Years Experience",
@@ -377,7 +379,7 @@ export const uiStrings = {
     offerings: {
       title: "हम क्या",
       titleAccent: "प्रदान करते हैं",
-      subtitle: "सेवाएं, उत्पाद, पाठ्यक्रम और पूजा — आपकी आध्यात्मिक यात्रा के लिए सब कुछ",
+      subtitle: "सेवाएं, उत्पाद, पाठ्यक्रम, पूजा और हीलिंग — आपकी आध्यात्मिक यात्रा के लिए सब कुछ",
       exploreNow: "अभी देखें",
       services: "सेवाएं",
       servicesDesc: "वैदिक परामर्श — कुंडली, वास्तु, अंक ज्योतिष और अधिक",
@@ -387,6 +389,8 @@ export const uiStrings = {
       coursesDesc: "वैदिक ज्योतिष, अनुष्ठान, अंक शास्त्र और वास्तु सीखें",
       pooja: "पूजा",
       poojaDesc: "अनुभवी वैदिक पंडितों द्वारा पवित्र अनुष्ठान",
+      healing: "हीलिंग",
+      healingDesc: "रेकी, क्रिस्टल, थीटा हीलिंग और मंत्र साधना — आंतरिक संतुलन के लिए",
     },
     stats: {
       yearsExperience: "वर्षों का अनुभव",
