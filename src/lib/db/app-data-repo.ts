@@ -75,6 +75,22 @@ export async function mongoUpdateUser(id: string, patch: Partial<User>) {
   return (await UserModel.findOne({ id }).lean()) as User | null;
 }
 
+export async function mongoDeleteUser(id: string) {
+  await connectDB();
+  const result = await UserModel.collection.deleteOne({ id });
+  return result.deletedCount > 0;
+}
+
+export async function mongoRestoreUser(id: string) {
+  await connectDB();
+  const result = await UserModel.collection.updateOne(
+    { id },
+    { $set: { accountStatus: "active" }, $unset: { suspendedAt: "" } }
+  );
+  if (result.matchedCount === 0) return null;
+  return (await UserModel.findOne({ id }).lean()) as User | null;
+}
+
 // ── Payments ──
 
 export async function mongoGetPayments(): Promise<PaymentRecord[]> {

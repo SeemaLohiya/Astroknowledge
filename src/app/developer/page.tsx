@@ -21,9 +21,11 @@ import {
   Zap,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 const DEVELOPER = {
   name: "Ishant Goyal",
+  photo: "/images/developer/ishant-goyal.png",
   title: "Vice President – Head of Website Development & Management and AI Specialist",
   location: "Jaipur, Rajasthan",
   phone: "+91 6367010131",
@@ -152,7 +154,7 @@ export default function DeveloperPage() {
             <div className="dev-scan-line pointer-events-none absolute inset-0" aria-hidden />
 
             <div className="relative flex flex-col items-center text-center">
-              <div className="dev-orbit-wrap relative mb-8 flex h-40 w-40 items-center justify-center md:h-48 md:w-48">
+              <div className="dev-orbit-wrap relative mb-8 flex h-44 w-44 items-center justify-center md:h-52 md:w-52">
                 <motion.div
                   className="dev-orbit-ring absolute inset-0 rounded-full border-2 border-dashed border-gold/40"
                   animate={reduceMotion ? undefined : { rotate: 360 }}
@@ -179,11 +181,18 @@ export default function DeveloperPage() {
                   </motion.span>
                 ))}
                 <motion.div
-                  className="relative z-10 flex h-24 w-24 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 via-violet-600 to-gold text-3xl font-black text-white shadow-2xl md:h-28 md:w-28 md:text-4xl"
+                  className="dev-photo-frame relative z-10 h-28 w-28 overflow-hidden rounded-2xl border-2 border-gold/50 shadow-2xl md:h-32 md:w-32"
                   animate={reduceMotion ? undefined : { boxShadow: ["0 0 20px rgba(234,88,12,0.4)", "0 0 40px rgba(99,102,241,0.6)", "0 0 20px rgba(234,88,12,0.4)"] }}
                   transition={{ duration: 3, repeat: Infinity }}
                 >
-                  IG
+                  <Image
+                    src={DEVELOPER.photo}
+                    alt={DEVELOPER.name}
+                    width={256}
+                    height={256}
+                    className="h-full w-full object-cover object-top"
+                    priority
+                  />
                 </motion.div>
               </div>
 

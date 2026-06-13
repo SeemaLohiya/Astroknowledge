@@ -10,7 +10,7 @@ export async function GET() {
   if (!session) return NextResponse.json({ user: null });
 
   const user = await store.users.findById(session.userId);
-  if (!user) return NextResponse.json({ user: null });
+  if (!user || user.accountStatus === "suspended") return NextResponse.json({ user: null });
 
   return NextResponse.json({ user: sanitizeUser(user) });
 }

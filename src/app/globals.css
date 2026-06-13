@@ -2413,3 +2413,7 @@ textarea::placeholder {
 .dev-social-btn:hover {
   filter: brightness(1.1);
 }
+
+.dev-photo-frame {
+  background: linear-gradient(145deg, #fff, #eef2ff);
+}

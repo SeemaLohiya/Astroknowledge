@@ -6,6 +6,9 @@ export interface User {
   password: string;
   role: "user" | "admin";
   createdAt: string;
+  /** active = normal; suspended = temporary block (admin can restore) */
+  accountStatus?: "active" | "suspended";
+  suspendedAt?: string;
   dob?: string;
   birthTime?: string;
   birthPlace?: string;

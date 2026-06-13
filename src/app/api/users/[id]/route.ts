@@ -45,3 +45,39 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   await store.users.persist(user);
   return NextResponse.json({ user: sanitizeUser(user) });
 }
+
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const session = await getSession();
+  if (!session || session.role !== "admin") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  const user = await store.users.findById(id);
+  if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (user.role === "admin") {
+    return NextResponse.json({ error: "Cannot modify admin accounts" }, { status: 400 });
+  }
+
+  const action = req.nextUrl.searchParams.get("action") || "permanent";
+
+  if (action === "suspend") {
+    const updated = await store.users.suspend(id);
+    if (!updated) return NextResponse.json({ error: "Could not suspend user" }, { status: 500 });
+    return NextResponse.json({ user: sanitizeUser(updated), message: "User suspended temporarily" });
+  }
+
+  if (action === "restore") {
+    const updated = await store.users.restore(id);
+    if (!updated) return NextResponse.json({ error: "Could not restore user" }, { status: 500 });
+    return NextResponse.json({ user: sanitizeUser(updated), message: "User restored" });
+  }
+
+  if (action === "permanent") {
+    const ok = await store.users.remove(id);
+    if (!ok) return NextResponse.json({ error: "Could not delete user" }, { status: 500 });
+    return NextResponse.json({ success: true, message: "User permanently deleted" });
+  }
+
+  return NextResponse.json({ error: "Invalid action. Use suspend, restore, or permanent" }, { status: 400 });
+}

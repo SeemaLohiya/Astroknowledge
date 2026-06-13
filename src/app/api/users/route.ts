@@ -11,11 +11,15 @@ export async function GET(req: NextRequest) {
 
   const search = req.nextUrl.searchParams.get("search")?.toLowerCase() || "";
   const role = req.nextUrl.searchParams.get("role");
+  const includeSuspended = req.nextUrl.searchParams.get("includeSuspended") === "1";
 
   let users = (await store.users.getAll()).map(sanitizeUser);
 
   if (role && role !== "all") {
     users = users.filter((u) => u.role === role);
+  }
+  if (!includeSuspended) {
+    users = users.filter((u) => u.accountStatus !== "suspended");
   }
   if (search) {
     users = users.filter((u) =>

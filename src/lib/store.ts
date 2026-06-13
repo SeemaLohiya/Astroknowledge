@@ -121,6 +121,44 @@ export const store = {
       writeUsers(users);
       return user;
     },
+    suspend: async (id: string) => {
+      const patch = { accountStatus: "suspended" as const, suspendedAt: new Date().toISOString() };
+      if (isRemotePersistEnabled()) {
+        await ensureUsersSeeded();
+        return mongo.mongoUpdateUser(id, patch);
+      }
+      const users = readUsers();
+      const idx = users.findIndex((u) => u.id === id);
+      if (idx === -1) return null;
+      users[idx] = { ...users[idx], ...patch };
+      writeUsers(users);
+      return users[idx];
+    },
+    restore: async (id: string) => {
+      if (isRemotePersistEnabled()) {
+        await ensureUsersSeeded();
+        return mongo.mongoRestoreUser(id);
+      }
+      const users = readUsers();
+      const idx = users.findIndex((u) => u.id === id);
+      if (idx === -1) return null;
+      users[idx] = { ...users[idx], accountStatus: "active" };
+      delete users[idx].suspendedAt;
+      writeUsers(users);
+      return users[idx];
+    },
+    remove: async (id: string) => {
+      if (isRemotePersistEnabled()) {
+        await ensureUsersSeeded();
+        const ok = await mongo.mongoDeleteUser(id);
+        return ok;
+      }
+      const users = readUsers();
+      const next = users.filter((u) => u.id !== id);
+      if (next.length === users.length) return false;
+      writeUsers(next);
+      return true;
+    },
   },
   bookings: {
     getAll: async () => {

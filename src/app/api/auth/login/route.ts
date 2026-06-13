@@ -10,6 +10,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
   }
 
+  if (user.accountStatus === "suspended") {
+    return NextResponse.json({ error: "Your account has been suspended. Please contact support." }, { status: 403 });
+  }
+
   const token = await createToken(user);
   const response = NextResponse.json({ user: sanitizeUser(user) });
   response.cookies.set("auth-token", token, authCookieOptions());
