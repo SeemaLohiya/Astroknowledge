@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/Button";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { COUNTRIES, getCities, getStates } from "@/lib/location-data";
+import { withSelectedOption } from "@/lib/select-options";
 import { fetchJson } from "@/lib/fetch-json";
 import { SavedAddress } from "@/lib/types";
 import { MapPin, Plus, Star, Trash2 } from "lucide-react";
@@ -35,12 +36,18 @@ export function SavedAddresses() {
   const states = useMemo(() => getStates(form.country), [form.country]);
   const cities = useMemo(() => getCities(form.state), [form.state]);
   const filteredStates = useMemo(
-    () => states.filter((s) => s.toLowerCase().includes(stateFilter.toLowerCase())),
-    [states, stateFilter]
+    () => withSelectedOption(
+      states.filter((s) => s.toLowerCase().includes(stateFilter.toLowerCase())),
+      form.state
+    ),
+    [states, stateFilter, form.state]
   );
   const filteredCities = useMemo(
-    () => cities.filter((c) => c.toLowerCase().includes(cityFilter.toLowerCase())),
-    [cities, cityFilter]
+    () => withSelectedOption(
+      cities.filter((c) => c.toLowerCase().includes(cityFilter.toLowerCase())),
+      form.city
+    ),
+    [cities, cityFilter, form.city]
   );
 
   const load = () => {
@@ -81,7 +88,7 @@ export function SavedAddresses() {
     load();
   };
 
-  const selectCls = "w-full rounded-xl border border-gold/20 bg-orange/5 px-3 py-2.5 text-sm focus:border-gold focus:outline-none";
+  const selectCls = "w-full min-h-[44px] rounded-xl border border-gold/20 bg-orange/5 px-3 py-2.5 text-sm focus:border-gold focus:outline-none cursor-pointer";
 
   return (
     <div className="rounded-2xl glass-card p-6">
@@ -154,7 +161,10 @@ export function SavedAddresses() {
               <select
                 required
                 value={form.state}
-                onChange={(e) => setForm({ ...form, state: e.target.value, city: "" })}
+                onChange={(e) => {
+                  setStateFilter("");
+                  setForm({ ...form, state: e.target.value, city: "" });
+                }}
                 className={selectCls}
               >
                 <option value="">Select state</option>
@@ -176,7 +186,10 @@ export function SavedAddresses() {
               <select
                 required
                 value={form.city}
-                onChange={(e) => setForm({ ...form, city: e.target.value })}
+                onChange={(e) => {
+                  setCityFilter("");
+                  setForm({ ...form, city: e.target.value });
+                }}
                 className={selectCls}
                 disabled={!form.state}
               >

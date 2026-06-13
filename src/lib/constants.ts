@@ -6,6 +6,7 @@ export const CTA = {
 
 export const SITE = {
   name: "AstroKnowledge",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://astroknowledge.in",
   logo: "/images/logo.png",
   tagline: "Illuminating Life Through Vedic Wisdom",
   acharya: "Acharya Seema Lohiya",

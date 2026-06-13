@@ -10,6 +10,7 @@ import { SITE } from "@/lib/constants";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE.url),
   title: `${SITE.name} | Best Vedic Astrologer - ${SITE.acharya}`,
   description: `Expert Vedic astrology consultation by ${SITE.acharya}. Kundali analysis, Kundli Milan, Vastu, Numerology, spiritual products and more. ${SITE.experience} years experience.`,
   keywords: "vedic astrology, kundali, horoscope, acharya seema lohiya, astroknowledge, kundli milan, vastu, numerology",

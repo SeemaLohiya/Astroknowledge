@@ -7,7 +7,12 @@ services:
     buildCommand: npm install --include=dev && npm run build
     startCommand: npm start
     autoDeploy: true
+    domains:
+      - astroknowledge.in
+      - www.astroknowledge.in
     envVars:
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://astroknowledge.in
       - key: NODE_ENV
         value: production
       - key: JWT_SECRET

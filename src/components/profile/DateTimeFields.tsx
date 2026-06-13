@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import {
   composeBirthTime,
   composeDob,
@@ -15,7 +16,7 @@ import {
 } from "@/lib/date-fields";
 
 const selectCls =
-  "w-full rounded-xl border border-gold/20 bg-orange/5 px-3 py-3 text-sm text-text-primary transition-all focus:border-gold focus:ring-2 focus:ring-gold/15 focus:outline-none disabled:opacity-50";
+  "w-full min-h-[44px] rounded-xl border border-gold/20 bg-orange/5 px-3 py-3 text-sm text-text-primary transition-all focus:border-gold focus:ring-2 focus:ring-gold/15 focus:outline-none disabled:opacity-50 cursor-pointer";
 
 interface DobFieldsProps {
   value: string;
@@ -24,8 +25,15 @@ interface DobFieldsProps {
 }
 
 export function DobFields({ value, disabled, onChange }: DobFieldsProps) {
-  const parts = parseDob(value);
-  const days = dayOptions(parts.year, parts.month);
+  const [parts, setParts] = useState<DobParts>(() => parseDob(value));
+  const lastEmitted = useRef(value);
+
+  useEffect(() => {
+    if (value !== lastEmitted.current) {
+      lastEmitted.current = value;
+      setParts(parseDob(value));
+    }
+  }, [value]);
 
   const update = (patch: Partial<DobParts>) => {
     const next = { ...parts, ...patch };
@@ -33,8 +41,13 @@ export function DobFields({ value, disabled, onChange }: DobFieldsProps) {
       const max = dayOptions(next.year, next.month).length;
       if (next.day && Number(next.day) > max) next.day = String(max).padStart(2, "0");
     }
-    onChange(composeDob(next));
+    setParts(next);
+    const composed = composeDob(next);
+    lastEmitted.current = composed;
+    onChange(composed);
   };
+
+  const days = dayOptions(parts.year, parts.month);
 
   return (
     <div className="grid grid-cols-3 gap-2">
@@ -97,10 +110,22 @@ interface BirthTimeFieldsProps {
 }
 
 export function BirthTimeFields({ value, disabled, onChange }: BirthTimeFieldsProps) {
-  const parts = parseBirthTime(value);
+  const [parts, setParts] = useState<TimeParts>(() => parseBirthTime(value));
+  const lastEmitted = useRef(value);
+
+  useEffect(() => {
+    if (value !== lastEmitted.current) {
+      lastEmitted.current = value;
+      setParts(parseBirthTime(value));
+    }
+  }, [value]);
 
   const update = (patch: Partial<TimeParts>) => {
-    onChange(composeBirthTime({ ...parts, ...patch }));
+    const next = { ...parts, ...patch };
+    setParts(next);
+    const composed = composeBirthTime(next);
+    lastEmitted.current = composed;
+    onChange(composed);
   };
 
   return (

@@ -111,6 +111,19 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+select,
+input,
+textarea,
+button {
+  touch-action: manipulation;
+}
+
+select {
+  -webkit-appearance: menulist;
+  appearance: auto;
+  cursor: pointer;
+}
+
 img,
 video,
 iframe {

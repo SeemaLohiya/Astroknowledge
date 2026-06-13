@@ -74,7 +74,7 @@ export function ZodiacTabsPanel({ className, compact, showTitle = true }: Zodiac
   const [selected, setSelected] = useState<ZodiacSignDetail>(ZODIAC_DETAILS[0]);
 
   return (
-    <div className={cn("relative overflow-hidden rounded-2xl border border-gold/15 bg-white/60 px-4 py-5 md:px-6", className)}>
+    <div className={cn("relative rounded-2xl border border-gold/15 bg-white/60 px-4 py-5 md:px-6", className)}>
       {showTitle && (
         <p className="mb-4 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-gold">
           12 Rashis · Zodiac Wheel

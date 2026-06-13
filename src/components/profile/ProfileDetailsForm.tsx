@@ -40,7 +40,7 @@ interface ProfileDetailsFormProps {
 }
 
 const inputCls =
-  "w-full rounded-xl border border-gold/20 bg-orange/5 px-4 py-3 text-sm text-text-primary transition-all focus:border-gold focus:ring-2 focus:ring-gold/15 focus:outline-none";
+  "w-full min-h-[44px] rounded-xl border border-gold/20 bg-orange/5 px-4 py-3 text-sm text-text-primary transition-all focus:border-gold focus:ring-2 focus:ring-gold/15 focus:outline-none cursor-pointer";
 
 const sectionMotion = {
   initial: { opacity: 0, y: 14 },

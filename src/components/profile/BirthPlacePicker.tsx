@@ -1,6 +1,7 @@
 "use client";
 
 import { COUNTRIES, getCities, getStates } from "@/lib/location-data";
+import { withSelectedOption } from "@/lib/select-options";
 import { useMemo, useState } from "react";
 
 export interface BirthPlaceValue {
@@ -44,15 +45,21 @@ export function BirthPlacePicker({ value, onChange, disabled, inputCls = "" }: B
   const states = useMemo(() => getStates(value.birthCountry), [value.birthCountry]);
   const cities = useMemo(() => getCities(value.birthState), [value.birthState]);
   const filteredStates = useMemo(
-    () => states.filter((s) => s.toLowerCase().includes(stateFilter.toLowerCase())),
-    [states, stateFilter]
+    () => withSelectedOption(
+      states.filter((s) => s.toLowerCase().includes(stateFilter.toLowerCase())),
+      value.birthState
+    ),
+    [states, stateFilter, value.birthState]
   );
   const filteredCities = useMemo(
-    () => cities.filter((c) => c.toLowerCase().includes(cityFilter.toLowerCase())),
-    [cities, cityFilter]
+    () => withSelectedOption(
+      cities.filter((c) => c.toLowerCase().includes(cityFilter.toLowerCase())),
+      value.birthCity
+    ),
+    [cities, cityFilter, value.birthCity]
   );
 
-  const selectCls = `w-full rounded-xl border border-gold/20 bg-orange/5 px-3 py-2.5 text-sm focus:border-gold focus:outline-none disabled:opacity-50 ${inputCls}`;
+  const selectCls = "w-full min-h-[44px] rounded-xl border border-gold/20 bg-orange/5 px-3 py-2.5 text-sm focus:border-gold focus:outline-none disabled:opacity-50 cursor-pointer";
 
   return (
     <div className="space-y-3">
@@ -62,7 +69,7 @@ export function BirthPlacePicker({ value, onChange, disabled, inputCls = "" }: B
           disabled={disabled}
           value={value.birthCountry}
           onChange={(e) => onChange({ birthCountry: e.target.value, birthState: "", birthCity: "" })}
-          className={selectCls}
+          className={`${selectCls} ${inputCls}`}
         >
           <option value="">Select country</option>
           {COUNTRIES.map((c) => (
@@ -84,8 +91,11 @@ export function BirthPlacePicker({ value, onChange, disabled, inputCls = "" }: B
         <select
           disabled={disabled || !value.birthCountry}
           value={value.birthState}
-          onChange={(e) => onChange({ ...value, birthState: e.target.value, birthCity: "" })}
-          className={`${selectCls} mt-2`}
+          onChange={(e) => {
+            setStateFilter("");
+            onChange({ ...value, birthState: e.target.value, birthCity: "" });
+          }}
+          className={`${selectCls} mt-2 ${inputCls}`}
         >
           <option value="">Select state</option>
           {filteredStates.map((s) => (
@@ -107,8 +117,11 @@ export function BirthPlacePicker({ value, onChange, disabled, inputCls = "" }: B
         <select
           disabled={disabled || !value.birthState}
           value={value.birthCity}
-          onChange={(e) => onChange({ ...value, birthCity: e.target.value })}
-          className={`${selectCls} mt-2`}
+          onChange={(e) => {
+            setCityFilter("");
+            onChange({ ...value, birthCity: e.target.value });
+          }}
+          className={`${selectCls} mt-2 ${inputCls}`}
         >
           <option value="">Select city</option>
           {filteredCities.map((c) => (

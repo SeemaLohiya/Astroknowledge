@@ -81,7 +81,9 @@ function ProfileDetailsModal({ open, onClose }: ProfileDetailsModalProps) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
           className="fixed inset-0 z-[300] flex min-h-[100dvh] items-center justify-center bg-black/45 p-4 backdrop-blur-[6px]"
-          onClick={onClose}
+          onPointerDown={(e) => {
+            if (e.target === e.currentTarget) onClose();
+          }}
           role="dialog"
           aria-modal="true"
           aria-labelledby="profile-details-title"
@@ -91,7 +93,7 @@ function ProfileDetailsModal({ open, onClose }: ProfileDetailsModalProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.94, y: 16 }}
             transition={{ type: "spring", stiffness: 340, damping: 28 }}
-            className="relative w-full max-w-lg max-h-[90dvh] overflow-hidden rounded-3xl border border-gold/25 bg-gradient-to-b from-cream via-white to-orange/5 shadow-2xl shadow-gold/10"
+            className="relative flex w-full max-w-lg max-h-[90dvh] flex-col rounded-3xl border border-gold/25 bg-gradient-to-b from-cream via-white to-orange/5 shadow-2xl shadow-gold/10"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="pointer-events-none absolute -left-10 -top-10 h-32 w-32 rounded-full bg-gold/20 blur-3xl" />
@@ -132,7 +134,7 @@ function ProfileDetailsModal({ open, onClose }: ProfileDetailsModalProps) {
               </motion.div>
             </div>
 
-            <div className="relative overflow-y-auto px-6 py-5 max-h-[calc(90dvh-5.5rem)]">
+            <div className="relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-5">
               {loading || !user ? (
                 <div className="flex flex-col items-center justify-center gap-3 py-16">
                   <div className="h-10 w-10 animate-spin rounded-full border-2 border-gold/30 border-t-gold" />
