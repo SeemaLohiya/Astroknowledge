@@ -9,12 +9,12 @@ import { TrustBadges } from "@/components/home/TrustBadges";
 import { PageTransition } from "@/components/animations/PageTransition";
 import { LazySection } from "@/components/animations/LazySection";
 
-const ServicesSection = dynamic(() => import("@/components/home/ServicesSection").then((m) => ({ default: m.ServicesSection })));
-const CoursesSection = dynamic(() => import("@/components/home/CoursesSection").then((m) => ({ default: m.CoursesSection })));
-const ProductsSection = dynamic(() => import("@/components/home/ProductsSection").then((m) => ({ default: m.ProductsSection })));
-const ProblemsSection = dynamic(() => import("@/components/home/ProblemsSection").then((m) => ({ default: m.ProblemsSection })));
-const AchievementsSection = dynamic(() => import("@/components/home/AchievementsSection").then((m) => ({ default: m.AchievementsSection })));
-const ReviewsSection = dynamic(() => import("@/components/home/ReviewsSection").then((m) => ({ default: m.ReviewsSection })));
+const ServicesSection = dynamic(() => import("@/components/home/ServicesSection").then((m) => ({ default: m.ServicesSection })), { loading: () => null });
+const CoursesSection = dynamic(() => import("@/components/home/CoursesSection").then((m) => ({ default: m.CoursesSection })), { loading: () => null });
+const ProductsSection = dynamic(() => import("@/components/home/ProductsSection").then((m) => ({ default: m.ProductsSection })), { loading: () => null });
+const ProblemsSection = dynamic(() => import("@/components/home/ProblemsSection").then((m) => ({ default: m.ProblemsSection })), { loading: () => null });
+const AchievementsSection = dynamic(() => import("@/components/home/AchievementsSection").then((m) => ({ default: m.AchievementsSection })), { loading: () => null });
+const ReviewsSection = dynamic(() => import("@/components/home/ReviewsSection").then((m) => ({ default: m.ReviewsSection })), { loading: () => null });
 const CosmicElementsSection = dynamic(
   () => import("@/components/home/CosmicElementsSection").then((m) => m.CosmicElementsSection),
   { loading: () => null }

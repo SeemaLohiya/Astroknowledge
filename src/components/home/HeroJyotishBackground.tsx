@@ -124,7 +124,9 @@ export function HeroJyotishBackground() {
   }, []);
 
 
-  const visibleTiles = isMobile ? JYOTISH_TILES.filter((t) => t.mobile) : JYOTISH_TILES.filter((t) => t.mobile || t.layer !== "far");
+  const visibleTiles = isMobile
+    ? JYOTISH_TILES.filter((t) => t.mobile).slice(0, 3)
+    : JYOTISH_TILES.filter((t) => t.mobile || t.layer !== "far");
 
   return (
     <div
@@ -169,7 +171,8 @@ export function HeroJyotishBackground() {
                       src={tile.src}
                       alt={tile.alt}
                       fill
-                      sizes="(max-width:768px) 28vw, 260px"
+                      sizes={isMobile ? "30vw" : "(max-width:768px) 28vw, 260px"}
+                      quality={isMobile ? 48 : 60}
                       className="hero-bg-tile-img object-cover"
                       loading="lazy"
                     />

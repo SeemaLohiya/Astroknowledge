@@ -1,12 +1,21 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 export function PageTransition({ children }: { children: ReactNode }) {
   const reduceMotion = useReducedMotion();
+  const [isMobile, setIsMobile] = useState(false);
 
-  if (reduceMotion) {
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  if (reduceMotion || isMobile) {
     return <div className="animate-fade-in">{children}</div>;
   }
 
