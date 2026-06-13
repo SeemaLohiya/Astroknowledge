@@ -5,6 +5,7 @@ import { FloatingParticles } from "@/components/animations/FloatingParticles";
 import { PageTransition } from "@/components/animations/PageTransition";
 import { ShimmerText } from "@/components/animations/ShimmerText";
 import { PageBanner } from "@/components/ui/PageBanner";
+import { SafeImage } from "@/components/ui/SafeImage";
 import { GitHubIcon, InstagramIcon, LinkedInIcon, WhatsAppIcon } from "@/components/ui/SocialIcons";
 import { motion, useReducedMotion } from "framer-motion";
 import {
@@ -21,7 +22,6 @@ import {
   Zap,
 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 
 const DEVELOPER = {
   name: "Ishant Goyal",
@@ -154,24 +154,24 @@ export default function DeveloperPage() {
             <div className="dev-scan-line pointer-events-none absolute inset-0" aria-hidden />
 
             <div className="relative flex flex-col items-center text-center">
-              <div className="dev-orbit-wrap relative mb-8 flex h-44 w-44 items-center justify-center md:h-52 md:w-52">
+              <div className="relative mb-8 flex h-56 w-56 items-center justify-center md:h-64 md:w-64">
                 <motion.div
-                  className="dev-orbit-ring absolute inset-0 rounded-full border-2 border-dashed border-gold/40"
+                  className="dev-orbit-ring pointer-events-none absolute inset-0 rounded-full border-2 border-dashed border-gold/40"
                   animate={reduceMotion ? undefined : { rotate: 360 }}
                   transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                 />
                 <motion.div
-                  className="dev-orbit-ring-2 absolute inset-3 rounded-full border border-cyan-400/30"
+                  className="dev-orbit-ring-2 pointer-events-none absolute inset-4 rounded-full border border-emerald-400/30"
                   animate={reduceMotion ? undefined : { rotate: -360 }}
                   transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
                 />
                 {ORBIT_ICONS.map((Icon, i) => (
                   <motion.span
                     key={i}
-                    className="dev-orbit-node absolute flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-gold to-orange text-white shadow-md"
+                    className="dev-orbit-node pointer-events-none absolute flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-gold to-orange text-white shadow-md"
                     style={{
-                      top: `${50 + 42 * Math.sin((i / ORBIT_ICONS.length) * Math.PI * 2)}%`,
-                      left: `${50 + 42 * Math.cos((i / ORBIT_ICONS.length) * Math.PI * 2)}%`,
+                      top: `${50 + 46 * Math.sin((i / ORBIT_ICONS.length) * Math.PI * 2)}%`,
+                      left: `${50 + 46 * Math.cos((i / ORBIT_ICONS.length) * Math.PI * 2)}%`,
                       transform: "translate(-50%, -50%)",
                     }}
                     animate={reduceMotion ? undefined : { scale: [1, 1.15, 1] }}
@@ -181,17 +181,18 @@ export default function DeveloperPage() {
                   </motion.span>
                 ))}
                 <motion.div
-                  className="dev-photo-frame relative z-10 h-28 w-28 overflow-hidden rounded-2xl border-2 border-gold/50 shadow-2xl md:h-32 md:w-32"
-                  animate={reduceMotion ? undefined : { boxShadow: ["0 0 20px rgba(234,88,12,0.4)", "0 0 40px rgba(99,102,241,0.6)", "0 0 20px rgba(234,88,12,0.4)"] }}
+                  className="dev-photo-frame relative z-20 h-40 w-40 overflow-hidden rounded-3xl border-4 border-gold/60 shadow-2xl md:h-48 md:w-48"
+                  animate={reduceMotion ? undefined : { boxShadow: ["0 0 24px rgba(234,88,12,0.45)", "0 0 48px rgba(16,185,129,0.45)", "0 0 24px rgba(234,88,12,0.45)"] }}
                   transition={{ duration: 3, repeat: Infinity }}
                 >
-                  <Image
+                  <SafeImage
                     src={DEVELOPER.photo}
                     alt={DEVELOPER.name}
-                    width={256}
-                    height={256}
-                    className="h-full w-full object-cover object-top"
+                    fill
+                    sizes="(max-width: 768px) 160px, 192px"
+                    className="object-cover object-top"
                     priority
+                    quality={90}
                   />
                 </motion.div>
               </div>

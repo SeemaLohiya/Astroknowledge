@@ -91,19 +91,19 @@ export default function AboutPage() {
           <FadeIn className="mt-12">
             <Link
               href="/developer"
-              className="group dev-about-link relative block overflow-hidden rounded-2xl border border-indigo-300/40 bg-gradient-to-br from-indigo-50 via-white to-violet-50 p-6 shadow-md transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-200/40 md:p-8"
+              className="group dev-about-link relative block overflow-hidden rounded-2xl border border-emerald-300/50 bg-gradient-to-br from-emerald-50 via-white to-green-50 p-6 shadow-md transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-200/40 md:p-8"
             >
-              <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-indigo-400/20 blur-2xl transition-transform group-hover:scale-125" />
+              <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-emerald-400/20 blur-2xl transition-transform group-hover:scale-125" />
               <div className="pointer-events-none absolute -bottom-6 -left-6 h-24 w-24 rounded-full bg-gold/20 blur-2xl" />
               <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">Developer Information</p>
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700">Developer Information</p>
                   <h3 className="mt-2 font-display text-xl font-bold text-text-primary md:text-2xl">
                     {c.about.developerLinkTitle}
                   </h3>
                   <p className="mt-2 max-w-xl text-sm text-text-body">{c.about.developerLinkDesc}</p>
                 </div>
-                <span className="inline-flex shrink-0 items-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-transform group-hover:scale-105">
+                <span className="inline-flex shrink-0 items-center gap-2 rounded-full bg-gradient-to-r from-emerald-600 to-green-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-transform group-hover:scale-105">
                   {c.about.developerLinkCta}
                   <motion.span
                     className="inline-block"

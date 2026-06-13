@@ -2407,7 +2407,7 @@ textarea::placeholder {
 }
 
 .dev-about-link:hover {
-  border-color: rgba(99, 102, 241, 0.5);
+  border-color: rgba(16, 185, 129, 0.5);
 }
 
 .dev-social-btn:hover {
@@ -2415,5 +2415,5 @@ textarea::placeholder {
 }
 
 .dev-photo-frame {
-  background: linear-gradient(145deg, #fff, #eef2ff);
+  background: linear-gradient(145deg, #fff, #ecfdf5);
 }
