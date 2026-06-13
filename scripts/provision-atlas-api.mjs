@@ -120,6 +120,11 @@ async function main() {
   if (!uri.includes(`/${DB_NAME}`)) uri = uri.replace("?", `/${DB_NAME}?`);
 
   const body = JSON.stringify({ value: uri });
+  await fetch(`https://api.render.com/v1/services/${RENDER_SERVICE}/env-vars/REDIS_URL`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${RENDER_KEY}` },
+  }).catch(() => {});
+
   execSync(
     `curl.exe -s -X PUT "https://api.render.com/v1/services/${RENDER_SERVICE}/env-vars/MONGODB_URI" -H "Authorization: Bearer ${RENDER_KEY}" -H "Content-Type: application/json" -d "${body.replace(/"/g, '\\"')}"`,
     { stdio: "inherit" }

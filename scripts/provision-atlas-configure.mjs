@@ -1,8 +1,10 @@
-import pty from "node-pty";
+/**
+ * After `atlas auth login` succeeds, creates cluster (if needed) and wires Render MONGODB_URI.
+ */
+import { execSync } from "child_process";
+import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { execSync, spawn as nodeSpawn } from "child_process";
-import fs from "fs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, "..");
@@ -11,12 +13,10 @@ const RENDER_KEY = process.env.RENDER_API_KEY || "rnd_IQjIitAJYEdd8aBmmOLQQ43tf7
 const RENDER_SERVICE = "srv-d8lpek0g4nts73flkd8g";
 const CLUSTER = "AstroKnowledge";
 const DB_USER = "astroknowledge_admin";
-const DB_PASS = `Ak${Date.now().toString(36)}!9`;
+const DB_PASS = process.env.MONGODB_DB_PASSWORD || `Ak${Date.now().toString(36)}!9`;
 const DB_NAME = "astroknowledge";
-const ORG_ID = "6a2bbe01ad6f8544cdc11316";
 
 function runAtlas(args, { json = false } = {}) {
-  const cmd = [atlas, ...args, ...(json ? ["-o", "json"] : [])];
   return execSync(`"${atlas}" ${args.join(" ")}${json ? " -o json" : ""}`, {
     encoding: "utf8",
     stdio: ["pipe", "pipe", "pipe"],
@@ -33,69 +33,9 @@ function isLoggedIn() {
   }
 }
 
-async function loginWithDeviceCode() {
-  return new Promise((resolve, reject) => {
-    const term = pty.spawn(atlas, ["auth", "login", "--noBrowser"], {
-      name: "xterm-color",
-      cols: 120,
-      rows: 30,
-      cwd: path.dirname(atlas),
-    });
-
-    let buf = "";
-    let opened = false;
-    const timer = setTimeout(() => {
-      term.kill();
-      reject(new Error("Atlas login timed out"));
-    }, 300000);
-
-    term.onData((data) => {
-      buf += data;
-      if (buf.includes("Select authentication type") && !buf.includes("UserAccount\n")) {
-        term.write("\r");
-      }
-      const codeMatch = buf.match(/To verify your account, copy your one-time verification code:\s*\r?\n\s*([A-Z0-9]{4}-[A-Z0-9]{4})/);
-      if (codeMatch && !opened) {
-        opened = true;
-        const code = codeMatch[1];
-        console.log("\nAtlas verification code:", code);
-        try {
-          execSync(`powershell -Command "Set-Clipboard -Value '${code}'"`);
-          console.log("Code copied to clipboard.");
-        } catch {}
-        nodeSpawn("cmd", ["/c", "start", "https://account.mongodb.com/account/connect"], {
-          detached: true,
-          stdio: "ignore",
-        }).unref();
-        console.log("Browser opened — paste the code if prompted (logged in as astroknowledge01@gmail.com).");
-      }
-      if (/logged in|Success|authenticated/i.test(buf)) {
-        clearTimeout(timer);
-        term.kill();
-        resolve();
-      }
-    });
-
-    term.onExit(({ exitCode }) => {
-      clearTimeout(timer);
-      if (isLoggedIn()) resolve();
-      else reject(new Error(`Atlas login failed (exit ${exitCode})`));
-    });
-  });
-}
-
 async function main() {
-  console.log("=== AstroKnowledge Atlas + Render provisioner ===");
-
-  if (!fs.existsSync(atlas)) {
-    throw new Error("Atlas CLI missing. Run: npm run db:download-cli");
-  }
-
-  if (!isLoggedIn()) {
-    console.log("Starting Atlas device-code login...");
-    await loginWithDeviceCode();
-    console.log("Atlas login OK.");
-  }
+  if (!fs.existsSync(atlas)) throw new Error("Atlas CLI missing. Run: npm run db:download-cli");
+  if (!isLoggedIn()) throw new Error("Not logged in. Run: atlas auth login");
 
   try {
     runAtlas([
@@ -118,7 +58,7 @@ async function main() {
       "--skipSampleData",
     ]);
   } catch (e) {
-    console.warn("Setup note:", e.message?.slice(0, 200) || e);
+    console.warn("Setup note:", String(e.message || e).slice(0, 200));
   }
 
   const projects = JSON.parse(runAtlas(["projects", "list"], { json: true }));
@@ -156,15 +96,8 @@ async function main() {
     { stdio: "inherit" }
   );
 
-  const credPath = path.join(root, "data/atlas-credentials.local.json");
-  fs.writeFileSync(
-    credPath,
-    JSON.stringify({ orgId: ORG_ID, projectId, cluster: cluster.name, dbUser: DB_USER, dbName: DB_NAME, at: new Date().toISOString() }, null, 2)
-  );
-
-  console.log("\nDone.");
-  console.log("Render MONGODB_URI set and redeploy triggered.");
-  console.log("Check: https://astroknowledge.onrender.com/api/health/db");
+  console.log("\nDone. MONGODB_URI set on Render. Check:");
+  console.log("https://astroknowledge.onrender.com/api/health/db");
 }
 
 main().catch((e) => {

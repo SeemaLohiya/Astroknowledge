@@ -12,7 +12,8 @@
     "slim": "npm run clean && npm run compress-images",
     "db:download-cli": "powershell -ExecutionPolicy Bypass -File scripts/download-atlas-cli.ps1",
     "db:provision": "node scripts/provision-atlas-full.mjs",
-    "db:provision:api": "node scripts/provision-atlas-api.mjs"
+    "db:provision:api": "node scripts/provision-atlas-api.mjs",
+    "db:wire-render": "node scripts/configure-render-mongo.mjs"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.13",
