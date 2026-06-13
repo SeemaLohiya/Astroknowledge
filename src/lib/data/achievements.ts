@@ -7,6 +7,20 @@ export const certifications = [
   { title: "Numerology Expert", subtitle: "Name Correction & Life Path Analysis" },
   { title: "Ritual & Pooja Specialist", subtitle: "Sacred Ceremony & Anushthan" },
   { title: "Kundli Milan Expert", subtitle: "Marriage Compatibility & Muhurat" },
+  { title: "Expert in BNN", subtitle: "Bhrigu Nandi Nadi" },
+  { title: "Expert in KP", subtitle: "Krishnamurti Paddhati — Nakshatra Jyotish" },
+  { title: "Expert in Palmistry", subtitle: "Hasta Samudrik Shastra & Hand Reading" },
+  { title: "Mundane Astrology", subtitle: "World Events & National Predictions" },
+  { title: "Medical Astrology", subtitle: "Health & Disease Analysis via Grahas" },
+  { title: "Ashtakavarga", subtitle: "Planetary Strength & Transit Analysis" },
+  { title: "Prashna Kundali", subtitle: "Horary Chart & Question-Based Jyotish" },
+  { title: "Tenali Padhati", subtitle: "Traditional Predictive Methodology" },
+  { title: "Kabala", subtitle: "Esoteric Astrology & Mystical Sciences" },
+  { title: "Hibru", subtitle: "Ancient Semitic Astrological Traditions" },
+  { title: "Lal Kitab", subtitle: "Remedial Astrology & Upayas" },
+  { title: "Ramal Jyotish", subtitle: "Divination & Predictive Ramal" },
+  { title: "Panchang", subtitle: "Tithi, Nakshatra, Yoga & Muhurat" },
+  { title: "Swar Vigyan", subtitle: "Sound & Breath-Based Predictive Science" },
 ];
 
 export const achievementPhotos: AchievementPhoto[] = [
