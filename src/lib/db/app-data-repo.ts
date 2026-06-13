@@ -32,9 +32,19 @@ export async function mongoSeedUsers(seed: User[]) {
   await UserModel.insertMany(seed);
 }
 
+function normalizeEmail(email: string) {
+  return email.trim().toLowerCase();
+}
+
 export async function mongoFindUserByEmail(email: string) {
   await connectDB();
-  return (await UserModel.findOne({ email }).lean()) as User | null;
+  const trimmed = email.trim();
+  const normalized = normalizeEmail(trimmed);
+  let user = await UserModel.findOne({ email: normalized }).lean();
+  if (!user && normalized !== trimmed) {
+    user = await UserModel.findOne({ email: trimmed }).lean();
+  }
+  return user as User | null;
 }
 
 export async function mongoFindUserById(id: string) {
@@ -44,8 +54,15 @@ export async function mongoFindUserById(id: string) {
 
 export async function mongoCreateUser(user: User) {
   await connectDB();
-  await UserModel.create(user);
-  return user;
+  const doc: User = { ...user, email: normalizeEmail(user.email) };
+  try {
+    await UserModel.collection.insertOne(doc);
+  } catch (err: unknown) {
+    const code = (err as { code?: number }).code;
+    if (code === 11000) throw new Error("DUPLICATE_EMAIL");
+    throw err;
+  }
+  return doc;
 }
 
 export async function mongoUpdateUser(id: string, patch: Partial<User>) {

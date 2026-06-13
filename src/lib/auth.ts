@@ -55,8 +55,10 @@ export function authCookieOptions() {
   };
 }
 
-export function sanitizeUser(user: User) {
-  const { password: _pw, ...safe } = user;
+export function sanitizeUser(user: User & { _id?: unknown; __v?: unknown }) {
+  const { password: _pw, _id, __v, ...safe } = user;
   void _pw;
+  void _id;
+  void __v;
   return safe;
 }
