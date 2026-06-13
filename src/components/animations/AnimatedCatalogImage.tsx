@@ -38,8 +38,8 @@ export function AnimatedCatalogImage({
     return () => mq.removeEventListener("change", update);
   }, []);
 
-  const eager = priority ?? index < 3;
-  const quality = isMobile ? 58 : 68;
+  const eager = priority ?? index < 2;
+  const quality = isMobile ? 52 : 65;
 
   return (
     <div className={cn("catalog-img-frame group/img relative min-h-[12rem] overflow-hidden bg-orange/[0.04]", frameClassName)}>

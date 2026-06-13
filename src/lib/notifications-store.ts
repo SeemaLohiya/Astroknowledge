@@ -1,16 +1,16 @@
 import { isRemotePersistEnabled } from "./db/persist";
-import * as redis from "./db/redis-repo";
+import * as mongoMeta from "./db/mongo-meta-repo";
 import { readJsonFile, writeJsonFile } from "./json-store";
 import { AdminNotification } from "./types";
 
 async function load(): Promise<AdminNotification[]> {
-  if (isRemotePersistEnabled()) return redis.redisGetNotifications();
+  if (isRemotePersistEnabled()) return mongoMeta.mongoGetNotifications();
   return readJsonFile<AdminNotification[]>("notifications.json", []);
 }
 
 async function save(list: AdminNotification[]) {
   if (isRemotePersistEnabled()) {
-    await redis.redisSaveNotifications(list);
+    await mongoMeta.mongoSaveNotifications(list);
     return;
   }
   writeJsonFile("notifications.json", list);

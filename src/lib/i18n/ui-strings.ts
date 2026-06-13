@@ -10,7 +10,7 @@ export const uiStrings = {
     all: "All",
     pleaseWait: "Please wait…",
     reviews: "reviews",
-    acharyaTitle: "Shastracharya · Chief Vedic Astrologer",
+    acharyaTitle: "Chief Vedic Astrologer",
     nav: { services: "Services", courses: "Courses", products: "Products" },
     offerings: {
       title: "What We",
@@ -372,7 +372,7 @@ export const uiStrings = {
     all: "सभी",
     pleaseWait: "कृपया प्रतीक्षा करें…",
     reviews: "समीक्षाएं",
-    acharyaTitle: "शास्त्राचार्य · मुख्य वैदिक ज्योतिषाचार्या",
+    acharyaTitle: "मुख्य वैदिक ज्योतिषाचार्या",
     nav: { services: "सेवाएं", courses: "पाठ्यक्रम", products: "उत्पाद" },
     offerings: {
       title: "हम क्या",

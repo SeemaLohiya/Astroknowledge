@@ -10,6 +10,7 @@ import { SITE } from "@/lib/constants";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { motion } from "framer-motion";
 import { YouTubeSection } from "@/components/about/YouTubeSection";
+import { CertificationsList } from "@/components/about/CertificationsList";
 import { Award, Heart, Sparkles, Users } from "lucide-react";
 
 const AchievementsSection = dynamic(
@@ -83,6 +84,8 @@ export default function AboutPage() {
               ))}
             </div>
           </FadeIn>
+
+          <CertificationsList />
 
           <YouTubeSection />
 

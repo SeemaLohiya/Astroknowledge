@@ -27,13 +27,14 @@ export function Footer() {
       { label: c.footer.links.yantra, href: "/products?category=yantra" },
       { label: c.footer.links.poojaKit, href: "/products?category=pooja-kit" },
       { label: c.footer.links.vastuItems, href: "/products?category=vastu" },
+      { label: "Healing", href: "/healing" },
     ],
     quick: [
-      { label: c.footer.links.about, href: "/about" },
-      { label: "Healing", href: "/healing" },
-      { label: "YouTube", href: SITE.youtube },
-      { label: c.footer.links.contact, href: "/contact" },
       { label: c.footer.links.bookConsultation, href: "/dashboard/slots" },
+      { label: "YouTube", href: SITE.youtube },
+      { label: "Instagram", href: SITE.instagram },
+      { label: c.footer.links.about, href: "/about" },
+      { label: c.footer.links.contact, href: "/contact" },
     ],
   };
 
@@ -122,6 +123,16 @@ export function Footer() {
               >
                 <MapPin className="h-3.5 w-3.5" />
                 {c.contact.openMaps}
+                <ExternalLink className="h-3 w-3" />
+              </a>
+              <a
+                href={SITE.instagram}
+                target="_blank"
+                rel="noopener"
+                className="inline-flex items-center gap-1.5 text-gold hover:underline font-medium"
+              >
+                <InstagramIcon className="h-3.5 w-3.5" />
+                Instagram
                 <ExternalLink className="h-3 w-3" />
               </a>
               <p className="mt-2 text-gold text-xs">{SITE.consultationHours}</p>

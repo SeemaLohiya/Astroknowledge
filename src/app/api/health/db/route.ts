@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { connectDB, isMongoEnabled } from "@/lib/db/connect";
-import { connectRedis, isRedisEnabled } from "@/lib/db/redis-connect";
 import { getPersistBackend } from "@/lib/db/persist";
 
 export const dynamic = "force-dynamic";
@@ -8,20 +7,23 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const backend = getPersistBackend();
   if (backend === "file") {
-    return NextResponse.json({ status: "json-fallback", backend: "file", mongo: false, redis: false });
+    return NextResponse.json({
+      status: "json-fallback",
+      backend: "file",
+      mongo: false,
+      message: "Set MONGODB_URI for production persistence",
+    });
   }
 
   try {
-    if (isMongoEnabled()) await connectDB();
-    if (isRedisEnabled()) await connectRedis();
-    return NextResponse.json({ status: "connected", backend, mongo: isMongoEnabled(), redis: isRedisEnabled() });
+    await connectDB();
+    return NextResponse.json({ status: "connected", backend: "mongo", mongo: true });
   } catch (e) {
     return NextResponse.json(
       {
         status: "error",
-        backend,
+        backend: "mongo",
         mongo: isMongoEnabled(),
-        redis: isRedisEnabled(),
         error: e instanceof Error ? e.message : "Connection failed",
       },
       { status: 503 }

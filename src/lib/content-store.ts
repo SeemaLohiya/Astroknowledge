@@ -2,7 +2,7 @@ import { achievementPhotos } from "./data/achievements";
 import { problemCategories } from "./data/content";
 import { reviews } from "./data/content";
 import { isRemotePersistEnabled } from "./db/persist";
-import * as redis from "./db/redis-repo";
+import * as mongoMeta from "./db/mongo-meta-repo";
 import { siteContent } from "./i18n/site-content";
 import { readJsonFile, writeJsonFile } from "./json-store";
 import { EditableSiteContent } from "./types";
@@ -21,10 +21,10 @@ function seedContent(): EditableSiteContent {
 
 async function load(): Promise<EditableSiteContent> {
   if (isRemotePersistEnabled()) {
-    const fromRedis = await redis.redisGetContent();
-    if (fromRedis) return fromRedis;
+    const fromMongo = await mongoMeta.mongoGetContent();
+    if (fromMongo) return fromMongo;
     const seed = seedContent();
-    await redis.redisSaveContent(seed);
+    await mongoMeta.mongoSaveContent(seed);
     return seed;
   }
   return readJsonFile<EditableSiteContent>("content.json", seedContent());
@@ -32,7 +32,7 @@ async function load(): Promise<EditableSiteContent> {
 
 async function save(data: EditableSiteContent) {
   if (isRemotePersistEnabled()) {
-    await redis.redisSaveContent(data);
+    await mongoMeta.mongoSaveContent(data);
     return;
   }
   writeJsonFile("content.json", data);

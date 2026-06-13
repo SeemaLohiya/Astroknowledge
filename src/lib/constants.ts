@@ -10,7 +10,7 @@ export const SITE = {
   tagline: "Illuminating Life Through Vedic Wisdom",
   acharya: "Acharya Seema Lohiya",
   acharyaImage: "/images/seema-lohiya.png",
-  acharyaTitle: "Shastracharya · Chief Vedic Astrologer",
+  acharyaTitle: "Chief Vedic Astrologer",
   phone: "+91 8949265869",
   whatsapp: "+918949265869",
   email: "astroknowledge01@gmail.com",

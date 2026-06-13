@@ -19,7 +19,7 @@ interface SafeImageProps {
   quality?: number;
 }
 
-export function SafeImage({ src, alt, fill, width, height, className, sizes, priority, loading, quality = 72 }: SafeImageProps) {
+export function SafeImage({ src, alt, fill, width, height, className, sizes, priority, loading, quality = 65 }: SafeImageProps) {
   const isSvg = src.endsWith(".svg");
 
   if (isSvg) {

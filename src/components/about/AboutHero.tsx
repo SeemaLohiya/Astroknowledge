@@ -7,7 +7,7 @@ import { SITE } from "@/lib/constants";
 import { YOUTUBE_CHANNEL_URL } from "@/lib/data/youtube";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { motion, useReducedMotion } from "framer-motion";
-import { Award, ExternalLink, Sparkles, Star, Video } from "lucide-react";
+import { Award, ExternalLink, Video } from "lucide-react";
 import Link from "next/link";
 
 export function AboutHero() {
@@ -70,17 +70,6 @@ export function AboutHero() {
         </motion.div>
 
         <div className="text-center lg:text-left">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="mb-4 inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gradient-to-r from-gold/15 to-orange/10 px-4 py-1.5 text-sm font-semibold text-gold"
-          >
-            <Star className="h-4 w-4" />
-            {c.about.shastracharya}
-            <Sparkles className="h-4 w-4 animate-pulse" />
-          </motion.div>
-
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

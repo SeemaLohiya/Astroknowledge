@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap");
 @import "tailwindcss";
 
 :root {
@@ -145,45 +144,31 @@ iframe {
     display: none;
   }
   .promo-marquee-track {
-    animation-duration: 42s;
+    animation-duration: 28s;
   }
   .animate-float,
-  .animate-float-slow,
-  .animate-pulse-glow,
-  .animate-spin-slow,
-  .animate-aurora,
+  .animate-float-slow {
+    animation-duration: 5s !important;
+  }
+  .animate-pulse-glow {
+    animation-duration: 2.5s !important;
+  }
+  .animate-spin-slow {
+    animation-duration: 24s !important;
+  }
+  .animate-aurora {
+    animation-duration: 8s !important;
+  }
   .whatsapp-fab-pulse {
-    animation: none !important;
+    animation-duration: 2s !important;
   }
-  .reveal-on-scroll {
-    opacity: 1 !important;
-    transform: none !important;
-    filter: none !important;
-  }
-  .navgraha-lite .navgraha-ambient,
-  .navgraha-lite .navgraha-ambient-2,
-  .navgraha-lite .navgraha-stars,
-  .navgraha-lite .navgraha-constellation,
-  .navgraha-lite .navgraha-panel-ring,
-  .navgraha-lite .navgraha-panel-ring-2,
   .navgraha-lite .navgraha-shockwave,
   .navgraha-lite .navgraha-holo-scan,
-  .navgraha-lite .navgraha-satellite,
-  .navgraha-lite .navgraha-tab-ping,
-  .navgraha-lite .navgraha-tab-glow {
+  .navgraha-lite .navgraha-satellite {
     display: none !important;
   }
-  .navgraha-lite .navgraha-orbit-crazy,
-  .navgraha-lite .navgraha-core-warp,
-  .navgraha-lite .navgraha-portal-enter,
-  .navgraha-lite .navgraha-influence-pop,
-  .navgraha-lite .navgraha-fact-card,
-  .navgraha-lite .navgraha-text-reveal {
-    animation: none !important;
-  }
-  .catalog-img-shine,
-  .catalog-img-animated {
-    animation: none !important;
+  .catalog-img-shine {
+    display: none !important;
   }
 }
 

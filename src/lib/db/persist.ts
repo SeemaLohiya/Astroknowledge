@@ -1,14 +1,12 @@
 import { isMongoEnabled } from "./connect";
-import { isRedisEnabled } from "./redis-connect";
 
-export type PersistBackend = "mongo" | "redis" | "file";
+export type PersistBackend = "mongo" | "file";
 
+/** MongoDB when MONGODB_URI is set; local JSON files for dev/build without Atlas. */
 export function getPersistBackend(): PersistBackend {
-  if (isMongoEnabled()) return "mongo";
-  if (isRedisEnabled()) return "redis";
-  return "file";
+  return isMongoEnabled() ? "mongo" : "file";
 }
 
 export function isRemotePersistEnabled(): boolean {
-  return getPersistBackend() !== "file";
+  return isMongoEnabled();
 }

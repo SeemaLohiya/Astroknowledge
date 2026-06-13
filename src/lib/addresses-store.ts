@@ -1,16 +1,16 @@
 import { isRemotePersistEnabled } from "./db/persist";
-import * as redis from "./db/redis-repo";
+import * as mongoMeta from "./db/mongo-meta-repo";
 import { readJsonFile, writeJsonFile } from "./json-store";
 import { SavedAddress } from "./types";
 
 async function load(): Promise<SavedAddress[]> {
-  if (isRemotePersistEnabled()) return redis.redisGetAddresses();
+  if (isRemotePersistEnabled()) return mongoMeta.mongoGetAddresses();
   return readJsonFile<SavedAddress[]>("addresses.json", []);
 }
 
 async function save(list: SavedAddress[]) {
   if (isRemotePersistEnabled()) {
-    await redis.redisSaveAddresses(list);
+    await mongoMeta.mongoSaveAddresses(list);
     return;
   }
   writeJsonFile("addresses.json", list);

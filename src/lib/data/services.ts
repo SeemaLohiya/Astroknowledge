@@ -43,7 +43,7 @@ export const services: Service[] = [
     duration: "45 min",
     price: 5500,
     image: `${S}/vastu.png`,
-    features: ["Home & office analysis", "No demolition needed", "Practical remedies", "Floor plan review"],
+    features: ["Home & office vastu analysis", "No demolition needed", "Practical remedies", "Floor plan review"],
   },
   {
     id: "numerology",

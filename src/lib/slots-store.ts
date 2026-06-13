@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { isRemotePersistEnabled } from "./db/persist";
-import * as redis from "./db/redis-repo";
+import * as mongoMeta from "./db/mongo-meta-repo";
 import { BookingSlot } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -29,13 +29,13 @@ function writeSlots(slots: BookingSlot[]) {
 }
 
 async function loadSlots(): Promise<BookingSlot[]> {
-  if (isRemotePersistEnabled()) return redis.redisGetSlots();
+  if (isRemotePersistEnabled()) return mongoMeta.mongoGetSlots();
   return readSlots();
 }
 
 async function persistSlots(slots: BookingSlot[]) {
   if (isRemotePersistEnabled()) {
-    await redis.redisSaveSlots(slots);
+    await mongoMeta.mongoSaveSlots(slots);
     return;
   }
   writeSlots(slots);

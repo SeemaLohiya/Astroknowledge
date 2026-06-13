@@ -1,8 +1,6 @@
 import fs from "fs";
 import path from "path";
 import { connectDB } from "./connect";
-import { isRedisEnabled } from "./redis-connect";
-import * as redisCatalog from "./redis-repo";
 import { CatalogModel } from "./models";
 import { CatalogType } from "../types";
 
@@ -63,19 +61,16 @@ async function saveCatalog(data: CatalogData) {
 }
 
 export async function mongoGetAll<T extends CatalogType>(type: T): Promise<CatalogData[T]> {
-  if (isRedisEnabled()) return redisCatalog.redisGetAll(type);
   const data = await getCatalogDoc();
   return data[type] as CatalogData[T];
 }
 
 export async function mongoGetById(type: CatalogType, id: string) {
-  if (isRedisEnabled()) return redisCatalog.redisGetById(type, id);
   const items = await mongoGetAll(type);
   return (items as { id: string }[]).find((item) => item.id === id);
 }
 
 export async function mongoCreate(type: CatalogType, item: Record<string, unknown>) {
-  if (isRedisEnabled()) return redisCatalog.redisCreate(type, item);
   const data = await getCatalogDoc();
   const id = (item.id as string) || `${type.slice(0, 3)}-${Date.now()}`;
   const newItem = { ...item, id };
@@ -85,7 +80,6 @@ export async function mongoCreate(type: CatalogType, item: Record<string, unknow
 }
 
 export async function mongoUpdate(type: CatalogType, id: string, updates: Record<string, unknown>) {
-  if (isRedisEnabled()) return redisCatalog.redisUpdate(type, id, updates);
   const data = await getCatalogDoc();
   const items = data[type] as { id: string }[];
   const index = items.findIndex((item) => item.id === id);
@@ -97,7 +91,6 @@ export async function mongoUpdate(type: CatalogType, id: string, updates: Record
 }
 
 export async function mongoDelete(type: CatalogType, id: string) {
-  if (isRedisEnabled()) return redisCatalog.redisDelete(type, id);
   const data = await getCatalogDoc();
   const items = data[type] as { id: string }[];
   const index = items.findIndex((item) => item.id === id);
@@ -108,13 +101,11 @@ export async function mongoDelete(type: CatalogType, id: string) {
 }
 
 export async function mongoGetCategories() {
-  if (isRedisEnabled()) return redisCatalog.redisGetCategories();
   const data = await getCatalogDoc();
   return data.categories;
 }
 
 export async function mongoCreateCategory(cat: Record<string, unknown> & { id?: string; name: string }) {
-  if (isRedisEnabled()) return redisCatalog.redisCreateCategory(cat);
   const data = await getCatalogDoc();
   const id =
     cat.id ||
@@ -130,7 +121,6 @@ export async function mongoCreateCategory(cat: Record<string, unknown> & { id?: 
 }
 
 export async function mongoUpdateCategory(id: string, updates: Record<string, unknown>) {
-  if (isRedisEnabled()) return redisCatalog.redisUpdateCategory(id, updates);
   const data = await getCatalogDoc();
   const index = (data.categories as { id: string }[]).findIndex((c) => c.id === id);
   if (index === -1) return null;
@@ -140,7 +130,6 @@ export async function mongoUpdateCategory(id: string, updates: Record<string, un
 }
 
 export async function mongoDeleteCategory(id: string) {
-  if (isRedisEnabled()) return redisCatalog.redisDeleteCategory(id);
   const data = await getCatalogDoc();
   data.categories = (data.categories as { id: string }[]).filter((c) => c.id !== id);
   await saveCatalog(data);
@@ -148,7 +137,6 @@ export async function mongoDeleteCategory(id: string) {
 }
 
 export async function seedCatalogToMongo(seed: CatalogData) {
-  if (isRedisEnabled()) return redisCatalog.redisSeedCatalog(seed);
   await connectDB();
   const existing = await CatalogModel.findById("main");
   if (existing) return existing.toObject();
