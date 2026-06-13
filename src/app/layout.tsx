@@ -14,8 +14,9 @@ export const metadata: Metadata = {
   description: `Expert Vedic astrology consultation by ${SITE.acharya}. Kundali analysis, Kundli Milan, Vastu, Numerology, spiritual products and more. ${SITE.experience} years experience.`,
   keywords: "vedic astrology, kundali, horoscope, acharya seema lohiya, astroknowledge, kundli milan, vastu, numerology",
   icons: {
-    icon: "/images/logo.png",
-    apple: "/images/logo.png",
+    icon: [{ url: "/images/logo.png", type: "image/png" }],
+    apple: [{ url: "/apple-touch-icon.png", type: "image/png" }],
+    shortcut: "/images/logo.png",
   },
 };
 
@@ -25,7 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-cosmic min-h-screen antialiased">
         <AppProviders>
           <Header />
-          <main className="min-h-screen pb-20 md:pb-0">{children}</main>
+          <main className="min-h-screen overflow-x-hidden pb-20 md:pb-0">{children}</main>
           <Footer />
           <MobileBottomNav />
           <WhatsAppFab />

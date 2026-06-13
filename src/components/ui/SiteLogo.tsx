@@ -19,15 +19,27 @@ const sizes = {
 
 export function SiteLogo({ size = "md", showName = true, tagline, className = "" }: SiteLogoProps) {
   return (
-    <div className={cn("flex items-center gap-2.5 shrink-0", className)}>
+    <div className={cn("flex items-center gap-2 sm:gap-2.5 shrink-0 min-w-0", className)}>
       <div className={cn("relative shrink-0 overflow-hidden rounded-full shadow-md ring-1 ring-gold/20", sizes[size])}>
-        <SafeImage src={SITE.logo} alt={`${SITE.name} logo`} fill className="object-cover" priority />
+        <SafeImage
+          src={SITE.logo}
+          alt={`${SITE.name} logo`}
+          fill
+          className="object-cover"
+          priority
+          sizes="40px"
+          quality={90}
+        />
       </div>
       {showName && (
         <div className="min-w-0">
-          <span className="block text-lg font-bold text-text-primary leading-tight">{SITE.name}</span>
+          <span className="block text-sm sm:text-lg font-bold text-text-primary leading-tight truncate max-w-[7.5rem] sm:max-w-none">
+            {SITE.name}
+          </span>
           {tagline && (
-            <p className="text-[9px] text-gold tracking-widest uppercase leading-tight">{tagline}</p>
+            <p className="hidden sm:block text-[9px] text-gold tracking-widest uppercase leading-tight truncate">
+              {tagline}
+            </p>
           )}
         </div>
       )}

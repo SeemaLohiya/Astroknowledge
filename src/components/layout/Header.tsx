@@ -73,8 +73,8 @@ export function Header() {
           scrolled ? "bg-white/98 shadow-lg shadow-orange/10 border-b border-gold/15" : "bg-cream/95"
         )}
       >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
-          <Link href="/" className="group shrink-0">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3 sm:px-4">
+          <Link href="/" className="group min-w-0 shrink">
             <SiteLogo size="sm" tagline={c.common.vedicWisdom} className="group-hover:[&_span]:text-gold transition-colors" />
           </Link>
 

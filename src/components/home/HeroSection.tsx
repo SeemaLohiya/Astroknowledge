@@ -20,7 +20,7 @@ export function HeroSection() {
         style={{ animationDelay: "1.2s" }}
       />
 
-      <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center gap-10 px-4 py-14 md:py-16 lg:flex-row lg:py-20">
+      <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center gap-10 px-3 py-12 sm:px-4 sm:py-14 md:py-16 lg:flex-row lg:py-20">
         <div className="hero-copy-panel flex-1 text-center lg:text-left animate-fade-in-up">
           <div className="hero-badge-glow mb-5 inline-flex items-center gap-2 rounded-full border border-indigo/25 bg-white/85 px-4 py-2 text-sm shadow-sm backdrop-blur-md">
             <Sparkles className="h-4 w-4 text-gold animate-icon-bounce" />

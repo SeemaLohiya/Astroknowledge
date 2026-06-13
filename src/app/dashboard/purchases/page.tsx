@@ -186,7 +186,7 @@ export default function PurchasesPage() {
                           </span>
                         )}
                       </div>
-                      <h3 className="font-semibold text-text-primary">{item.name}</h3>
+                      <h3 className="font-semibold text-text-primary break-words">{item.name}</h3>
                       <p className="text-xs text-text-muted mt-0.5">
                         {p.qty} {item.quantity} · {formatDate(purchase.createdAt)}
                         {purchase.orderId && ` · ${p.order} #${purchase.orderId}`}

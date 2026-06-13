@@ -137,14 +137,23 @@ iframe {
   .navgraha-cosmos .navgraha-ambient-2 {
     display: none !important;
   }
-  .promo-banner-mesh,
-  .promo-banner-shine,
-  .promo-banner-sparks,
+  .promo-banner-mesh {
+    opacity: 0.3;
+  }
+  .promo-banner-sparks {
+    opacity: 0.55;
+  }
   .promo-banner-gradient {
-    display: none;
+    animation-duration: 10s;
+  }
+  .promo-banner-shine::after {
+    animation-duration: 5s;
   }
   .promo-marquee-track {
-    animation-duration: 28s;
+    animation-duration: 24s;
+  }
+  .promo-intro-chip {
+    animation: promo-pooja-pulse 2.5s ease-in-out infinite;
   }
   .animate-float,
   .animate-float-slow {
@@ -1616,6 +1625,10 @@ textarea::placeholder {
 
 .promo-pooja-text {
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
+}
+
+.promo-intro-chip {
+  box-shadow: 0 0 16px rgba(251, 191, 36, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .promo-pooja-side {

@@ -63,8 +63,8 @@ function LoginContent() {
   const inputCls = "w-full rounded-xl border border-gold/20 bg-orange/5 px-4 py-3 text-text-primary placeholder:text-text-muted focus:border-gold focus:outline-none";
 
   return (
-    <section className="flex min-h-[80vh] items-center justify-center py-16">
-      <div className="mx-auto w-full max-w-md px-4">
+    <section className="flex min-h-[80vh] items-center justify-center px-3 py-12 sm:px-4 sm:py-16">
+      <div className="mx-auto w-full max-w-md">
         <FadeIn className="mb-8 flex flex-col items-center text-center">
           <FounderImage size="sm" showRing={false} />
           <h1 className="mt-4 font-display text-3xl font-bold text-text-primary">{a.welcomeTitle}</h1>
@@ -116,12 +116,6 @@ function LoginContent() {
                 {loading ? c.pleaseWait : tab === "login" ? a.login : a.createAccount}
               </Button>
             </form>
-
-            <div className="mt-6 rounded-xl bg-orange/5 p-4 text-xs text-text-muted">
-              <p className="font-semibold text-gold mb-2">{a.demoTitle}</p>
-              <p>{a.demoAdmin}</p>
-              <p>{a.demoUser}</p>
-            </div>
           </div>
         </FadeIn>
       </div>
