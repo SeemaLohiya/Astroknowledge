@@ -12,8 +12,9 @@ export const SITE = {
   acharya: "Acharya Seema Lohiya",
   acharyaImage: "/images/seema-lohiya.png",
   acharyaTitle: "Chief Vedic Astrologer",
-  phone: "+91 8949265869",
-  whatsapp: "+918949265869",
+  phone: "+91 8949268569",
+  phoneRaw: "8949268569",
+  whatsapp: "918949268569",
   email: "astroknowledge01@gmail.com",
   address: "Jaipur, Rajasthan, India",
   mapsUrl: "https://maps.app.goo.gl/QPVC4p5i9rY6PDcQ6",
@@ -101,3 +102,14 @@ export const ZODIAC_SIGNS = [
   { sign: "Aquarius", hindi: "कुम्भ", symbol: "♒", dates: "Jan 20 - Feb 18" },
   { sign: "Pisces", hindi: "मीन", symbol: "♓", dates: "Feb 19 - Mar 20" },
 ];
+
+/** Click-to-call link */
+export function telLink() {
+  return `tel:+91${SITE.phoneRaw}`;
+}
+
+/** WhatsApp chat link */
+export function whatsappLink(message?: string) {
+  const base = `https://wa.me/${SITE.whatsapp}`;
+  return message ? `${base}?text=${encodeURIComponent(message)}` : base;
+}

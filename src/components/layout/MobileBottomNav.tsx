@@ -36,7 +36,7 @@ export function MobileBottomNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-gold/15 bg-white/95 md:hidden safe-area-pb">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-gold/15 bg-white/95 backdrop-blur-md md:hidden safe-area-pb shadow-[0_-4px_20px_rgba(234,88,12,0.08)]">
       <div className="flex items-end justify-around px-1 pt-1.5 pb-2">
         {navItems.map((item) => {
           const accountHref = user ? (user.role === "admin" ? "/admin" : "/dashboard") : "/login";
@@ -48,12 +48,12 @@ export function MobileBottomNav() {
             <Link
               key={item.href}
               href={href}
-              className={`relative flex flex-col items-center px-2 py-1 transition-transform duration-200 active:scale-95 ${isBook ? "-mt-3" : ""}`}
+              className={`relative flex flex-col items-center px-2 py-1 transition-all duration-300 active:scale-90 ${isBook ? "-mt-3" : ""} ${active && !isBook ? "animate-fade-in-up" : ""}`}
             >
               <div
                 className={`relative flex items-center justify-center rounded-2xl transition-all duration-300 ${
                   isBook
-                    ? "h-12 w-12 bg-gradient-to-br from-gold to-gold-bright text-white shadow-lg shadow-gold/30"
+                    ? "h-12 w-12 bg-gradient-to-br from-gold to-gold-bright text-white shadow-lg shadow-gold/30 animate-pulse-glow"
                     : `h-9 w-9 ${active ? "bg-gold/15 text-gold scale-105" : "text-text-body"}`
                 }`}
               >

@@ -1,6 +1,6 @@
 "use client";
 
-import { SITE } from "@/lib/constants";
+import { SITE, telLink, whatsappLink } from "@/lib/constants";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { ExpertShowcase } from "./ExpertShowcase";
 import { HeroJyotishBackground } from "./HeroJyotishBackground";
@@ -60,7 +60,7 @@ export function HeroSection() {
             <Button href="/courses" variant="outline" size="lg">
               {c.sections.coursesTitle}
             </Button>
-            <Button href={`https://wa.me/${SITE.whatsapp}`} variant="whatsapp" size="lg">
+            <Button href={whatsappLink()} variant="whatsapp" size="lg">
               <MessageCircle className="h-5 w-5" /> {c.hero.whatsapp}
             </Button>
           </div>
@@ -69,17 +69,25 @@ export function HeroSection() {
             {[
               { icon: Award, text: `${SITE.experience} ${c.hero.years}`, color: "border-gold/30 bg-gold/10 text-gold" },
               { icon: Star, text: `${SITE.rating}${c.hero.rating}`, color: "border-orange/30 bg-orange/10 text-gold-bright" },
-              { icon: Phone, text: c.hero.support, color: "border-indigo/25 bg-indigo/8 text-indigo" },
-            ].map((item, i) => (
-              <div
-                key={item.text}
-                className={`hero-stat-pop flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium backdrop-blur-sm transition-transform duration-200 hover:-translate-y-1 hover:shadow-md ${item.color}`}
-                style={{ animationDelay: `${0.55 + i * 0.1}s` }}
-              >
-                <item.icon className="h-4 w-4" />
-                {item.text}
-              </div>
-            ))}
+              { icon: Phone, text: SITE.phone, color: "border-indigo/25 bg-indigo/8 text-indigo", href: telLink() },
+            ].map((item, i) => {
+              const className = `hero-stat-pop flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium backdrop-blur-sm transition-transform duration-200 hover:-translate-y-1 hover:shadow-md ${item.color}`;
+              const style = { animationDelay: `${0.55 + i * 0.1}s` };
+              if (item.href) {
+                return (
+                  <a key={item.text} href={item.href} className={className} style={style}>
+                    <item.icon className="h-4 w-4" />
+                    {item.text}
+                  </a>
+                );
+              }
+              return (
+                <div key={item.text} className={className} style={style}>
+                  <item.icon className="h-4 w-4" />
+                  {item.text}
+                </div>
+              );
+            })}
           </div>
         </div>
 

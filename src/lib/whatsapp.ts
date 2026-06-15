@@ -1,7 +1,11 @@
-import { SITE } from "./constants";
+import { whatsappLink } from "./constants";
 
-export function buildWhatsAppUrl(message: string, phone = SITE.whatsapp) {
-  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+export function buildWhatsAppUrl(message: string, phoneDigits?: string) {
+  if (phoneDigits) {
+    const base = `https://wa.me/${phoneDigits.replace(/\D/g, "")}`;
+    return message ? `${base}?text=${encodeURIComponent(message)}` : base;
+  }
+  return whatsappLink(message);
 }
 
 export function bookingConfirmMessage(name: string, service: string, date: string, time: string) {

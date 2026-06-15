@@ -33,7 +33,7 @@ export const legalContent: Record<"terms" | "privacy" | "shipping" | "refund", R
         { heading: "How We Use Your Information", content: "Your birth details are used exclusively for generating accurate horoscope analysis and Kundali reports. We do not sell or share your personal information with third parties for marketing purposes." },
         { heading: "Data Security", content: "We implement industry-standard security measures to protect your personal data. All consultation records are kept confidential and accessible only to authorized AstroKnowledge staff." },
         { heading: "Cookies", content: "Our website uses cookies for authentication, cart functionality, and improving user experience. You can disable cookies in your browser settings, though some features may not work properly." },
-        { heading: "Contact", content: "For privacy-related inquiries, contact us at astroknowledge01@gmail.com or call +91 8949265869." },
+        { heading: "Contact", content: "For privacy-related inquiries, contact us at astroknowledge01@gmail.com or call +91 8949268569." },
       ],
     },
     hi: {
@@ -43,7 +43,7 @@ export const legalContent: Record<"terms" | "privacy" | "shipping" | "refund", R
         { heading: "हम आपकी जानकारी का उपयोग कैसे करते हैं", content: "आपके जन्म विवरण का उपयोग विशेष रूप से सटीक कुंडली विश्लेषण और रिपोर्ट बनाने के लिए किया जाता है। हम मार्केटिंग उद्देश्यों के लिए आपकी व्यक्तिगत जानकारी तीसरे पक्ष को नहीं बेचते या साझा नहीं करते।" },
         { heading: "डेटा सुरक्षा", content: "हम आपके व्यक्तिगत डेटा की सुरक्षा के लिए उद्योग-मानक सुरक्षा उपाय लागू करते हैं। सभी परामर्श रिकॉर्ड गोपनीय रखे जाते हैं और केवल अधिकृत एस्ट्रोनॉलेज कर्मचारियों द्वारा एक्सेस किए जा सकते हैं।" },
         { heading: "कुकीज़", content: "हमारी वेबसाइट प्रमाणीकरण, कार्ट कार्यक्षमता और उपयोगकर्ता अनुभव सुधारने के लिए कुकीज़ का उपयोग करती है। आप ब्राउज़र सेटिंग्स में कुकीज़ अक्षम कर सकते हैं, हालांकि कुछ सुविधाएं ठीक से काम नहीं कर सकतीं।" },
-        { heading: "संपर्क", content: "गोपनीयता संबंधी पूछताछ के लिए astroknowledge01@gmail.com पर संपर्क करें या +91 8949265869 पर कॉल करें।" },
+        { heading: "संपर्क", content: "गोपनीयता संबंधी पूछताछ के लिए astroknowledge01@gmail.com पर संपर्क करें या +91 8949268569 पर कॉल करें।" },
       ],
     },
   },

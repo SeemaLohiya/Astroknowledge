@@ -5,7 +5,7 @@ import { PageTransition } from "@/components/animations/PageTransition";
 import { QuickConsultCTA } from "@/components/home/QuickConsultCTA";
 import { Button } from "@/components/ui/Button";
 import { PageBanner } from "@/components/ui/PageBanner";
-import { SITE } from "@/lib/constants";
+import { SITE, telLink, whatsappLink } from "@/lib/constants";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { motion } from "framer-motion";
 import { Clock, ExternalLink, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
@@ -27,8 +27,8 @@ export default function ContactPage() {
             <FadeIn>
               <div className="space-y-4">
                 {[
-                  { icon: Phone, label: c.contact.phone, value: SITE.phone, href: `tel:${SITE.phone}` },
-                  { icon: MessageCircle, label: c.contact.whatsapp, value: SITE.phone, href: `https://wa.me/${SITE.whatsapp}` },
+                  { icon: Phone, label: c.contact.phone, value: SITE.phone, href: telLink() },
+                  { icon: MessageCircle, label: c.contact.whatsapp, value: SITE.phone, href: whatsappLink() },
                   { icon: Mail, label: c.contact.email, value: SITE.email, href: `mailto:${SITE.email}` },
                   { icon: MapPin, label: c.contact.address, value: SITE.address, href: SITE.mapsUrl },
                   { icon: Clock, label: c.contact.hours, value: SITE.consultationHours },
@@ -60,7 +60,7 @@ export default function ContactPage() {
                 ))}
 
                 <Button
-                  href={`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent("Hello AstroKnowledge, I would like to get in touch.")}`}
+                  href={whatsappLink("Hello AstroKnowledge, I would like to get in touch.")}
                   variant="whatsapp"
                   size="lg"
                   className="mt-4 w-full"

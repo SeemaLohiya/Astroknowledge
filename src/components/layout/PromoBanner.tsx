@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { SITE } from "@/lib/constants";
+import { SITE, telLink } from "@/lib/constants";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { BookOpen, Copy, Flame, Heart, Phone, Sparkles, Star, Tag, Zap } from "lucide-react";
 import Link from "next/link";
@@ -65,7 +65,7 @@ function MarqueeChip({
 
   if (variant === "phone") {
     return (
-      <a href={`tel:${SITE.phone}`} className={className}>
+      <a href={telLink()} className={className}>
         {inner}
       </a>
     );
@@ -157,7 +157,7 @@ export function PromoBanner() {
             <Copy className="h-3 w-3 opacity-60 transition-opacity group-hover:opacity-100" />
           </button>
           <a
-            href={`tel:${SITE.phone}`}
+            href={telLink()}
             className="promo-phone-btn inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-semibold text-white transition-all hover:scale-110 hover:bg-white/20"
           >
             <Phone className="h-3.5 w-3.5" />

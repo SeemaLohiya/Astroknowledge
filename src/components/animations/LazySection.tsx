@@ -11,7 +11,7 @@ interface LazySectionProps {
   revealVariant?: RevealVariant;
 }
 
-/** Mount chil  dren near the viewport, then play a scroll-reveal entrance. */
+/** Mount children near the viewport, then play a scroll-reveal entrance. */
 export function LazySection({
   children,
   minHeight = "280px",
@@ -32,7 +32,7 @@ export function LazySection({
           observer.disconnect();
         }
       },
-      { rootMargin: "150px 0px" }
+      { rootMargin: "200px 0px", threshold: 0.01 }
     );
 
     observer.observe(el);

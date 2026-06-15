@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { SITE } from "@/lib/constants";
+import { SITE, telLink, whatsappLink } from "@/lib/constants";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { formatMsg } from "@/lib/i18n/ui-strings";
 import { getDisplayStatus } from "@/lib/purchase-display";
@@ -72,13 +72,13 @@ export function ItemNextStep({ itemType, itemId, paymentStatus, paymentId }: Ite
         </p>
         <div className="flex flex-wrap gap-2">
           <a
-            href={`tel:${SITE.phone.replace(/\s/g, "")}`}
+            href={telLink()}
             className="inline-flex items-center gap-1.5 rounded-full border border-gold/30 bg-white px-3 py-1.5 text-xs font-semibold text-gold hover:bg-gold/10"
           >
             <Phone className="h-3.5 w-3.5" /> {SITE.phone}
           </a>
           <a
-            href={`https://wa.me/${SITE.whatsapp}`}
+            href={whatsappLink()}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 rounded-full border border-[#25D366]/40 bg-[#25D366]/10 px-3 py-1.5 text-xs font-semibold text-[#25D366] hover:bg-[#25D366]/20"

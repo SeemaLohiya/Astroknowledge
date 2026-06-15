@@ -1,6 +1,6 @@
 "use client";
 
-import { SITE } from "@/lib/constants";
+import { SITE, telLink, whatsappLink } from "@/lib/constants";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { FadeIn } from "../animations/FadeIn";
 import { FounderImage } from "../animations/FounderImage";
@@ -56,7 +56,7 @@ export function Footer() {
             </div>
             <div className="flex gap-3">
               <motion.a
-                href={`https://wa.me/${SITE.whatsapp}`}
+                href={whatsappLink()}
                 target="_blank"
                 rel="noopener"
                 aria-label="WhatsApp"
@@ -110,7 +110,9 @@ export function Footer() {
           <FadeIn delay={0.3}>
             <h4 className="mb-4 text-lg font-semibold text-gold">{c.footer.contactUs}</h4>
             <div className="space-y-3 text-sm text-text-body">
-              <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-gold" />{SITE.phone}</p>
+              <a href={telLink()} className="flex items-center gap-2 hover:text-gold transition-colors">
+                <Phone className="h-4 w-4 text-gold shrink-0" />{SITE.phone}
+              </a>
               <p className="flex items-center gap-2"><Mail className="h-4 w-4 text-gold" />{SITE.email}</p>
               <p className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-gold shrink-0" />{SITE.address}

@@ -1,6 +1,6 @@
 "use client";
 
-import { SITE } from "@/lib/constants";
+import { whatsappLink } from "@/lib/constants";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { MessageCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -10,7 +10,7 @@ export function WhatsAppFab() {
   const pathname = usePathname();
 
   if (pathname.startsWith("/admin")) return null;
-  const href = `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent("Namaste! I would like to consult with Acharya Seema Lohiya.")}`;
+  const href = whatsappLink("Namaste! I would like to consult with Acharya Seema Lohiya.");
 
   return (
     <a
