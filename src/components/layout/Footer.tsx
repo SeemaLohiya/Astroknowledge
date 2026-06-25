@@ -5,7 +5,7 @@ import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { FadeIn } from "../animations/FadeIn";
 import { FounderImage } from "../animations/FounderImage";
 import { motion } from "framer-motion";
-import { InstagramIcon, WhatsAppIcon, YouTubeIcon } from "@/components/ui/SocialIcons";
+import { WhatsAppIcon, YouTubeIcon } from "@/components/ui/SocialIcons";
 import { ExternalLink, Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 
@@ -32,7 +32,6 @@ export function Footer() {
     quick: [
       { label: c.footer.links.bookConsultation, href: "/dashboard/slots" },
       { label: "YouTube", href: SITE.youtube },
-      { label: "Instagram", href: SITE.instagram },
       { label: c.footer.links.about, href: "/about" },
       { label: c.footer.links.contact, href: "/contact" },
     ],
@@ -64,16 +63,6 @@ export function Footer() {
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-gold/30 text-[#25D366] hover:bg-[#25D366]/10"
               >
                 <WhatsAppIcon className="h-5 w-5" />
-              </motion.a>
-              <motion.a
-                href={SITE.instagram}
-                target="_blank"
-                rel="noopener"
-                aria-label="Instagram"
-                whileHover={{ scale: 1.15 }}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-gold/30 text-[#E4405F] hover:bg-[#E4405F]/10"
-              >
-                <InstagramIcon className="h-5 w-5" />
               </motion.a>
               <motion.a
                 href={SITE.youtube}
@@ -125,16 +114,6 @@ export function Footer() {
               >
                 <MapPin className="h-3.5 w-3.5" />
                 {c.contact.openMaps}
-                <ExternalLink className="h-3 w-3" />
-              </a>
-              <a
-                href={SITE.instagram}
-                target="_blank"
-                rel="noopener"
-                className="inline-flex items-center gap-1.5 text-gold hover:underline font-medium"
-              >
-                <InstagramIcon className="h-3.5 w-3.5" />
-                Instagram
                 <ExternalLink className="h-3 w-3" />
               </a>
               <p className="mt-2 text-gold text-xs">{SITE.consultationHours}</p>
