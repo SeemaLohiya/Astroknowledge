@@ -86,13 +86,25 @@ export default function DashboardBookingsPage() {
           {loading ? (
             <p className="text-sm text-text-muted">{c.common.loading}</p>
           ) : (
-            <UnifiedBookingsList bookings={filtered} />
+            <UnifiedBookingsList
+              bookings={filtered}
+              onChanged={() => {
+                setLoading(true);
+                void fetchJson<{ bookings?: UnifiedBookingItem[] }>("/api/bookings/unified").then((res) => {
+                  setBookings(res.data?.bookings || []);
+                  setLoading(false);
+                });
+              }}
+            />
           )}
           {!loading && bookings.length === 0 && (
             <div className="mt-4 rounded-xl border border-dashed border-gold/25 bg-orange/5 p-6 text-center">
-              <p className="text-sm text-text-body mb-4">No bookings yet. Purchase a consultation service, then book your preferred slot.</p>
+              <p className="text-sm text-text-body mb-4">
+                No bookings yet. Purchase a service or course, complete payment, then book one online consultation slot.
+              </p>
               <div className="flex flex-wrap justify-center gap-3">
                 <Button href="/services" variant="secondary" size="sm">{d.browseServices}</Button>
+                <Button href="/courses" variant="outline" size="sm">Courses</Button>
                 <Button href="/dashboard/slots" variant="outline" size="sm">{d.bookConsultation}</Button>
               </div>
             </div>
@@ -105,9 +117,12 @@ export default function DashboardBookingsPage() {
 
       {!loading && bookings.length > 0 && (
         <FadeIn delay={0.15} className="mt-6">
-          <Link href="/dashboard/slots" className="text-sm text-gold hover:underline">
-            Need another slot? Book consultation →
-          </Link>
+          <p className="text-sm text-text-muted">
+            One slot per purchased item. Cancel an existing slot to book a different time.{" "}
+            <Link href="/dashboard/slots" className="text-gold hover:underline">
+              Manage slots →
+            </Link>
+          </p>
         </FadeIn>
       )}
     </PageTransition>

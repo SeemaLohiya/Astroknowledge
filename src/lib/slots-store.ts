@@ -41,11 +41,39 @@ async function persistSlots(slots: BookingSlot[]) {
   writeSlots(slots);
 }
 
+function clearBookingFields(slot: BookingSlot) {
+  slot.status = "available";
+  slot.userId = undefined;
+  slot.userName = undefined;
+  slot.userEmail = undefined;
+  slot.userPhone = undefined;
+  slot.dob = undefined;
+  slot.birthTime = undefined;
+  slot.birthPlace = undefined;
+  slot.dobUnknown = undefined;
+  slot.birthTimeUnknown = undefined;
+  slot.birthPlaceUnknown = undefined;
+  slot.serviceId = undefined;
+  slot.serviceName = undefined;
+  slot.paymentStatus = undefined;
+  slot.paymentAmount = undefined;
+  slot.bookedAt = undefined;
+  slot.confirmedAt = undefined;
+}
+
 export const slotsStore = {
   getAll: async () => loadSlots(),
   getAvailable: async () => (await loadSlots()).filter((s) => s.status === "available"),
   getByUser: async (userId: string) =>
     (await loadSlots()).filter((s) => s.userId === userId && (s.status === "pending" || s.status === "booked")),
+  /** Active slot for a user + purchased item (one slot per item policy). */
+  getActiveForItem: async (userId: string, serviceId: string) =>
+    (await loadSlots()).find(
+      (s) =>
+        s.userId === userId &&
+        s.serviceId === serviceId &&
+        (s.status === "pending" || s.status === "booked")
+    ) || null,
   getPending: async () => (await loadSlots()).filter((s) => s.status === "pending"),
   getBooked: async () => (await loadSlots()).filter((s) => s.status === "booked"),
   create: async (slot: Omit<BookingSlot, "id" | "createdAt">) => {
@@ -104,24 +132,18 @@ export const slotsStore = {
   reject: async (id: string) => {
     const slots = await loadSlots();
     const slot = slots.find((s) => s.id === id);
-    if (!slot || slot.status !== "pending") return null;
-    slot.status = "available";
-    slot.userId = undefined;
-    slot.userName = undefined;
-    slot.userEmail = undefined;
-    slot.userPhone = undefined;
-    slot.dob = undefined;
-    slot.birthTime = undefined;
-    slot.birthPlace = undefined;
-    slot.dobUnknown = undefined;
-    slot.birthTimeUnknown = undefined;
-    slot.birthPlaceUnknown = undefined;
-    slot.serviceId = undefined;
-    slot.serviceName = undefined;
-    slot.paymentStatus = undefined;
-    slot.paymentAmount = undefined;
-    slot.bookedAt = undefined;
-    slot.confirmedAt = undefined;
+    if (!slot || (slot.status !== "pending" && slot.status !== "booked")) return null;
+    clearBookingFields(slot);
+    await persistSlots(slots);
+    return slot;
+  },
+  /** User cancels their pending/booked slot so they can book a different time. */
+  cancelByUser: async (id: string, userId: string) => {
+    const slots = await loadSlots();
+    const slot = slots.find((s) => s.id === id);
+    if (!slot || slot.userId !== userId) return null;
+    if (slot.status !== "pending" && slot.status !== "booked") return null;
+    clearBookingFields(slot);
     await persistSlots(slots);
     return slot;
   },
@@ -131,16 +153,8 @@ export const slotsStore = {
     if (!slot) return null;
     slot.status = status;
     if (status === "available") {
-      slot.userId = undefined;
-      slot.userName = undefined;
-      slot.userEmail = undefined;
-      slot.userPhone = undefined;
-      slot.serviceId = undefined;
-      slot.serviceName = undefined;
-      slot.paymentStatus = undefined;
-      slot.paymentAmount = undefined;
-      slot.bookedAt = undefined;
-      slot.confirmedAt = undefined;
+      clearBookingFields(slot);
+      slot.status = "available";
     }
     await persistSlots(slots);
     return slot;

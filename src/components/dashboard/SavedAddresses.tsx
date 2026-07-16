@@ -153,10 +153,23 @@ export function SavedAddresses() {
             <div>
               <label className="mb-1 block text-xs text-text-muted">State *</label>
               <input
-                placeholder="Filter states..."
+                type="search"
+                placeholder="Type to filter states..."
                 value={stateFilter}
-                onChange={(e) => setStateFilter(e.target.value)}
-                className="mb-2 w-full rounded-lg border border-gold/15 bg-orange/5 px-3 py-1.5 text-xs"
+                onChange={(e) => {
+                  const next = e.target.value;
+                  setStateFilter(next);
+                  const q = next.trim().toLowerCase();
+                  if (!q) return;
+                  const exact = states.find((s) => s.toLowerCase() === q);
+                  const matches = states.filter((s) => s.toLowerCase().includes(q));
+                  const pick = exact || (matches.length === 1 ? matches[0] : null);
+                  if (pick && pick !== form.state) {
+                    setCityFilter("");
+                    setForm({ ...form, state: pick, city: "" });
+                  }
+                }}
+                className="mb-2 w-full rounded-lg border border-gold/15 bg-white px-3 py-1.5 text-xs"
               />
               <select
                 required
@@ -166,6 +179,7 @@ export function SavedAddresses() {
                   setForm({ ...form, state: e.target.value, city: "" });
                 }}
                 className={selectCls}
+                size={Math.min(6, Math.max(3, filteredStates.length + 1))}
               >
                 <option value="">Select state</option>
                 {filteredStates.map((s) => (
@@ -177,10 +191,22 @@ export function SavedAddresses() {
             <div>
               <label className="mb-1 block text-xs text-text-muted">City *</label>
               <input
-                placeholder="Filter cities..."
+                type="search"
+                placeholder="Type to filter cities..."
                 value={cityFilter}
-                onChange={(e) => setCityFilter(e.target.value)}
-                className="mb-2 w-full rounded-lg border border-gold/15 bg-orange/5 px-3 py-1.5 text-xs"
+                onChange={(e) => {
+                  const next = e.target.value;
+                  setCityFilter(next);
+                  const q = next.trim().toLowerCase();
+                  if (!q || !form.state) return;
+                  const exact = cities.find((c) => c.toLowerCase() === q);
+                  const matches = cities.filter((c) => c.toLowerCase().includes(q));
+                  const pick = exact || (matches.length === 1 ? matches[0] : null);
+                  if (pick && pick !== form.city) {
+                    setForm({ ...form, city: pick });
+                  }
+                }}
+                className="mb-2 w-full rounded-lg border border-gold/15 bg-white px-3 py-1.5 text-xs"
                 disabled={!form.state}
               />
               <select
@@ -192,6 +218,7 @@ export function SavedAddresses() {
                 }}
                 className={selectCls}
                 disabled={!form.state}
+                size={Math.min(6, Math.max(3, filteredCities.length + 1))}
               >
                 <option value="">Select city</option>
                 {filteredCities.map((c) => (

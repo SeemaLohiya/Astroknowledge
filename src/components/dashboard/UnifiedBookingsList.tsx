@@ -1,8 +1,11 @@
 "use client";
 
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
+import { parseResponseJson } from "@/lib/fetch-json";
 import { UnifiedBookingItem } from "@/lib/types";
 import { Calendar, Clock, MessageCircle } from "lucide-react";
+import { useState } from "react";
+import toast from "react-hot-toast";
 
 function statusStyle(status: UnifiedBookingItem["status"]) {
   switch (status) {
@@ -34,9 +37,39 @@ function statusLabel(status: UnifiedBookingItem["status"], d: ReturnType<typeof 
   }
 }
 
-export function UnifiedBookingsList({ bookings }: { bookings: UnifiedBookingItem[] }) {
+export function UnifiedBookingsList({
+  bookings,
+  onChanged,
+}: {
+  bookings: UnifiedBookingItem[];
+  onChanged?: () => void;
+}) {
   const { c } = useLanguage();
   const d = c.dashboard;
+  const [cancelling, setCancelling] = useState<string | null>(null);
+
+  const handleCancel = async (booking: UnifiedBookingItem) => {
+    if (booking.source !== "slot") {
+      toast.error("Only calendar slots can be cancelled here.");
+      return;
+    }
+    setCancelling(booking.id);
+    try {
+      const res = await fetch(`/api/slots/${booking.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "cancel" }),
+      });
+      const data = await parseResponseJson<{ message?: string; error?: string }>(res);
+      if (!res.ok || !data) throw new Error(data?.error || d.failedCancel);
+      toast.success(data.message || d.slotCancelled);
+      onChanged?.();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : d.failedCancel);
+    } finally {
+      setCancelling(null);
+    }
+  };
 
   if (bookings.length === 0) {
     return <p className="text-sm text-text-muted">{d.noBookings}</p>;
@@ -70,14 +103,26 @@ export function UnifiedBookingsList({ bookings }: { bookings: UnifiedBookingItem
               </span>
             </div>
             {booking.status === "pending" && (
-              <p className="mt-2 text-xs text-gold">Awaiting admin confirmation — you will be notified once confirmed.</p>
+              <p className="mt-2 text-xs text-gold">
+                Online consultation awaiting admin confirmation — you will be notified once confirmed.
+              </p>
             )}
             {booking.status === "confirmed" && (
               <p className="mt-2 flex items-center gap-1 text-xs text-green-700">
-                <MessageCircle className="h-3 w-3" /> Your consultation is confirmed. Check WhatsApp for reminders.
+                <MessageCircle className="h-3 w-3" /> Your online consultation is confirmed. Check WhatsApp for reminders.
               </p>
             )}
           </div>
+          {booking.source === "slot" && (booking.status === "pending" || booking.status === "confirmed") && (
+            <button
+              type="button"
+              disabled={cancelling === booking.id}
+              onClick={() => handleCancel(booking)}
+              className="rounded-full border border-red-300 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-100 disabled:opacity-50"
+            >
+              {cancelling === booking.id ? "..." : d.cancelSlot}
+            </button>
+          )}
         </div>
       ))}
     </div>

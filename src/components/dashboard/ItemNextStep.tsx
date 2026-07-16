@@ -16,6 +16,8 @@ interface ItemNextStepProps {
   paymentId?: string;
 }
 
+const SLOT_BOOKABLE = new Set<CartItemType>(["service", "course"]);
+
 export function ItemNextStep({ itemType, itemId, paymentStatus, paymentId }: ItemNextStepProps) {
   const { lang, c } = useLanguage();
   const n = c.nextStep;
@@ -24,6 +26,7 @@ export function ItemNextStep({ itemType, itemId, paymentStatus, paymentId }: Ite
   const isPaid = paymentStatus === "paid";
   const isPending = paymentStatus === "pending";
   const isAwaiting = paymentStatus === "awaiting_approval";
+  const isSlotBookable = SLOT_BOOKABLE.has(itemType);
 
   if (isPending && paymentId) {
     return (
@@ -41,17 +44,18 @@ export function ItemNextStep({ itemType, itemId, paymentStatus, paymentId }: Ite
       <div className="rounded-xl bg-yellow-500/5 border border-yellow-500/20 px-4 py-3 text-sm text-yellow-800">
         <p className="font-semibold text-yellow-900 mb-1">{n.pendingTitle}</p>
         <p>
-          {itemType === "service" ? n.pendingService : n.pendingOther}
+          {isSlotBookable ? n.pendingService : n.pendingOther}
         </p>
       </div>
     );
   }
 
-  if (itemType === "service") {
+  if (isSlotBookable) {
     if (isPaid) {
       return (
         <div className="rounded-xl bg-gold/5 border border-gold/25 px-4 py-3">
-          <p className="text-sm font-medium text-text-primary mb-2">{n.bookNext}</p>
+          <p className="text-sm font-medium text-text-primary mb-1">{n.bookNext}</p>
+          <p className="text-xs text-text-muted mb-3">{n.onlineOnly}</p>
           <Button href={`/dashboard/slots?service=${itemId}`} variant="secondary" size="sm">
             <Calendar className="h-4 w-4" /> {d.bookConsultation}
           </Button>

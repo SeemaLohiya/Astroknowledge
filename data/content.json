@@ -277,5 +277,101 @@
         "Moon Remedies"
       ]
     }
+  ],
+  "certifications": [
+    {
+      "id": "cert-1",
+      "title": "Shastracharya in Vedic Astrology"
+    },
+    {
+      "id": "cert-2",
+      "title": "Expert in KP"
+    },
+    {
+      "id": "cert-3",
+      "title": "Shastracharya in Vastu"
+    },
+    {
+      "id": "cert-4",
+      "title": "Expert in BNN"
+    },
+    {
+      "id": "cert-5",
+      "title": "Shastracharya in Palmistry"
+    },
+    {
+      "id": "cert-6",
+      "title": "Numerology Expert"
+    },
+    {
+      "id": "cert-7",
+      "title": "Certified Jyotish Acharya",
+      "subtitle": "Advanced Birth Chart & Dasha Analysis"
+    },
+    {
+      "id": "cert-8",
+      "title": "Ritual & Pooja Specialist",
+      "subtitle": "Sacred Ceremony & Anushthan"
+    },
+    {
+      "id": "cert-9",
+      "title": "Kundli Milan Expert",
+      "subtitle": "Marriage Compatibility & Muhurat"
+    },
+    {
+      "id": "cert-10",
+      "title": "Mundane Astrology",
+      "subtitle": "World Events & National Predictions"
+    },
+    {
+      "id": "cert-11",
+      "title": "Medical Astrology",
+      "subtitle": "Health & Disease Analysis via Grahas"
+    },
+    {
+      "id": "cert-12",
+      "title": "Ashtakavarga",
+      "subtitle": "Planetary Strength & Transit Analysis"
+    },
+    {
+      "id": "cert-13",
+      "title": "Prashna Kundali",
+      "subtitle": "Horary Chart & Question-Based Jyotish"
+    },
+    {
+      "id": "cert-14",
+      "title": "Tenali Padhati",
+      "subtitle": "Traditional Predictive Methodology"
+    },
+    {
+      "id": "cert-15",
+      "title": "Kabala",
+      "subtitle": "Esoteric Astrology & Mystical Sciences"
+    },
+    {
+      "id": "cert-16",
+      "title": "Hibru",
+      "subtitle": "Ancient Semitic Astrological Traditions"
+    },
+    {
+      "id": "cert-17",
+      "title": "Lal Kitab",
+      "subtitle": "Remedial Astrology & Upayas"
+    },
+    {
+      "id": "cert-18",
+      "title": "Ramal Jyotish",
+      "subtitle": "Divination & Predictive Ramal"
+    },
+    {
+      "id": "cert-19",
+      "title": "Panchang",
+      "subtitle": "Tithi, Nakshatra, Yoga & Muhurat"
+    },
+    {
+      "id": "cert-20",
+      "title": "Swar Vigyan",
+      "subtitle": "Sound & Breath-Based Predictive Science"
+    }
   ]
 }

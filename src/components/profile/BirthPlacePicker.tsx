@@ -38,28 +38,41 @@ interface BirthPlacePickerProps {
   inputCls?: string;
 }
 
+function applyFilterMatch(
+  options: string[],
+  filter: string,
+  current: string
+): { list: string[]; autoSelect?: string } {
+  const q = filter.trim().toLowerCase();
+  const filtered = q ? options.filter((s) => s.toLowerCase().includes(q)) : options;
+  const list = withSelectedOption(filtered, current);
+  if (!q) return { list };
+  const exact = options.find((s) => s.toLowerCase() === q);
+  if (exact && exact !== current) return { list, autoSelect: exact };
+  if (filtered.length === 1 && filtered[0] !== current) return { list, autoSelect: filtered[0] };
+  return { list };
+}
+
 export function BirthPlacePicker({ value, onChange, disabled, inputCls = "" }: BirthPlacePickerProps) {
   const [stateFilter, setStateFilter] = useState("");
   const [cityFilter, setCityFilter] = useState("");
 
   const states = useMemo(() => getStates(value.birthCountry), [value.birthCountry]);
   const cities = useMemo(() => getCities(value.birthState), [value.birthState]);
-  const filteredStates = useMemo(
-    () => withSelectedOption(
-      states.filter((s) => s.toLowerCase().includes(stateFilter.toLowerCase())),
-      value.birthState
-    ),
+
+  const stateResult = useMemo(
+    () => applyFilterMatch(states, stateFilter, value.birthState),
     [states, stateFilter, value.birthState]
   );
-  const filteredCities = useMemo(
-    () => withSelectedOption(
-      cities.filter((c) => c.toLowerCase().includes(cityFilter.toLowerCase())),
-      value.birthCity
-    ),
+  const cityResult = useMemo(
+    () => applyFilterMatch(cities, cityFilter, value.birthCity),
     [cities, cityFilter, value.birthCity]
   );
 
-  const selectCls = "w-full min-h-[44px] rounded-xl border border-gold/20 bg-orange/5 px-3 py-2.5 text-sm focus:border-gold focus:outline-none disabled:opacity-50 cursor-pointer";
+  const selectCls =
+    "w-full min-h-[44px] rounded-xl border border-gold/20 bg-orange/5 px-3 py-2.5 text-sm focus:border-gold focus:outline-none disabled:opacity-50 cursor-pointer";
+  const filterCls =
+    "mb-2 w-full rounded-lg border border-gold/15 bg-white px-3 py-1.5 text-xs text-text-body placeholder:text-text-muted focus:border-gold focus:outline-none disabled:opacity-50";
 
   return (
     <div className="space-y-3">
@@ -68,7 +81,11 @@ export function BirthPlacePicker({ value, onChange, disabled, inputCls = "" }: B
         <select
           disabled={disabled}
           value={value.birthCountry}
-          onChange={(e) => onChange({ birthCountry: e.target.value, birthState: "", birthCity: "" })}
+          onChange={(e) => {
+            setStateFilter("");
+            setCityFilter("");
+            onChange({ birthCountry: e.target.value, birthState: "", birthCity: "" });
+          }}
           className={`${selectCls} ${inputCls}`}
         >
           <option value="">Select country</option>
@@ -81,38 +98,60 @@ export function BirthPlacePicker({ value, onChange, disabled, inputCls = "" }: B
       <div>
         <label className="mb-1 block text-[10px] font-medium uppercase tracking-wide text-text-muted">State *</label>
         <input
-          type="text"
+          type="search"
           disabled={disabled || !value.birthCountry}
-          placeholder="Filter states..."
+          placeholder="Type to filter states (e.g. Rajasthan)..."
           value={stateFilter}
-          onChange={(e) => setStateFilter(e.target.value)}
-          className={selectCls}
+          onChange={(e) => {
+            const next = e.target.value;
+            setStateFilter(next);
+            const match = applyFilterMatch(states, next, value.birthState);
+            if (match.autoSelect) {
+              setCityFilter("");
+              onChange({ ...value, birthState: match.autoSelect, birthCity: "" });
+            }
+          }}
+          className={filterCls}
+          autoComplete="address-level1"
         />
         <select
           disabled={disabled || !value.birthCountry}
           value={value.birthState}
           onChange={(e) => {
             setStateFilter("");
+            setCityFilter("");
             onChange({ ...value, birthState: e.target.value, birthCity: "" });
           }}
-          className={`${selectCls} mt-2 ${inputCls}`}
+          className={`${selectCls} ${inputCls}`}
+          size={Math.min(6, Math.max(3, stateResult.list.length + 1))}
         >
           <option value="">Select state</option>
-          {filteredStates.map((s) => (
+          {stateResult.list.map((s) => (
             <option key={s} value={s}>{s}</option>
           ))}
         </select>
+        {stateFilter && stateResult.list.length === 0 && (
+          <p className="mt-1 text-xs text-red-500">No states match “{stateFilter}”</p>
+        )}
       </div>
 
       <div>
         <label className="mb-1 block text-[10px] font-medium uppercase tracking-wide text-text-muted">City *</label>
         <input
-          type="text"
+          type="search"
           disabled={disabled || !value.birthState}
-          placeholder="Filter cities..."
+          placeholder="Type to filter cities..."
           value={cityFilter}
-          onChange={(e) => setCityFilter(e.target.value)}
-          className={selectCls}
+          onChange={(e) => {
+            const next = e.target.value;
+            setCityFilter(next);
+            const match = applyFilterMatch(cities, next, value.birthCity);
+            if (match.autoSelect) {
+              onChange({ ...value, birthCity: match.autoSelect });
+            }
+          }}
+          className={filterCls}
+          autoComplete="address-level2"
         />
         <select
           disabled={disabled || !value.birthState}
@@ -121,13 +160,17 @@ export function BirthPlacePicker({ value, onChange, disabled, inputCls = "" }: B
             setCityFilter("");
             onChange({ ...value, birthCity: e.target.value });
           }}
-          className={`${selectCls} mt-2 ${inputCls}`}
+          className={`${selectCls} ${inputCls}`}
+          size={Math.min(6, Math.max(3, cityResult.list.length + 1))}
         >
           <option value="">Select city</option>
-          {filteredCities.map((c) => (
+          {cityResult.list.map((c) => (
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
+        {cityFilter && cityResult.list.length === 0 && (
+          <p className="mt-1 text-xs text-red-500">No cities match “{cityFilter}”</p>
+        )}
       </div>
 
       {(value.birthCity || value.birthState || value.birthCountry) && (

@@ -31,6 +31,7 @@ function SlotsContent() {
   const [paidServices, setPaidServices] = useState<PaidServiceItem[]>([]);
   const [accessLoading, setAccessLoading] = useState(true);
   const [booking, setBooking] = useState<string | null>(null);
+  const [cancelling, setCancelling] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState("");
 
   const birthComplete = user ? isBirthProfileComplete(user) : false;
@@ -43,7 +44,12 @@ function SlotsContent() {
     return null;
   }, [paidServices, serviceParam]);
 
-  useEffect(() => {
+  const existingForItem = useMemo(() => {
+    if (!activeService) return null;
+    return myBookings.find((s) => s.serviceId === activeService.id) || null;
+  }, [activeService, myBookings]);
+
+  const reload = () => {
     void Promise.all([
       fetchJson<{ slots?: BookingSlot[] }>("/api/slots"),
       fetchJson<{ slots?: BookingSlot[] }>("/api/slots?mine=true"),
@@ -55,6 +61,10 @@ function SlotsContent() {
       setLoading(false);
       setAccessLoading(false);
     });
+  };
+
+  useEffect(() => {
+    reload();
   }, []);
 
   const visibleSlots = useMemo(() => {
@@ -65,6 +75,10 @@ function SlotsContent() {
   const handleBook = async (slotId: string) => {
     if (!activeService) {
       toast.error(d.noServiceForBooking);
+      return;
+    }
+    if (existingForItem) {
+      toast.error(d.oneSlotRule);
       return;
     }
     setBooking(slotId);
@@ -81,11 +95,30 @@ function SlotsContent() {
       const data = await parseResponseJson<{ message?: string; error?: string }>(res);
       if (!res.ok || !data) throw new Error(data?.error || d.failedBook);
       toast.success(data.message || d.bookingSubmitted);
-      window.location.reload();
+      reload();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : d.failedBook);
     } finally {
       setBooking(null);
+    }
+  };
+
+  const handleCancel = async (slotId: string) => {
+    setCancelling(slotId);
+    try {
+      const res = await fetch(`/api/slots/${slotId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "cancel" }),
+      });
+      const data = await parseResponseJson<{ message?: string; error?: string }>(res);
+      if (!res.ok || !data) throw new Error(data?.error || d.failedCancel);
+      toast.success(data.message || d.slotCancelled);
+      reload();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : d.failedCancel);
+    } finally {
+      setCancelling(null);
     }
   };
 
@@ -103,6 +136,7 @@ function SlotsContent() {
         <p className="mt-3 text-sm text-text-body">{d.noPaidServices}</p>
         <div className="mt-6 flex flex-wrap gap-3 justify-center">
           <Button href="/services" variant="secondary">{d.browseServices}</Button>
+          <Button href="/courses" variant="outline">Courses</Button>
           <Button href="/dashboard/purchases" variant="outline">{d.purchases}</Button>
         </div>
       </FadeIn>
@@ -120,22 +154,29 @@ function SlotsContent() {
           <p className="text-sm text-text-body">{d.multipleServices}</p>
         </FadeIn>
         <div className="space-y-3">
-          {paidServices.map((service) => (
-            <FadeIn key={service.id}>
-              <div className="flex items-center gap-4 rounded-2xl glass-card p-4">
-                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl">
-                  <SafeImage src={service.image} alt={service.name} fill className="object-cover" />
+          {paidServices.map((service) => {
+            const booked = myBookings.find((b) => b.serviceId === service.id);
+            return (
+              <FadeIn key={service.id}>
+                <div className="flex items-center gap-4 rounded-2xl glass-card p-4">
+                  <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl">
+                    <SafeImage src={service.image} alt={service.name} fill className="object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-text-primary">{service.name}</p>
+                    <p className="text-xs text-text-muted">
+                      {booked
+                        ? `${booked.date} ${booked.time} · ${booked.status === "pending" ? c.booking.pendingConfirm : c.booking.confirmed}`
+                        : d.paidReady}
+                    </p>
+                  </div>
+                  <Button href={`/dashboard/slots?service=${service.id}`} variant="secondary" size="sm">
+                    <Calendar className="h-4 w-4" /> {booked ? "Manage" : d.book}
+                  </Button>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-text-primary">{service.name}</p>
-                  <p className="text-xs text-text-muted">{d.paidReady}</p>
-                </div>
-                <Button href={`/dashboard/slots?service=${service.id}`} variant="secondary" size="sm">
-                  <Calendar className="h-4 w-4" /> {d.book}
-                </Button>
-              </div>
-            </FadeIn>
-          ))}
+              </FadeIn>
+            );
+          })}
         </div>
         <p className="mt-6 text-center text-sm text-text-muted">
           {d.orGoToPurchases}{" "}
@@ -154,6 +195,7 @@ function SlotsContent() {
           <h1 className="font-display text-2xl font-bold text-text-primary">{d.bookConsultation}</h1>
         </div>
         <p className="text-sm text-text-body">{d.pickDate}</p>
+        <p className="mt-1 text-xs text-text-muted">{d.onlineSessionNote}</p>
       </FadeIn>
 
       {activeService && (
@@ -176,68 +218,102 @@ function SlotsContent() {
         </FadeIn>
       ) : (
         <>
-      <div className="mb-6">
-        <FadeIn>
-          <SlotCalendar
-            slots={slots}
-            selectedDate={selectedDate}
-            onSelectDate={setSelectedDate}
-            mode="user"
-          />
-        </FadeIn>
-        {selectedDate && (
-          <p className="mt-3 text-sm text-text-muted text-center">
-            {d.showingSlotsFor} <strong>{selectedDate}</strong>
-          </p>
-        )}
-      </div>
-
-      {loading ? (
-        <p className="text-text-muted text-center py-8">{c.booking.loading}</p>
-      ) : visibleSlots.length === 0 ? (
-        <p className="text-text-muted text-center py-8">
-          {selectedDate ? formatMsg(d.noSlotsOnDate, { date: selectedDate }) : c.booking.noSlots}
-        </p>
-      ) : (
-        <div className="grid gap-3 sm:grid-cols-2">
-          {visibleSlots.map((slot) => (
-            <div key={slot.id} className="rounded-xl glass-card p-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Calendar className="h-5 w-5 text-gold" />
+          {existingForItem ? (
+            <FadeIn className="mb-6 rounded-2xl border border-yellow-500/30 bg-yellow-500/5 p-5">
+              <p className="text-sm font-semibold text-yellow-900 mb-1">{d.oneSlotRule}</p>
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-white/70 px-4 py-3">
                 <div>
-                  <p className="font-medium text-text-primary">{slot.date}</p>
-                  <p className="text-sm text-gold">{slot.time} · {slot.duration}</p>
+                  <p className="font-medium text-text-primary">
+                    {existingForItem.date} at {existingForItem.time}
+                  </p>
+                  <p className="text-xs text-gold">
+                    {existingForItem.status === "pending" ? c.booking.pendingConfirm : c.booking.confirmed}
+                  </p>
                 </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={cancelling === existingForItem.id}
+                  onClick={() => handleCancel(existingForItem.id)}
+                >
+                  {cancelling === existingForItem.id ? "..." : d.cancelSlot}
+                </Button>
               </div>
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={booking === slot.id}
-                onClick={() => handleBook(slot.id)}
-              >
-                {booking === slot.id ? "..." : c.common.bookSlot}
-              </Button>
-            </div>
-          ))}
-        </div>
-      )}
+            </FadeIn>
+          ) : (
+            <>
+              <div className="mb-6">
+                <FadeIn>
+                  <SlotCalendar
+                    slots={slots}
+                    selectedDate={selectedDate}
+                    onSelectDate={setSelectedDate}
+                    mode="user"
+                  />
+                </FadeIn>
+                {selectedDate && (
+                  <p className="mt-3 text-sm text-text-muted text-center">
+                    {d.showingSlotsFor} <strong>{selectedDate}</strong>
+                  </p>
+                )}
+              </div>
 
-      {myBookings.length > 0 && (
-        <FadeIn className="mt-10">
-          <h2 className="font-semibold text-text-primary mb-4">{d.yourConsultations}</h2>
-          {myBookings.map((slot) => (
-            <div key={slot.id} className="mb-2 rounded-xl bg-gold/10 px-4 py-3 flex flex-wrap justify-between gap-2">
-              <span className="text-text-primary text-sm">{slot.date} at {slot.time} ({slot.duration})</span>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-gold">{slot.serviceName}</span>
-                <span className={`text-xs px-2 py-0.5 rounded-full ${slot.status === "pending" ? "bg-yellow-500/20 text-yellow-700" : "bg-green-500/20 text-green-700"}`}>
-                  {slot.status === "pending" ? c.booking.pendingConfirm : c.booking.confirmed}
-                </span>
-              </div>
-            </div>
-          ))}
-        </FadeIn>
-      )}
+              {loading ? (
+                <p className="text-text-muted text-center py-8">{c.booking.loading}</p>
+              ) : visibleSlots.length === 0 ? (
+                <p className="text-text-muted text-center py-8">
+                  {selectedDate ? formatMsg(d.noSlotsOnDate, { date: selectedDate }) : c.booking.noSlots}
+                </p>
+              ) : (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {visibleSlots.map((slot) => (
+                    <div key={slot.id} className="rounded-xl glass-card p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Calendar className="h-5 w-5 text-gold" />
+                        <div>
+                          <p className="font-medium text-text-primary">{slot.date}</p>
+                          <p className="text-sm text-gold">{slot.time} · {slot.duration}</p>
+                        </div>
+                      </div>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        disabled={booking === slot.id}
+                        onClick={() => handleBook(slot.id)}
+                      >
+                        {booking === slot.id ? "..." : c.common.bookSlot}
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {myBookings.length > 0 && (
+            <FadeIn className="mt-10">
+              <h2 className="font-semibold text-text-primary mb-4">{d.yourConsultations}</h2>
+              {myBookings.map((slot) => (
+                <div key={slot.id} className="mb-2 rounded-xl bg-gold/10 px-4 py-3 flex flex-wrap justify-between gap-2 items-center">
+                  <span className="text-text-primary text-sm">{slot.date} at {slot.time} ({slot.duration})</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gold">{slot.serviceName}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${slot.status === "pending" ? "bg-yellow-500/20 text-yellow-700" : "bg-green-500/20 text-green-700"}`}>
+                      {slot.status === "pending" ? c.booking.pendingConfirm : c.booking.confirmed}
+                    </span>
+                    <button
+                      type="button"
+                      disabled={cancelling === slot.id}
+                      onClick={() => handleCancel(slot.id)}
+                      className="text-xs font-semibold text-red-600 hover:underline disabled:opacity-50"
+                    >
+                      {cancelling === slot.id ? "..." : d.cancelSlot}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </FadeIn>
+          )}
         </>
       )}
     </>

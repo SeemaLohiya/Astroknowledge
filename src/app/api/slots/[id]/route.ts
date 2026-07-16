@@ -16,16 +16,29 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   if (body.action === "book") {
     if (!(await hasPaidServiceAccess(session.userId))) {
       return NextResponse.json(
-        { error: "Purchase and pay for a consultation service first" },
+        { error: "Purchase and pay for a consultation service or course first" },
         { status: 403 }
       );
     }
     const paidServices = await getPaidServices(session.userId);
     if (body.serviceId && !paidServices.some((s) => s.id === body.serviceId)) {
       return NextResponse.json(
-        { error: "You can only book slots for services you have purchased" },
+        { error: "You can only book slots for services or courses you have purchased" },
         { status: 403 }
       );
+    }
+    if (body.serviceId) {
+      const existing = await slotsStore.getActiveForItem(session.userId, body.serviceId);
+      if (existing) {
+        return NextResponse.json(
+          {
+            error:
+              "You already have one slot booked for this item. Cancel it first to book a different time.",
+            existingSlotId: existing.id,
+          },
+          { status: 409 }
+        );
+      }
     }
     const user = await store.users.findById(session.userId);
     if (!user || !isBirthProfileComplete(user)) {
@@ -34,7 +47,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     let paymentAmount = body.paymentAmount;
     if (!paymentAmount && body.serviceId) {
       const { catalogStore } = await import("@/lib/catalog-store");
-      const service = (await catalogStore.getById("services", body.serviceId)) as { price?: number } | undefined;
+      const service =
+        ((await catalogStore.getById("services", body.serviceId)) as { price?: number } | undefined) ||
+        ((await catalogStore.getById("courses", body.serviceId)) as { price?: number } | undefined);
       paymentAmount = service?.price;
     }
     const slot = await slotsStore.book(id, {
@@ -61,7 +76,29 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       message: `${slot.userName} booked slot ${slot.date} ${slot.time} for ${slot.serviceName || "consultation"}`,
       channel: "system",
     });
-    return NextResponse.json({ slot, message: "Booking submitted. Awaiting admin confirmation." });
+    return NextResponse.json({
+      slot,
+      message: "Booking submitted for online consultation. Awaiting admin confirmation.",
+    });
+  }
+
+  if (body.action === "cancel") {
+    const slot = await slotsStore.cancelByUser(id, session.userId);
+    if (!slot) {
+      return NextResponse.json(
+        { error: "Cannot cancel this slot. It may already be released or not belong to you." },
+        { status: 400 }
+      );
+    }
+    await logNotification({
+      type: "slot_cancelled",
+      userId: session.userId,
+      userName: session.name,
+      referenceId: id,
+      message: `${session.name} cancelled their slot booking`,
+      channel: "system",
+    });
+    return NextResponse.json({ slot, message: "Slot cancelled. You can now book a different time." });
   }
 
   if (session.role !== "admin") {

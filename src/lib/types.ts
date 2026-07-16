@@ -249,7 +249,7 @@ export interface SavedAddress {
 
 export interface AdminNotification {
   id: string;
-  type: "payment_approved" | "payment_rejected" | "payment_received" | "booking_confirmed" | "order_shipped" | "payment_submitted" | "booking_submitted" | "slot_booked" | "slot_confirmed";
+  type: "payment_approved" | "payment_rejected" | "payment_received" | "booking_confirmed" | "order_shipped" | "payment_submitted" | "booking_submitted" | "slot_booked" | "slot_confirmed" | "slot_cancelled";
   userId?: string;
   userName?: string;
   referenceId?: string;
