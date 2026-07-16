@@ -20,6 +20,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (body.email !== undefined) user.email = body.email?.trim() || user.email;
   if (body.phone !== undefined) user.phone = body.phone?.trim() || "";
 
+  if (typeof body.password === "string") {
+    const nextPassword = body.password.trim();
+    if (nextPassword.length < 6) {
+      return NextResponse.json({ error: "Password must be at least 6 characters" }, { status: 400 });
+    }
+    user.password = nextPassword;
+  }
+
   if (body.dobUnknown !== undefined) user.dobUnknown = !!body.dobUnknown;
   if (body.birthTimeUnknown !== undefined) user.birthTimeUnknown = !!body.birthTimeUnknown;
   if (body.birthPlaceUnknown !== undefined) user.birthPlaceUnknown = !!body.birthPlaceUnknown;

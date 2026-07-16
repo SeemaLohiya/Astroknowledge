@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import { AdminNotification, BookingSlot, EditableSiteContent, SavedAddress } from "../types";
+import type { PasswordResetRecord } from "../password-reset-store";
 import { connectDB } from "./connect";
 
 const slotBundleSchema = new Schema(
@@ -14,6 +15,10 @@ const siteContentSchema = new Schema(
 
 const notificationSchema = new Schema({}, { _id: false, strict: false });
 const addressSchema = new Schema({}, { _id: false, strict: false });
+const passwordResetBundleSchema = new Schema(
+  { _id: { type: String, default: "main" }, records: { type: [Schema.Types.Mixed], default: [] } },
+  { _id: false, timestamps: true }
+);
 
 const SlotBundleModel =
   mongoose.models.SlotBundle ?? mongoose.model("SlotBundle", slotBundleSchema, "slot_bundles");
@@ -23,6 +28,9 @@ const NotificationModel =
   mongoose.models.Notification ?? mongoose.model("Notification", notificationSchema, "notifications");
 const AddressModel =
   mongoose.models.Address ?? mongoose.model("Address", addressSchema, "addresses");
+const PasswordResetBundleModel =
+  mongoose.models.PasswordResetBundle ??
+  mongoose.model("PasswordResetBundle", passwordResetBundleSchema, "password_resets");
 
 export async function mongoGetSlots(): Promise<BookingSlot[]> {
   await connectDB();
@@ -66,4 +74,19 @@ export async function mongoSaveAddresses(addresses: SavedAddress[]) {
   await connectDB();
   await AddressModel.deleteMany({});
   if (addresses.length) await AddressModel.insertMany(addresses);
+}
+
+export async function mongoGetPasswordResets(): Promise<PasswordResetRecord[]> {
+  await connectDB();
+  const doc = await PasswordResetBundleModel.findById("main").lean();
+  return (doc?.records as PasswordResetRecord[]) ?? [];
+}
+
+export async function mongoSavePasswordResets(records: PasswordResetRecord[]) {
+  await connectDB();
+  await PasswordResetBundleModel.findByIdAndUpdate(
+    "main",
+    { $set: { records } },
+    { upsert: true, new: true }
+  );
 }

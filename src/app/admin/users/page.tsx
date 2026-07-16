@@ -5,7 +5,7 @@ import { PageTransition } from "@/components/animations/PageTransition";
 import { fetchJson } from "@/lib/fetch-json";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { User } from "@/lib/types";
-import { Ban, Download, RotateCcw, Search, Trash2, User as UserIcon } from "lucide-react";
+import { Ban, Download, KeyRound, RotateCcw, Search, Trash2, User as UserIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -78,6 +78,38 @@ export default function AdminUsersPage() {
       await load();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Action failed");
+    } finally {
+      setActing(null);
+    }
+  };
+
+  const changePassword = async (id: string, name: string) => {
+    const password = window.prompt(`Set a new password for "${name}" (min 6 characters):`);
+    if (password === null) return;
+    const trimmed = password.trim();
+    if (trimmed.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+    const confirm = window.prompt("Confirm new password:");
+    if (confirm === null) return;
+    if (confirm.trim() !== trimmed) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    setActing(`${id}-password`);
+    try {
+      const res = await fetch(`/api/users/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: trimmed }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Could not change password");
+      toast.success(`Password updated for ${name}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not change password");
     } finally {
       setActing(null);
     }
@@ -165,6 +197,16 @@ export default function AdminUsersPage() {
                       <td className="px-4 py-3 text-text-muted text-xs">{u.createdAt}</td>
                       <td className="px-4 py-3">
                         <div className="flex justify-end gap-1.5">
+                          <button
+                            type="button"
+                            title="Change password"
+                            disabled={!!acting}
+                            onClick={() => void changePassword(u.id, u.name)}
+                            className="inline-flex items-center gap-1 rounded-lg border border-gold/30 bg-gold/10 px-2.5 py-1.5 text-xs font-medium text-gold hover:bg-gold/20 disabled:opacity-50"
+                          >
+                            <KeyRound className="h-3.5 w-3.5" />
+                            {acting === `${u.id}-password` ? "..." : "Password"}
+                          </button>
                           {suspended ? (
                             <button
                               type="button"
