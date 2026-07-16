@@ -10,7 +10,7 @@ function getResend() {
 export function getPasswordResetFromEmail() {
   return (
     process.env.RESEND_FROM_EMAIL?.trim() ||
-    `AstroKnowledge <onboarding@resend.dev>`
+    `AstroKnowledge <noreply@astroknowledge.in>`
   );
 }
 
