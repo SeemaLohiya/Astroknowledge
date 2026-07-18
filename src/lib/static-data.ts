@@ -5,6 +5,7 @@ import { healingServices } from "./data/healing";
 import { productCategories, products } from "./data/products";
 import { services } from "./data/services";
 import { siteContent } from "./i18n/site-content";
+import { defaultAcharyaImage } from "./site-branding";
 import { CatalogType, Course, EditableSiteContent, HealingService, PoojaService, Product, ProductCategory, Service } from "./types";
 
 /** In-memory catalog — instant reads, no API round-trips on public pages. */
@@ -27,6 +28,7 @@ export const staticContent: EditableSiteContent = {
   achievementPhotos: [...achievementPhotos],
   certifications: buildSeedCertifications(),
   problemCategories: [...problemCategories],
+  acharyaImage: defaultAcharyaImage(),
 };
 
 export function getStaticCatalog<T>(type: CatalogType): T[] {

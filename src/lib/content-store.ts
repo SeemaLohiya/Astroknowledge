@@ -5,6 +5,7 @@ import { isRemotePersistEnabled } from "./db/persist";
 import * as mongoMeta from "./db/mongo-meta-repo";
 import { siteContent } from "./i18n/site-content";
 import { readJsonFile, writeJsonFile } from "./json-store";
+import { defaultAcharyaImage, withBrandingDefaults } from "./site-branding";
 import { EditableSiteContent } from "./types";
 
 function seedContent(): EditableSiteContent {
@@ -17,20 +18,23 @@ function seedContent(): EditableSiteContent {
     achievementPhotos: [...achievementPhotos],
     certifications: buildSeedCertifications(),
     problemCategories: [...problemCategories],
+    acharyaImage: defaultAcharyaImage(),
   };
 }
 
-function withCertifications(data: EditableSiteContent): EditableSiteContent {
-  if (data.certifications?.length) return data;
-  return { ...data, certifications: buildSeedCertifications() };
+function normalizeContent(data: EditableSiteContent): EditableSiteContent {
+  const withCerts = data.certifications?.length
+    ? data
+    : { ...data, certifications: buildSeedCertifications() };
+  return withBrandingDefaults(withCerts);
 }
 
 async function load(): Promise<EditableSiteContent> {
   if (isRemotePersistEnabled()) {
     const fromMongo = await mongoMeta.mongoGetContent();
     if (fromMongo) {
-      const normalized = withCertifications(fromMongo);
-      if (!fromMongo.certifications?.length) {
+      const normalized = normalizeContent(fromMongo);
+      if (!fromMongo.certifications?.length || !fromMongo.acharyaImage) {
         await mongoMeta.mongoSaveContent(normalized);
       }
       return normalized;
@@ -40,8 +44,8 @@ async function load(): Promise<EditableSiteContent> {
     return seed;
   }
   const file = readJsonFile<EditableSiteContent>("content.json", seedContent());
-  const normalized = withCertifications(file);
-  if (!file.certifications?.length) {
+  const normalized = normalizeContent(file);
+  if (!file.certifications?.length || !file.acharyaImage) {
     writeJsonFile("content.json", normalized);
   }
   return normalized;
@@ -59,8 +63,9 @@ export const contentStore = {
   get: async () => load(),
 
   update: async (data: EditableSiteContent) => {
-    await save(withCertifications(data));
-    return data;
+    const normalized = normalizeContent(data);
+    await save(normalized);
+    return normalized;
   },
 
   updateSection: async <K extends keyof EditableSiteContent>(key: K, value: EditableSiteContent[K]) => {

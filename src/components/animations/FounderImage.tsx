@@ -1,6 +1,9 @@
+"use client";
+
 import { SafeImage } from "@/components/ui/SafeImage";
 import { cn } from "@/lib/cn";
 import { SITE } from "@/lib/constants";
+import { useAcharyaImage } from "@/lib/use-acharya-image";
 
 interface FounderImageProps {
   className?: string;
@@ -18,6 +21,8 @@ const sizes = {
 
 /** Compact expert photo for inner pages (about, admin banners). */
 export function FounderImage({ className = "", size = "lg", showGlow = false, showRing = false }: FounderImageProps) {
+  const { image } = useAcharyaImage();
+
   return (
     <div className={cn("relative", className)}>
       {showGlow && (
@@ -31,7 +36,7 @@ export function FounderImage({ className = "", size = "lg", showGlow = false, sh
         )}
       >
         <SafeImage
-          src={SITE.acharyaImage}
+          src={image}
           alt={`${SITE.acharya} - ${SITE.name}`}
           fill
           sizes="(max-width:768px) 200px, 320px"

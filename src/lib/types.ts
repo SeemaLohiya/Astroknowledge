@@ -264,6 +264,8 @@ export interface EditableSiteContent {
   achievementPhotos: AchievementPhoto[];
   certifications: CertificationEntry[];
   problemCategories: ProblemCategory[];
+  /** Homepage / about expert portrait — editable in admin Shop & Photos */
+  acharyaImage?: string;
 }
 
 export interface UnifiedBookingItem {

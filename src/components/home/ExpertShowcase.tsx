@@ -3,6 +3,7 @@
 import type { CSSProperties } from "react";
 import { SafeImage } from "@/components/ui/SafeImage";
 import { SITE } from "@/lib/constants";
+import { useAcharyaImage } from "@/lib/use-acharya-image";
 import { AnimatedCounter } from "@/components/animations/AnimatedCounter";
 import { Award, Calendar, MapPin, Sparkles, Star, Users, Zap } from "lucide-react";
 import Link from "next/link";
@@ -18,6 +19,8 @@ const ORBIT_NODES = ["◆", "◇", "◆"];
 
 /** Warm compact expert card + AI/trendy motion layer. */
 export function ExpertShowcase() {
+  const { image } = useAcharyaImage();
+
   return (
     <div className="expert-card-wrap relative mx-auto w-full max-w-[420px] sm:max-w-[480px]">
       {/* Ambient AI glow orbs */}
@@ -63,7 +66,7 @@ export function ExpertShowcase() {
                 <div className="relative overflow-hidden rounded-xl border border-gold/25 shadow-lg shadow-gold/10 transition-all duration-500 group-hover:border-gold/45 group-hover:shadow-xl group-hover:shadow-gold/20 cosmic-photo-pop">
                   <div className="relative aspect-[4/5] w-full min-h-[360px] sm:min-h-[420px]">
                     <SafeImage
-                      src={SITE.acharyaImage}
+                      src={image}
                       alt={`${SITE.acharya} - ${SITE.name}`}
                       fill
                       sizes="(max-width:768px) 92vw, 480px"

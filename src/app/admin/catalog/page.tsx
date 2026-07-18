@@ -8,13 +8,14 @@ import { invalidateCatalogCache } from "@/lib/catalog-cache";
 import { fetchJson } from "@/lib/fetch-json";
 import { AchievementPhoto, CatalogType, CertificationEntry, ProductCategory } from "@/lib/types";
 import { motion } from "framer-motion";
-import { Award, BookOpen, FolderOpen, GraduationCap, Heart, IndianRupee, Package, Plus, Save, Sparkles, Trash2, X } from "lucide-react";
+import { Award, BookOpen, FolderOpen, GraduationCap, Heart, IndianRupee, Package, Plus, Save, Sparkles, Trash2, UserRound, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-type AdminTab = CatalogType | "categories" | "achievements" | "certifications";
+type AdminTab = CatalogType | "categories" | "achievements" | "certifications" | "branding";
 
 const TABS: { type: AdminTab; label: string; icon: typeof Package }[] = [
+  { type: "branding", label: "Homepage Photo", icon: UserRound },
   { type: "products", label: "Products", icon: Package },
   { type: "services", label: "Services", icon: Sparkles },
   { type: "courses", label: "Courses", icon: BookOpen },
@@ -32,11 +33,12 @@ function getTitle(item: CatalogItem) {
 }
 
 export default function AdminCatalogPage() {
-  const [activeType, setActiveType] = useState<AdminTab>("products");
+  const [activeType, setActiveType] = useState<AdminTab>("branding");
   const [items, setItems] = useState<CatalogItem[]>([]);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [achievementPhotos, setAchievementPhotos] = useState<AchievementPhoto[]>([]);
   const [certificationEntries, setCertificationEntries] = useState<CertificationEntry[]>([]);
+  const [acharyaImage, setAcharyaImage] = useState("");
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<CatalogItem | null>(null);
   const [editingCategory, setEditingCategory] = useState<ProductCategory | null>(null);
@@ -88,6 +90,18 @@ export default function AdminCatalogPage() {
     }
   }, []);
 
+  const loadBranding = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetchJson<{ acharyaImage?: string }>("/api/content/branding");
+      setAcharyaImage(res.data?.acharyaImage || "");
+    } catch {
+      toast.error("Failed to load homepage photo");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadCategories();
   }, [loadCategories]);
@@ -97,7 +111,9 @@ export default function AdminCatalogPage() {
     setEditingCategory(null);
     setEditingAchievement(null);
     setEditingCertification(null);
-    if (activeType === "categories") {
+    if (activeType === "branding") {
+      void loadBranding();
+    } else if (activeType === "categories") {
       setLoading(true);
       loadCategories().finally(() => setLoading(false));
     } else if (activeType === "achievements") {
@@ -107,7 +123,29 @@ export default function AdminCatalogPage() {
     } else {
       loadItems(activeType);
     }
-  }, [activeType, loadItems, loadCategories, loadAchievements, loadCertifications]);
+  }, [activeType, loadItems, loadCategories, loadAchievements, loadCertifications, loadBranding]);
+
+  const handleSaveBranding = async () => {
+    if (!acharyaImage.trim()) {
+      toast.error("Please upload a photo first");
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch("/api/content/branding", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ acharyaImage }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success("Homepage photo updated — live now");
+      await loadBranding();
+    } catch {
+      toast.error("Failed to save homepage photo");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleAdd = () => {
     const defaults: CatalogItem =
@@ -339,23 +377,15 @@ export default function AdminCatalogPage() {
   const isCategoriesTab = activeType === "categories";
   const isAchievementsTab = activeType === "achievements";
   const isCertificationsTab = activeType === "certifications";
+  const isBrandingTab = activeType === "branding";
 
   return (
     <PageTransition>
       <FadeIn className="mb-6">
         <h1 className="font-display text-2xl font-bold text-text-primary">Shop &amp; Photos</h1>
         <p className="text-text-body text-sm mt-1">
-          Manage products, services, courses, pooja, healing, categories, and client photos — changes go live after Save.
+          Manage homepage photo, products, services, courses, and client photos. Upload a photo, then click Save &amp; Publish.
         </p>
-        <div className="mt-3 rounded-xl border border-gold/25 bg-gold/5 px-4 py-3 text-sm text-text-body">
-          <p className="font-semibold text-text-primary">Simple workflow</p>
-          <ol className="mt-1 list-decimal space-y-0.5 pl-5 text-xs text-text-muted sm:text-sm">
-            <li>Pick a tab (Products, Services, Courses…)</li>
-            <li>Click <strong className="text-text-primary">Add New</strong> or select an item</li>
-            <li>Upload a photo (drag &amp; drop or click), fill name/price</li>
-            <li>Click <strong className="text-text-primary">Save &amp; Publish</strong> — photo stays online permanently</li>
-          </ol>
-        </div>
       </FadeIn>
 
       <div className="mb-6 flex flex-wrap gap-2">
@@ -370,7 +400,37 @@ export default function AdminCatalogPage() {
         ))}
       </div>
 
-      {isCategoriesTab ? (
+      {isBrandingTab ? (
+        <FadeIn>
+          <div className="mx-auto max-w-xl rounded-2xl glass-card p-6">
+            <h2 className="font-semibold text-text-primary">Acharya Homepage Photo</h2>
+            <p className="mt-1 text-sm text-text-muted">
+              This photo appears on the home page expert card, About page, and other places showing Acharya Seema Lohiya.
+            </p>
+            {loading ? (
+              <p className="py-10 text-center text-sm text-text-muted">Loading…</p>
+            ) : (
+              <div className="mt-5">
+                <ImageUploadField
+                  value={acharyaImage}
+                  onChange={setAcharyaImage}
+                  label="Portrait Photo"
+                  hint="Upload a clear portrait. After Save & Publish it shows on the live website."
+                />
+                <button
+                  type="button"
+                  onClick={() => void handleSaveBranding()}
+                  disabled={saving}
+                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-gold py-3 text-sm font-bold text-white hover:bg-gold-bright disabled:opacity-50"
+                >
+                  <Save className="h-4 w-4" />
+                  {saving ? "Publishing…" : "Save & Publish Photo"}
+                </button>
+              </div>
+            )}
+          </div>
+        </FadeIn>
+      ) : isCategoriesTab ? (
         <div className="grid gap-6 lg:grid-cols-2">
           <FadeIn>
             <div className="rounded-2xl glass-card p-4">
