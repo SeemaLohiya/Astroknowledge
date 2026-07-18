@@ -4,6 +4,7 @@ import { FadeIn } from "@/components/animations/FadeIn";
 import { PageTransition } from "@/components/animations/PageTransition";
 import { ImageUploadField } from "@/components/ui/ImageUploadField";
 import { SafeImage } from "@/components/ui/SafeImage";
+import { invalidateCatalogCache } from "@/lib/catalog-cache";
 import { fetchJson } from "@/lib/fetch-json";
 import { AchievementPhoto, CatalogType, CertificationEntry, ProductCategory } from "@/lib/types";
 import { motion } from "framer-motion";
@@ -148,20 +149,32 @@ export default function AdminCatalogPage() {
 
   const handleSaveAchievement = async () => {
     if (!editingAchievement) return;
+    if (!editingAchievement.image) {
+      toast.error("Please upload a photo first");
+      return;
+    }
+    if (!editingAchievement.title.trim()) {
+      toast.error("Please add a title");
+      return;
+    }
+    const payload: AchievementPhoto = {
+      ...editingAchievement,
+      alt: editingAchievement.alt.trim() || editingAchievement.title,
+    };
     setSaving(true);
     try {
-      const isNew = !achievementPhotos.some((p) => p.id === editingAchievement.id);
+      const isNew = !achievementPhotos.some((p) => p.id === payload.id);
       const res = await fetch(
-        isNew ? "/api/content/achievement-photos" : `/api/content/achievement-photos/${editingAchievement.id}`,
+        isNew ? "/api/content/achievement-photos" : `/api/content/achievement-photos/${payload.id}`,
         {
           method: isNew ? "POST" : "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(editingAchievement),
+          body: JSON.stringify(payload),
         }
       );
       if (!res.ok) throw new Error();
-      toast.success(isNew ? "Photo added" : "Photo updated");
-      setEditingAchievement(null);
+      toast.success(isNew ? "Photo live on website" : "Photo updated — live now");
+      setEditingAchievement(payload);
       await loadAchievements();
     } catch {
       toast.error("Failed to save photo");
@@ -254,9 +267,9 @@ export default function AdminCatalogPage() {
         { method: isNew ? "POST" : "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }
       );
       if (!res.ok) throw new Error();
-      toast.success(isNew ? "Item added" : "Item updated");
-      setEditing(null);
-      loadItems(activeType as CatalogType);
+      invalidateCatalogCache(activeType as CatalogType);
+      toast.success(isNew ? "Saved — now live on website" : "Updated — live on website");
+      await loadItems(activeType as CatalogType);
     } catch {
       toast.error("Failed to save");
     } finally {
@@ -266,6 +279,10 @@ export default function AdminCatalogPage() {
 
   const handleSaveCategory = async () => {
     if (!editingCategory) return;
+    if (!editingCategory.id.trim() || !editingCategory.name.trim()) {
+      toast.error("Please enter category ID and name");
+      return;
+    }
     setSaving(true);
     try {
       const isNew = !categories.some((c) => c.id === editingCategory.id);
@@ -274,9 +291,9 @@ export default function AdminCatalogPage() {
         { method: isNew ? "POST" : "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(editingCategory) }
       );
       if (!res.ok) throw new Error();
-      toast.success(isNew ? "Category added" : "Category updated");
-      setEditingCategory(null);
-      loadCategories();
+      invalidateCatalogCache("categories");
+      toast.success(isNew ? "Category saved — live now" : "Category updated — live now");
+      await loadCategories();
     } catch {
       toast.error("Failed to save category");
     } finally {
@@ -326,8 +343,19 @@ export default function AdminCatalogPage() {
   return (
     <PageTransition>
       <FadeIn className="mb-6">
-        <h1 className="font-display text-2xl font-bold text-text-primary">Catalog <span className="text-gradient-gold">Manager</span></h1>
-        <p className="text-text-body text-sm mt-1">Add, edit, or remove products, services, courses, pooja, healing, categories, certifications, and client achievement photos</p>
+        <h1 className="font-display text-2xl font-bold text-text-primary">Shop &amp; Photos</h1>
+        <p className="text-text-body text-sm mt-1">
+          Manage products, services, courses, pooja, healing, categories, and client photos — changes go live after Save.
+        </p>
+        <div className="mt-3 rounded-xl border border-gold/25 bg-gold/5 px-4 py-3 text-sm text-text-body">
+          <p className="font-semibold text-text-primary">Simple workflow</p>
+          <ol className="mt-1 list-decimal space-y-0.5 pl-5 text-xs text-text-muted sm:text-sm">
+            <li>Pick a tab (Products, Services, Courses…)</li>
+            <li>Click <strong className="text-text-primary">Add New</strong> or select an item</li>
+            <li>Upload a photo (drag &amp; drop or click), fill name/price</li>
+            <li>Click <strong className="text-text-primary">Save &amp; Publish</strong> — photo stays online permanently</li>
+          </ol>
+        </div>
       </FadeIn>
 
       <div className="mb-6 flex flex-wrap gap-2">
@@ -391,16 +419,21 @@ export default function AdminCatalogPage() {
                   <ImageUploadField
                     value={editingCategory.image || ""}
                     onChange={(url) => setEditingCategory({ ...editingCategory, image: url })}
-                    label="Category Image"
+                    label="Category Photo"
                   />
                   <div className="space-y-3 mt-4">
-                    <Field label="ID (slug)" value={editingCategory.id} onChange={(v) => setEditingCategory({ ...editingCategory, id: v })} />
-                    <Field label="Name" value={editingCategory.name} onChange={(v) => setEditingCategory({ ...editingCategory, name: v })} />
+                    <Field
+                      label="Short ID (for filters)"
+                      value={editingCategory.id}
+                      onChange={(v) => setEditingCategory({ ...editingCategory, id: v.toLowerCase().replace(/\s+/g, "-") })}
+                      hint="Example: rudraksha — use letters only, no spaces"
+                    />
+                    <Field label="Name (English)" value={editingCategory.name} onChange={(v) => setEditingCategory({ ...editingCategory, name: v })} />
                     <Field label="Name (Hindi)" value={editingCategory.nameHindi} onChange={(v) => setEditingCategory({ ...editingCategory, nameHindi: v })} />
-                    <Field label="Description" value={editingCategory.description} onChange={(v) => setEditingCategory({ ...editingCategory, description: v })} textarea />
+                    <Field label="Short description" value={editingCategory.description} onChange={(v) => setEditingCategory({ ...editingCategory, description: v })} textarea />
                   </div>
                   <button onClick={handleSaveCategory} disabled={saving} className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-gold py-3 text-sm font-bold text-white hover:bg-gold-bright disabled:opacity-50">
-                    <Save className="h-4 w-4" />{saving ? "Saving..." : "Save Category"}
+                    <Save className="h-4 w-4" />{saving ? "Publishing…" : "Save & Publish Category"}
                   </button>
                 </>
               ) : (
@@ -530,17 +563,25 @@ export default function AdminCatalogPage() {
                   <ImageUploadField
                     value={editingAchievement.image || ""}
                     onChange={(url) => setEditingAchievement({ ...editingAchievement, image: url })}
-                    label="Event Photo"
+                    label="Client / Event Photo"
                   />
                   <div className="space-y-3 max-h-[480px] overflow-y-auto pr-1 mt-4">
-                    <Field label="ID" value={editingAchievement.id} onChange={(v) => setEditingAchievement({ ...editingAchievement, id: v })} hint="Unique identifier — change only when creating a new photo" />
                     <Field label="Title (English)" value={editingAchievement.title} onChange={(v) => setEditingAchievement({ ...editingAchievement, title: v })} />
                     <Field label="Title (Hindi)" value={editingAchievement.titleHindi} onChange={(v) => setEditingAchievement({ ...editingAchievement, titleHindi: v })} />
-                    <Field label="Description" value={editingAchievement.description || ""} onChange={(v) => setEditingAchievement({ ...editingAchievement, description: v })} textarea rows={3} hint="Short caption shown under the photo on Home and About pages" />
-                    <Field label="Alt Text" value={editingAchievement.alt} onChange={(v) => setEditingAchievement({ ...editingAchievement, alt: v })} textarea rows={2} hint="Accessibility description for screen readers" />
+                    <Field label="Caption" value={editingAchievement.description || ""} onChange={(v) => setEditingAchievement({ ...editingAchievement, description: v })} textarea rows={3} hint="Shown under the photo on Home and About" />
+                    <Field
+                      label="Alt text (optional)"
+                      value={editingAchievement.alt}
+                      onChange={(v) => setEditingAchievement({ ...editingAchievement, alt: v })}
+                      hint="If empty, title is used for accessibility"
+                    />
                   </div>
-                  <button onClick={handleSaveAchievement} disabled={saving} className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-gold py-3 text-sm font-bold text-white hover:bg-gold-bright disabled:opacity-50">
-                    <Save className="h-4 w-4" />{saving ? "Saving..." : "Save Photo"}
+                  <button
+                    onClick={() => void handleSaveAchievement()}
+                    disabled={saving}
+                    className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-gold py-3 text-sm font-bold text-white hover:bg-gold-bright disabled:opacity-50"
+                  >
+                    <Save className="h-4 w-4" />{saving ? "Publishing…" : "Save & Publish Photo"}
                   </button>
                 </>
               ) : (
@@ -604,7 +645,7 @@ export default function AdminCatalogPage() {
                   <ImageUploadField
                     value={(editing.image as string) || ""}
                     onChange={(url) => setField("image", url)}
-                    label="Item Image"
+                    label="Item Photo"
                   />
 
                   <div className="space-y-3 max-h-[480px] overflow-y-auto pr-1 mt-4">
@@ -669,8 +710,19 @@ export default function AdminCatalogPage() {
                     )}
                   </div>
 
-                  <button onClick={handleSave} disabled={saving} className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-gold py-3 text-sm font-bold text-white hover:bg-gold-bright disabled:opacity-50">
-                    <Save className="h-4 w-4" />{saving ? "Saving..." : "Save Changes"}
+                  <button
+                    onClick={() => {
+                      const title = getTitle(editing);
+                      if (!title || title === "Untitled") {
+                        toast.error(activeType === "products" ? "Please enter a name" : "Please enter a title");
+                        return;
+                      }
+                      void handleSave();
+                    }}
+                    disabled={saving}
+                    className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-gold py-3 text-sm font-bold text-white hover:bg-gold-bright disabled:opacity-50"
+                  >
+                    <Save className="h-4 w-4" />{saving ? "Publishing…" : "Save & Publish"}
                   </button>
                 </>
               ) : (

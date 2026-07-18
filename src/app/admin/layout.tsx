@@ -30,8 +30,8 @@ const navItems = [
   { href: "/admin/payments", icon: CreditCard, label: "Payments" },
   { href: "/admin/users", icon: Users, label: "Users" },
   { href: "/admin/vouchers", icon: Gift, label: "Vouchers" },
-  { href: "/admin/catalog", icon: Settings, label: "Catalog" },
-  { href: "/admin/content", icon: FileText, label: "Content" },
+  { href: "/admin/catalog", icon: Settings, label: "Shop & Photos" },
+  { href: "/admin/content", icon: FileText, label: "Website Text" },
   { href: "/admin/notifications", icon: Bell, label: "Notifications" },
 ];
 

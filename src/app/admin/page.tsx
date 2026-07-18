@@ -46,7 +46,7 @@ const QUICK_LINKS = [
   { href: "/admin/bookings", label: "Bookings", icon: Calendar },
   { href: "/admin/orders", label: "Orders", icon: Package },
   { href: "/admin/payments", label: "Payments", icon: IndianRupee },
-  { href: "/admin/catalog", label: "Catalog", icon: Package },
+  { href: "/admin/catalog", label: "Shop & Photos", icon: Package },
   { href: "/admin/users", label: "Users", icon: Users },
 ];
 
