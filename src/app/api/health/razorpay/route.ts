@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import crypto from "crypto";
 import { createRazorpayOrder, getRazorpayKeyId, isRazorpayConfigured } from "@/lib/razorpay";
 
 /** Diagnostics for Razorpay config (no secrets exposed). */
@@ -12,6 +13,7 @@ export async function GET() {
     keyIdPrefix: keyId.slice(0, 12),
     keyIdLength: keyId.length,
     secretLength: secret.length,
+    secretFingerprint: secret ? crypto.createHash("sha256").update(secret).digest("hex").slice(0, 12) : null,
     publicKeyPrefix: publicKey.slice(0, 12),
     publicKeyMatches: publicKey === keyId || !publicKey,
     getRazorpayKeyId: getRazorpayKeyId().slice(0, 12),

@@ -94,11 +94,7 @@ export function HeroSection() {
         </div>
 
             <div className="flex flex-1 w-full justify-center lg:min-w-[46%] lg:justify-end lg:pl-2">
-              <div className="relative w-full">
-                <div className="hero-floating-card absolute -left-3 bottom-5 hidden rounded-2xl border border-gold/20 bg-white/85 p-3 text-sm shadow-lg shadow-gold/10 backdrop-blur-md lg:block">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-gold">Trusted guidance</p>
-                  <p className="mt-1 text-sm font-semibold text-text-primary">Personalized remedies & spiritual clarity</p>
-                </div>
+              <div className="relative w-full max-w-[480px]">
                 <ExpertShowcase />
               </div>
             </div>

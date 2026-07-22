@@ -486,7 +486,7 @@ textarea::placeholder {
 }
 
 .reveal-on-scroll {
-  opacity: 0;
+  opacity: 1;
 }
 
 .reveal-on-scroll.reveal-visible {

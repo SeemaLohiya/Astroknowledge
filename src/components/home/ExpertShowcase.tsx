@@ -167,7 +167,7 @@ export function ExpertShowcase() {
                 <span className="transition-transform group-hover/btn:translate-x-0.5">Profile →</span>
               </Link>
               <Link
-                href="/dashboard/slots"
+                href="/booking"
                 className="expert-sans cosmic-btn-fire relative flex items-center justify-center gap-1.5 overflow-hidden rounded-xl bg-gradient-to-r from-gold via-gold-bright to-indigo py-2.5 text-xs font-semibold text-white cosmic-btn-fire-bg"
               >
                 <span className="cosmic-btn-ripple pointer-events-none absolute inset-0" />

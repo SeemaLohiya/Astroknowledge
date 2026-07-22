@@ -13,6 +13,7 @@ import {
   IndianRupee,
   Package,
   RefreshCw,
+  Settings,
   ShieldCheck,
   TrendingUp,
   Users,
@@ -171,6 +172,37 @@ export default function AdminPage() {
                 Updated {lastUpdated.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
               </p>
             )}
+          </div>
+        </div>
+      </RevealOnScroll>
+
+      <RevealOnScroll className="mb-8">
+        <div className="rounded-2xl border border-gold/15 bg-white/80 p-5">
+          <h2 className="mb-1 font-semibold text-text-primary">Daily workflow</h2>
+          <p className="mb-4 text-xs text-text-muted">Tap a step — verify payments, confirm bookings, fulfill orders</p>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            {[
+              { step: "1", title: "Payments", desc: "Approve UPI proofs", href: "/admin/payments", icon: CreditCard },
+              { step: "2", title: "Bookings", desc: "Confirm / complete slots", href: "/admin/bookings", icon: Calendar },
+              { step: "3", title: "Orders", desc: "Ship products & pooja", href: "/admin/items/products", icon: Package },
+              { step: "4", title: "Users", desc: "Profiles & resources", href: "/admin/users", icon: Users },
+              { step: "5", title: "Catalog", desc: "Shop & photos", href: "/admin/catalog", icon: Settings },
+            ].map((item) => (
+              <Link
+                key={item.step}
+                href={item.href}
+                className="rounded-xl border border-gold/15 bg-orange/5 p-3 transition hover:-translate-y-0.5 hover:border-gold/40 hover:bg-gold/5"
+              >
+                <div className="mb-2 flex items-center gap-2">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gold text-[10px] font-bold text-white">
+                    {item.step}
+                  </span>
+                  <item.icon className="h-4 w-4 text-gold" />
+                </div>
+                <p className="text-sm font-semibold text-text-primary">{item.title}</p>
+                <p className="mt-0.5 text-[11px] text-text-muted">{item.desc}</p>
+              </Link>
+            ))}
           </div>
         </div>
       </RevealOnScroll>
