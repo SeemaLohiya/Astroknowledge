@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   devIndicators: false,
-  serverExternalPackages: ["mongoose", "razorpay"],
+  serverExternalPackages: ["mongoose"],
   images: {
     formats: ["image/webp"],
     deviceSizes: [384, 640, 750, 1080, 1200],
