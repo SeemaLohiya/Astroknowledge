@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { validateCartItems } from "@/lib/cart-validation";
 import { validateVoucherForUser } from "@/lib/voucher-validation";
-import { vouchersStore } from "@/lib/vouchers-store";
 import { getPaidServices, hasPaidServiceAccess } from "@/lib/purchases";
 import { paymentsStore } from "@/lib/payments-store";
 import { CartItem } from "@/lib/types";
@@ -101,8 +100,6 @@ export async function POST(req: NextRequest) {
     voucherId,
     shippingAddress,
   });
-
-  if (voucherId) await vouchersStore.incrementUsage(voucherId);
 
   return NextResponse.json({ payment }, { status: 201 });
 }

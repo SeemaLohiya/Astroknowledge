@@ -24,9 +24,9 @@ export async function GET() {
     { key: "account", done: true, href: "/dashboard/profile" },
     { key: "birth", done: isBirthProfileComplete(user), current: !isBirthProfileComplete(user), href: "/dashboard/profile" },
     { key: "purchase", done: userPayments.length > 0, href: "/services" },
-    { key: "payment", done: hasPaid, current: hasAwaiting, href: "/dashboard/purchases" },
+    { key: "payment", done: hasPaid, current: hasAwaiting, href: "/dashboard/products" },
     { key: "book", done: bookings.length > 0 || slots.length > 0, href: "/dashboard/slots" },
-    { key: "confirm", done: hasConfirmedBooking, current: hasPendingBooking, href: "/dashboard/bookings" },
+    { key: "confirm", done: hasConfirmedBooking, current: hasPendingBooking, href: "/dashboard/services" },
   ];
 
   return NextResponse.json({ steps });

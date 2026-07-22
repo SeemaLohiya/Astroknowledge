@@ -15,7 +15,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
-/** Kept for future Razorpay re-enable — not offered in UI while locked. */
+/** Kept for Razorpay Standard Checkout (checkout.js + create-order / verify-payment). */
 declare global {
   interface Window {
     Razorpay?: new (options: Record<string, unknown>) => {
@@ -129,7 +129,7 @@ function PaymentContent() {
       router.push("/dashboard/slots");
     } else {
       toast.success(p.submittedVerification);
-      router.push("/dashboard/purchases");
+      router.push("/dashboard/products");
     }
   };
 
@@ -249,7 +249,7 @@ function PaymentContent() {
         {payment.transactionRefId && (
           <p className="mt-3 text-sm text-text-muted">{p.refId} <strong className="text-text-primary">{payment.transactionRefId}</strong></p>
         )}
-        <Button href="/dashboard/purchases" variant="secondary" className="mt-6">{d.purchases}</Button>
+        <Button href="/dashboard/products" variant="secondary" className="mt-6">{d.purchases}</Button>
       </div>
     );
   }

@@ -12,6 +12,7 @@ import {
   BookOpen,
   Calendar,
   Flame,
+  Gift,
   Heart,
   LayoutDashboard,
   LogOut,
@@ -40,6 +41,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       { href: "/dashboard/pooja", icon: Flame, label: "Pooja" },
       { href: "/dashboard/healing", icon: Heart, label: "Healing" },
       { href: "/dashboard/notifications", icon: Bell, label: "Notifications" },
+      { href: "/dashboard/vouchers", icon: Gift, label: "Vouchers" },
       { href: "/dashboard/profile", icon: User, label: c.common.profile },
     ],
     [c]
@@ -47,7 +49,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const isActive = (href: string) =>
     pathname === href ||
-    (href === "/dashboard/services" && (pathname.startsWith("/dashboard/slots") || pathname.startsWith("/dashboard/bookings"))) ||
+    (href === "/dashboard/services" && pathname.startsWith("/dashboard/bookings")) ||
     (href === "/dashboard/products" && pathname === "/dashboard/purchases") ||
     (href === "/dashboard/profile" && pathname === "/dashboard/kundli");
 

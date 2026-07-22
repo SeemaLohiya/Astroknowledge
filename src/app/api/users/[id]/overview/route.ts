@@ -16,7 +16,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const vouchers = await vouchersStore.getAll();
-  const assignedVouchers = vouchers.filter((v) => v.assignedUserIds.includes(id));
+  const assignedVouchers = vouchers.filter((v) => (v.assignedUserIds || []).includes(id));
   const payments = await paymentsStore.getByUser(id);
   const usedVoucherCodes = [
     ...new Set(payments.map((p) => p.voucherCode).filter(Boolean) as string[]),

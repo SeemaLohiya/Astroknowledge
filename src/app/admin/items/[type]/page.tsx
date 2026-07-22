@@ -3,22 +3,33 @@
 import { AdminOrdersPanel } from "@/components/admin/AdminOrdersPanel";
 import { CartItemType } from "@/lib/types";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
-const VALID: CartItemType[] = ["product", "service", "pooja", "healing", "course"];
+/** URL slug → CartItemType (nav uses plurals; orders use singular types). */
+const SLUG_TO_TYPE: Record<string, CartItemType> = {
+  product: "product",
+  products: "product",
+  service: "service",
+  services: "service",
+  course: "course",
+  courses: "course",
+  pooja: "pooja",
+  healing: "healing",
+};
 
 export default function AdminItemsByTypePage() {
   const params = useParams();
   const router = useRouter();
-  const type = String(params.type || "") as CartItemType;
+  const slug = String(params.type || "").toLowerCase();
+  const itemType = useMemo(() => SLUG_TO_TYPE[slug] ?? null, [slug]);
 
   useEffect(() => {
-    if (!VALID.includes(type)) router.replace("/admin/items/products");
-  }, [type, router]);
+    if (!itemType) router.replace("/admin/items/products");
+  }, [itemType, router]);
 
-  if (!VALID.includes(type)) {
+  if (!itemType) {
     return <p className="py-12 text-center text-text-muted">Redirecting…</p>;
   }
 
-  return <AdminOrdersPanel itemType={type} />;
+  return <AdminOrdersPanel itemType={itemType} />;
 }

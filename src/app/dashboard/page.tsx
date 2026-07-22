@@ -93,7 +93,7 @@ export default function DashboardPage() {
 
       <div className="mb-8 grid gap-4 sm:grid-cols-2">
         <FadeIn delay={0.1}>
-          <Link href="/dashboard/purchases">
+          <Link href="/dashboard/products">
             <div className="rounded-2xl glass-card p-6 transition-transform hover:-translate-y-1">
               <Package className="h-8 w-8 text-gold mb-3" />
               <p className="text-3xl font-bold text-text-primary">{purchaseCount}</p>
@@ -118,7 +118,7 @@ export default function DashboardPage() {
             <h2 className="font-semibold text-text-primary flex items-center gap-2">
               <Calendar className="h-5 w-5 text-gold" /> {d.yourBookings}
             </h2>
-            <Link href="/dashboard/bookings" className="flex items-center gap-1 text-sm text-gold hover:underline">
+            <Link href="/dashboard/services" className="flex items-center gap-1 text-sm text-gold hover:underline">
               <ArrowRight className="h-4 w-4" />{d.viewAllBookings}
             </Link>
           </div>
@@ -132,7 +132,7 @@ export default function DashboardPage() {
         <div className="rounded-2xl glass-card p-6">
           <h2 className="font-semibold text-text-primary mb-4">{c.common.quickActions}</h2>
           <div className="flex flex-wrap gap-3">
-            <Button href="/dashboard/purchases" variant="secondary" size="sm">{d.purchases}</Button>
+            <Button href="/dashboard/products" variant="secondary" size="sm">{d.purchases}</Button>
             <Button href="/dashboard/slots" variant="outline" size="sm">{d.bookConsultation}</Button>
             <Button href="/services" variant="outline" size="sm">{d.browseServices}</Button>
           </div>
@@ -143,7 +143,7 @@ export default function DashboardPage() {
         <FadeIn delay={0.3} className="mt-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold text-text-primary">{d.recentPurchases}</h2>
-            <Link href="/dashboard/purchases" className="flex items-center gap-1 text-sm text-gold hover:underline">
+            <Link href="/dashboard/products" className="flex items-center gap-1 text-sm text-gold hover:underline">
               <ArrowRight className="h-4 w-4" />{d.viewAll}
             </Link>
           </div>

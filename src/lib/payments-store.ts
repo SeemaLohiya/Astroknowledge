@@ -4,6 +4,7 @@ import { CartItem, PaymentRecord, PaymentStatus } from "./types";
 import { store } from "./store";
 import { isRemotePersistEnabled } from "./db/persist";
 import * as mongo from "./db/app-data-repo";
+import { vouchersStore } from "./vouchers-store";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const PAYMENTS_PATH = path.join(DATA_DIR, "payments.json");
@@ -187,6 +188,7 @@ export const paymentsStore = {
     const order = await createOrderFromPayment(payment);
     payment.referenceId = order.id;
     await savePaymentsList(payments);
+    if (payment.voucherId) await vouchersStore.incrementUsage(payment.voucherId);
     return payment;
   },
 
@@ -214,6 +216,7 @@ export const paymentsStore = {
     const order = await createOrderFromPayment(payment);
     payment.referenceId = order.id;
     await savePaymentsList(payments);
+    if (payment.voucherId) await vouchersStore.incrementUsage(payment.voucherId);
     return payment;
   },
 
