@@ -69,7 +69,7 @@ export async function GET() {
 
     const now = new Date();
     const monthlyMap: Record<string, number> = {};
-    for (let i = 5; i >= 0; i--) {
+    for (let i = 11; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
       monthlyMap[monthKey(d.toISOString())] = 0;
     }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { fetchCategories, invalidateCatalogCache } from "./catalog-cache";
+import { fetchCategories, invalidateCatalogCache, peekCatalogCache } from "./catalog-cache";
 import { staticCategories } from "./static-data";
 import { ProductCategory } from "./types";
 
@@ -27,6 +27,13 @@ export function useCategories(options?: Options) {
 
   useEffect(() => {
     if (!live) return;
+
+    const cached = peekCatalogCache<ProductCategory>("categories");
+    if (cached) {
+      setCategories(cached);
+      return;
+    }
+
     let cancelled = false;
     setLoading(true);
     fetchCategories()

@@ -38,13 +38,20 @@ export const vouchersStore = {
     (await getVouchersList()).find((v) => v.code.toUpperCase() === code.trim().toUpperCase()),
   getForUser: async (userId: string) =>
     (await getVouchersList()).filter((v) => v.active && v.assignedUserIds.includes(userId)),
-  create: async (data: Omit<Voucher, "id" | "usedCount" | "createdAt">) => {
+  create: async (data: Omit<Voucher, "id" | "usedCount" | "createdAt"> & { usageLimit?: number | null }) => {
     const vouchers = await getVouchersList();
     const code = data.code.trim().toUpperCase();
     if (vouchers.some((v) => v.code === code)) throw new Error("Voucher code already exists");
+    const usageLimit =
+      data.usageLimit === null || data.usageLimit === undefined || Number.isNaN(Number(data.usageLimit))
+        ? undefined
+        : Number(data.usageLimit);
     const voucher: Voucher = {
       ...data,
       code,
+      usageLimit,
+      applicableItemTypes: data.applicableItemTypes ?? [],
+      applicableItemIds: data.applicableItemIds ?? [],
       id: `vch-${Date.now()}`,
       usedCount: 0,
       createdAt: new Date().toISOString(),
@@ -54,12 +61,26 @@ export const vouchersStore = {
     writeVouchers(vouchers);
     return voucher;
   },
-  update: async (id: string, patch: Partial<Voucher>) => {
+  update: async (id: string, patch: Partial<Voucher> & { usageLimit?: number | null }) => {
     const vouchers = await getVouchersList();
     const idx = vouchers.findIndex((v) => v.id === id);
     if (idx === -1) return null;
     if (patch.code) patch.code = patch.code.trim().toUpperCase();
-    vouchers[idx] = { ...vouchers[idx], ...patch, updatedAt: new Date().toISOString() };
+    const next: Voucher = {
+      ...vouchers[idx],
+      ...patch,
+      updatedAt: new Date().toISOString(),
+    };
+    if ("usageLimit" in patch) {
+      next.usageLimit =
+        patch.usageLimit === null || patch.usageLimit === undefined || Number.isNaN(Number(patch.usageLimit))
+          ? undefined
+          : Number(patch.usageLimit);
+    }
+    if ("applicableItemTypes" in patch) {
+      next.applicableItemTypes = patch.applicableItemTypes ?? [];
+    }
+    vouchers[idx] = next;
     if (isRemotePersistEnabled()) return mongo.mongoSaveVoucher(vouchers[idx]);
     writeVouchers(vouchers);
     return vouchers[idx];

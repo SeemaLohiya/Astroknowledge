@@ -44,7 +44,7 @@ export function AchievementsSection() {
   return (
     <section className="relative py-24 overflow-hidden">
       <div className="absolute inset-0 bg-aurora opacity-25" />
-      <div className="relative mx-auto max-w-7xl px-4">
+      <div className="relative mx-auto max-w-screen-2xl px-4">
         <SectionHeader
           badgeIcon={Award}
           badge={a.badge}

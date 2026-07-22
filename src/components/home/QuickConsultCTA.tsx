@@ -12,8 +12,8 @@ export function QuickConsultCTA() {
 
   return (
     <section className="relative overflow-hidden py-16">
-      <div className="absolute inset-0 bg-gradient-to-r from-gold/15 via-orange/10 to-gold/15" />
-      <div className="absolute inset-0 bg-mesh opacity-20" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-gold/15 via-orange/10 to-gold/15" />
+      <div className="pointer-events-none absolute inset-0 bg-mesh opacity-20" />
 
       <div className="relative mx-auto max-w-5xl px-4">
         <FadeIn scroll variant="zoom">

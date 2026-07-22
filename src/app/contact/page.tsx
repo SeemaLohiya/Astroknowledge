@@ -8,7 +8,8 @@ import { PageBanner } from "@/components/ui/PageBanner";
 import { SITE, telLink, whatsappLink } from "@/lib/constants";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { motion } from "framer-motion";
-import { Clock, ExternalLink, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Clock, ExternalLink, Mail, MapPin, Phone } from "lucide-react";
+import { WhatsAppIcon } from "@/components/ui/SocialIcons";
 
 export default function ContactPage() {
   const { t, c } = useLanguage();
@@ -28,7 +29,7 @@ export default function ContactPage() {
               <div className="space-y-4">
                 {[
                   { icon: Phone, label: c.contact.phone, value: SITE.phone, href: telLink() },
-                  { icon: MessageCircle, label: c.contact.whatsapp, value: SITE.phone, href: whatsappLink() },
+                  { icon: WhatsAppIcon, label: c.contact.whatsapp, value: SITE.phone, href: whatsappLink() },
                   { icon: Mail, label: c.contact.email, value: SITE.email, href: `mailto:${SITE.email}` },
                   { icon: MapPin, label: c.contact.address, value: SITE.address, href: SITE.mapsUrl },
                   { icon: Clock, label: c.contact.hours, value: SITE.consultationHours },
@@ -65,7 +66,7 @@ export default function ContactPage() {
                   size="lg"
                   className="mt-4 w-full"
                 >
-                  <MessageCircle className="h-5 w-5" /> {c.contact.whatsappButton}
+                  <WhatsAppIcon className="h-5 w-5" /> {c.contact.whatsappButton}
                 </Button>
                 <Button href={SITE.mapsUrl} variant="secondary" size="lg" className="w-full">
                   <ExternalLink className="h-5 w-5" /> {t("viewLocation")}

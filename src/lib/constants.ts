@@ -22,8 +22,6 @@ export const SITE = {
   clients: "75,000+",
   reviews: "75,000+",
   rating: "4.9",
-  discountCode: "ASTRO10OFF",
-  discountPercent: 10,
   consultationHours: "Mon - Sat: 9:00 AM - 8:00 PM",
   youtube: "https://youtube.com/@seemalohiya3037?si=Td3IQUWbenZGt3wM",
   instagram: "https://www.instagram.com/astroknowledge.seema/",
@@ -43,7 +41,7 @@ export const PAYMENT_METHODS = {
 
 export const NAV_LINKS = [
   { href: "/", label: "Home" },
-  { href: "/services", label: "Services" },
+  { href: "/services", label: "Consultancy Services" },
   { href: "/products", label: "Products" },
   { href: "/pooja", label: "Pooja" },
   { href: "/about", label: "About" },
@@ -52,10 +50,10 @@ export const NAV_LINKS = [
 
 export const NAV_DROPDOWNS = [
   {
-    label: "Services",
+    label: "Consultancy Services",
     href: "/services",
     items: [
-      { href: "/services#kundali-vishleshan", label: "Kundali Vishleshan", desc: "Complete horoscope reading" },
+      { href: "/services#kundali-vishleshan", label: "Kundali Analysis", desc: "Complete horoscope reading" },
       { href: "/services#kundli-milan", label: "Kundli Milan", desc: "Marriage compatibility" },
       { href: "/services#vastu-consultancy", label: "Vastu Consultancy", desc: "Home & office Vastu" },
       { href: "/services#numerology", label: "Numerology", desc: "Name & number analysis" },

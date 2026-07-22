@@ -55,7 +55,7 @@ export default function ProductDetailPage() {
                   <Star className="h-4 w-4 fill-gold text-gold" />
                   <span className="text-text-body">{product.rating} ({product.reviews} {c.reviews})</span>
                 </div>
-                <p className="mt-4 text-text-body leading-relaxed">{localizedDesc(product, lang)}</p>
+                <p className="mt-4 whitespace-pre-line text-text-body leading-relaxed">{localizedDesc(product, lang)}</p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   {badges.map((b) => (
                     <span key={b.t} className="flex items-center gap-1 rounded-full border border-gold/20 px-3 py-1 text-xs text-gold">

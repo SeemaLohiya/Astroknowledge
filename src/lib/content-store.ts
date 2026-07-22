@@ -8,6 +8,12 @@ import { readJsonFile, writeJsonFile } from "./json-store";
 import { defaultAcharyaImage, withBrandingDefaults } from "./site-branding";
 import { EditableSiteContent } from "./types";
 
+const CONTENT_TTL_MS = 120_000;
+
+let contentCache: EditableSiteContent | null = null;
+let contentCacheTime = 0;
+let contentPromise: Promise<EditableSiteContent> | null = null;
+
 function seedContent(): EditableSiteContent {
   return {
     faqs: {
@@ -30,33 +36,50 @@ function normalizeContent(data: EditableSiteContent): EditableSiteContent {
 }
 
 async function load(): Promise<EditableSiteContent> {
-  if (isRemotePersistEnabled()) {
-    const fromMongo = await mongoMeta.mongoGetContent();
-    if (fromMongo) {
-      const normalized = normalizeContent(fromMongo);
-      if (!fromMongo.certifications?.length || !fromMongo.acharyaImage) {
-        await mongoMeta.mongoSaveContent(normalized);
+  const now = Date.now();
+  if (contentCache && now - contentCacheTime < CONTENT_TTL_MS) return contentCache;
+  if (contentPromise) return contentPromise;
+
+  contentPromise = (async () => {
+    if (isRemotePersistEnabled()) {
+      const fromMongo = await mongoMeta.mongoGetContent();
+      if (fromMongo) {
+        const normalized = normalizeContent(fromMongo);
+        if (!fromMongo.certifications?.length || !fromMongo.acharyaImage) {
+          await mongoMeta.mongoSaveContent(normalized);
+        }
+        return normalized;
       }
-      return normalized;
+      const seed = seedContent();
+      await mongoMeta.mongoSaveContent(seed);
+      return seed;
     }
-    const seed = seedContent();
-    await mongoMeta.mongoSaveContent(seed);
-    return seed;
+    const file = readJsonFile<EditableSiteContent>("content.json", seedContent());
+    const normalized = normalizeContent(file);
+    if (!file.certifications?.length || !file.acharyaImage) {
+      writeJsonFile("content.json", normalized);
+    }
+    return normalized;
+  })();
+
+  try {
+    const resolved = await contentPromise;
+    contentCache = resolved;
+    contentCacheTime = Date.now();
+    return resolved;
+  } finally {
+    contentPromise = null;
   }
-  const file = readJsonFile<EditableSiteContent>("content.json", seedContent());
-  const normalized = normalizeContent(file);
-  if (!file.certifications?.length || !file.acharyaImage) {
-    writeJsonFile("content.json", normalized);
-  }
-  return normalized;
 }
 
 async function save(data: EditableSiteContent) {
   if (isRemotePersistEnabled()) {
     await mongoMeta.mongoSaveContent(data);
-    return;
+  } else {
+    writeJsonFile("content.json", data);
   }
-  writeJsonFile("content.json", data);
+  contentCache = data;
+  contentCacheTime = Date.now();
 }
 
 export const contentStore = {

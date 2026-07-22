@@ -34,13 +34,10 @@ export default function AdminNotificationsPage() {
               <div>
                 <p className="text-sm text-text-primary">{n.message}</p>
                 <p className="text-xs text-text-muted mt-1">
-                  {n.type.replace(/_/g, " ")} · {n.channel} · {new Date(n.createdAt).toLocaleString("en-IN")}
+                  {n.type.replace(/_/g, " ")} · {new Date(n.createdAt).toLocaleString("en-IN")}
                   {n.referenceId && ` · Ref: ${n.referenceId}`}
                 </p>
               </div>
-              <span className={`text-xs px-2 py-1 rounded-full h-fit ${n.channel === "whatsapp" ? "bg-green-500/15 text-green-700" : "bg-gold/10 text-gold"}`}>
-                {n.channel}
-              </span>
             </div>
           </FadeIn>
         ))}

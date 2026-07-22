@@ -160,7 +160,7 @@ export default function AdminCatalogPage() {
               title: "",
               titleHindi: "",
               description: "",
-              ...(activeType === "courses" ? { sessionDescription: "" } : {}),
+              ...(activeType === "courses" ? { sessionDescription: "", resources: [] } : {}),
               price: 0,
               duration: "",
               features: [],
@@ -735,14 +735,46 @@ export default function AdminCatalogPage() {
                     )}
                     <Field label="Short Description" value={editing.description as string} onChange={(v) => setField("description", v)} textarea rows={3} hint="Brief summary shown on course cards" />
                     {activeType === "courses" && (
-                      <Field
-                        label="Detailed Session Description"
-                        value={(editing.sessionDescription as string) || ""}
-                        onChange={(v) => setField("sessionDescription", v)}
-                        textarea
-                        rows={14}
-                        hint="Full session-by-session breakdown — topics, modules, outcomes, and what students learn"
-                      />
+                      <>
+                        <Field
+                          label="Detailed Session Description"
+                          value={(editing.sessionDescription as string) || ""}
+                          onChange={(v) => setField("sessionDescription", v)}
+                          textarea
+                          rows={14}
+                          hint="Full session-by-session breakdown — topics, modules, outcomes, and what students learn"
+                        />
+                        <div className="rounded-xl border border-gold/20 bg-orange/5 p-3">
+                          <p className="mb-2 text-xs font-semibold text-text-primary">Course Resources (links for buyers)</p>
+                          <p className="mb-3 text-[11px] text-text-muted">
+                            WhatsApp community, recorded lectures, study material, certificates — one URL per line as Label|https://url
+                          </p>
+                          <textarea
+                            value={(((editing.resources as { label: string; url: string }[]) || [])
+                              .map((r) => `${r.label}|${r.url}`)
+                              .join("\n"))}
+                            onChange={(e) => {
+                              const resources = e.target.value
+                                .split("\n")
+                                .map((line) => line.trim())
+                                .filter(Boolean)
+                                .map((line, i) => {
+                                  const [label, ...rest] = line.split("|");
+                                  return {
+                                    id: `res-${i}`,
+                                    label: (label || `Resource ${i + 1}`).trim(),
+                                    url: rest.join("|").trim(),
+                                  };
+                                })
+                                .filter((r) => r.url);
+                              setField("resources", resources);
+                            }}
+                            rows={5}
+                            placeholder={"Join WhatsApp community|https://chat.whatsapp.com/...\nRecorded lectures|https://...\nStudy material|https://...\nCertificates|https://..."}
+                            className="w-full rounded-xl border border-gold/20 bg-white px-3 py-2 text-sm text-text-primary focus:border-gold focus:outline-none"
+                          />
+                        </div>
+                      </>
                     )}
                     <Field label="Price (₹)" value={String(editing.price ?? "")} onChange={(v) => setField("price", v)} type="number" />
                     {activeType === "products" && (

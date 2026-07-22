@@ -7,31 +7,48 @@ import { cn } from "@/lib/cn";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useLogout } from "@/lib/use-logout";
 import { motion } from "framer-motion";
-import { Calendar, Clock, Gift, LayoutDashboard, LogOut, Package, User } from "lucide-react";
+import {
+  Bell,
+  BookOpen,
+  Calendar,
+  Flame,
+  Heart,
+  LayoutDashboard,
+  LogOut,
+  Package,
+  Sparkles,
+  User,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { c } = useLanguage();
-  const d = c.dashboard;
   const pathname = usePathname();
   const router = useRouter();
   const handleLogout = useLogout();
   const { user, loading, authReady } = useProfile();
 
-  const navItems = useMemo(() => [
-    { href: "/dashboard", icon: LayoutDashboard, label: d.overview },
-    { href: "/dashboard/purchases", icon: Package, label: d.purchases },
-    { href: "/dashboard/vouchers", icon: Gift, label: "Vouchers" },
-    { href: "/dashboard/bookings", icon: Calendar, label: d.yourBookings },
-    { href: "/dashboard/slots", icon: Clock, label: d.bookConsultation },
-    { href: "/dashboard/profile", icon: User, label: c.common.profile },
-  ], [c, d]);
+  const navItems = useMemo(
+    () => [
+      { href: "/dashboard", icon: LayoutDashboard, label: c.dashboard.overview },
+      { href: "/dashboard/products", icon: Package, label: "Products" },
+      { href: "/dashboard/services", icon: Sparkles, label: "Consultancy Services" },
+      { href: "/dashboard/slots", icon: Calendar, label: "Book Consultation" },
+      { href: "/dashboard/courses", icon: BookOpen, label: "Courses" },
+      { href: "/dashboard/pooja", icon: Flame, label: "Pooja" },
+      { href: "/dashboard/healing", icon: Heart, label: "Healing" },
+      { href: "/dashboard/notifications", icon: Bell, label: "Notifications" },
+      { href: "/dashboard/profile", icon: User, label: c.common.profile },
+    ],
+    [c]
+  );
 
   const isActive = (href: string) =>
     pathname === href ||
-    (href === "/dashboard/purchases" && pathname === "/dashboard/orders") ||
+    (href === "/dashboard/services" && (pathname.startsWith("/dashboard/slots") || pathname.startsWith("/dashboard/bookings"))) ||
+    (href === "/dashboard/products" && pathname === "/dashboard/purchases") ||
     (href === "/dashboard/profile" && pathname === "/dashboard/kundli");
 
   useEffect(() => {
@@ -47,7 +64,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (!authReady || loading) {
     return (
-      <div className="mx-auto flex min-h-[50vh] max-w-7xl items-center justify-center px-4">
+      <div className="mx-auto flex min-h-[50vh] max-w-screen-2xl items-center justify-center px-4">
         <div className="h-10 w-10 animate-spin rounded-full border-2 border-gold/30 border-t-gold" />
       </div>
     );
@@ -56,7 +73,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (!user || user.role === "admin") return null;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 md:py-8">
+    <div className="mx-auto max-w-screen-2xl px-4 py-6 md:py-8">
       <div className="mb-4 md:hidden">
         <div className="mb-3 rounded-xl border border-gold/15 bg-white/80 px-4 py-3">
           <p className="font-semibold text-text-primary">{user.name}</p>
@@ -90,7 +107,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </nav>
       </div>
 
-      <div className="flex gap-8">
+      <div className="flex gap-6 lg:gap-8">
         <aside className="hidden w-64 shrink-0 md:block">
           <div className="sticky top-24 rounded-2xl glass-card p-6">
             <div className="mb-6 border-b border-white/10 pb-4">
@@ -109,12 +126,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     )}
                     whileHover={{ x: 4 }}
                   >
-                    <item.icon className="h-4 w-4" />{item.label}
+                    <item.icon className="h-4 w-4" />
+                    {item.label}
                   </motion.div>
                 </Link>
               ))}
-              <button onClick={() => void handleLogout()} className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-red-400 hover:bg-red-400/10">
-                <LogOut className="h-4 w-4" />{c.common.logout}
+              <button
+                onClick={() => void handleLogout()}
+                className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-red-400 hover:bg-red-400/10"
+              >
+                <LogOut className="h-4 w-4" />
+                {c.common.logout}
               </button>
             </nav>
           </div>

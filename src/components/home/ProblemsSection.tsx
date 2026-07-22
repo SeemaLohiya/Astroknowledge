@@ -22,7 +22,7 @@ export function ProblemsSection() {
     <section className="relative py-24 overflow-hidden">
       <div className="absolute inset-0 bg-mesh opacity-10" />
       <SectionBackdrop variant="soft" />
-      <div className="relative mx-auto max-w-7xl px-4">
+      <div className="relative mx-auto max-w-screen-2xl px-4">
         <SectionHeader
           title={<span className="text-gradient-gold">{c.sections.problemsTitle}</span>}
           subtitle={c.sections.problemsSubtitle}

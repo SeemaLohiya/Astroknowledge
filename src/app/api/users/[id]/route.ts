@@ -50,6 +50,24 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     body.birthPlaceUnknown !== undefined;
   if (birthTouched) user.birthDetailsUpdatedAt = new Date().toISOString();
 
+  if (body.courseResources !== undefined) {
+    if (!Array.isArray(body.courseResources)) {
+      return NextResponse.json({ error: "courseResources must be an array" }, { status: 400 });
+    }
+    user.courseResources = body.courseResources.map(
+      (entry: { courseId?: string; links?: { id?: string; label?: string; url?: string }[] }) => ({
+        courseId: String(entry.courseId || "").trim(),
+        links: (entry.links || [])
+          .filter((l) => l?.url?.trim())
+          .map((l) => ({
+            id: String(l.id || `link-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`),
+            label: String(l.label || "Resource").trim() || "Resource",
+            url: String(l.url).trim(),
+          })),
+      })
+    ).filter((e: { courseId: string }) => e.courseId);
+  }
+
   await store.users.persist(user);
   return NextResponse.json({ user: sanitizeUser(user) });
 }

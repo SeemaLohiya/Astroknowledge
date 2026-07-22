@@ -41,7 +41,7 @@ export default function PoojaPage() {
                         sizes="(max-width:768px) 100vw, 33vw"
                         frameClassName="h-48"
                       />
-                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-cream/90 to-transparent" />
+                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-cream/25 to-transparent" />
                       <Sparkles className="absolute right-3 top-3 z-10 h-6 w-6 text-gold animate-pulse" />
                     </div>
                     <div className="p-6">

@@ -207,7 +207,7 @@ export const siteContent: Record<Lang, SiteContentLang> = {
       title: "Expert Vedic Astrology",
       subtitle: "",
       typing: [
-        "Kundali Vishleshan & Birth Chart Analysis",
+        "Kundali Analysis & Birth Chart Analysis",
         "Personalized Vedic Remedy Guidance",
         "Marriage Compatibility & Kundli Milan",
         "Vastu Shastra & Numerology Guidance",
@@ -232,7 +232,7 @@ export const siteContent: Record<Lang, SiteContentLang> = {
       { title: "Vedic Blessings", sub: "Pandit Energized" },
     ],
     sections: {
-      servicesTitle: "Our Consultation Services",
+      servicesTitle: "Our Consultancy Services",
       servicesSubtitle: "Personalized guidance through telephonic consultations and detailed horoscope analysis.",
       coursesTitle: "Astrology Courses",
       coursesSubtitle: "Learn authentic Vedic sciences from Acharya Seema Lohiya.",
@@ -281,9 +281,9 @@ export const siteContent: Record<Lang, SiteContentLang> = {
       shipping: "Shipping",
       refund: "Refund",
       rights: "All Rights Reserved.",
-      badges: ["100% Certified", "Energized by Vedic Pandit", "Authentic Products", "Secure Payment Coming Soon"],
+      badges: ["100% Certified", "Energized by Vedic Pandit", "Authentic Products"],
       links: {
-        kundali: "Kundali Vishleshan",
+        kundali: "Kundali Analysis",
         kundliMilan: "Kundli Milan",
         vastu: "Vastu Consultancy",
         numerology: "Numerology",
@@ -493,7 +493,7 @@ export const siteContent: Record<Lang, SiteContentLang> = {
       shipping: "शिपिंग",
       refund: "रिफंड",
       rights: "सर्वाधिकार सुरक्षित।",
-      badges: ["१००% प्रमाणित", "वैदिक पंडित द्वारा ऊर्जावान", "प्रामाणिक उत्पाद", "सुरक्षित भुगतान जल्द आ रहा है"],
+      badges: ["१००% प्रमाणित", "वैदिक पंडित द्वारा ऊर्जावान", "प्रामाणिक उत्पाद"],
       links: {
         kundali: "कुंडली विश्लेषण",
         kundliMilan: "कुंडली मिलान",

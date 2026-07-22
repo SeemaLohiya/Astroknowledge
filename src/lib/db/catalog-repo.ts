@@ -16,6 +16,14 @@ export interface CatalogData {
 const DATA_DIR = path.join(process.cwd(), "data");
 const CATALOG_PATH = path.join(DATA_DIR, "catalog.json");
 
+let catalogDocCache: CatalogData | null = null;
+let catalogDocPromise: Promise<CatalogData> | null = null;
+
+export function invalidateCatalogDocCache() {
+  catalogDocCache = null;
+  catalogDocPromise = null;
+}
+
 export function readCatalogFromFile(): CatalogData | null {
   if (!fs.existsSync(CATALOG_PATH)) return null;
   try {
@@ -26,29 +34,42 @@ export function readCatalogFromFile(): CatalogData | null {
 }
 
 export async function getCatalogDoc(): Promise<CatalogData> {
-  await connectDB();
-  let doc = await CatalogModel.findById("main").lean();
-  if (!doc) {
-    const fromFile = readCatalogFromFile();
-    const seed = fromFile ?? {
-      products: [],
-      services: [],
-      courses: [],
-      pooja: [],
-      healing: [],
-      categories: [],
+  if (catalogDocCache) return catalogDocCache;
+  if (catalogDocPromise) return catalogDocPromise;
+
+  catalogDocPromise = (async () => {
+    await connectDB();
+    let doc = await CatalogModel.findById("main").lean();
+    if (!doc) {
+      const fromFile = readCatalogFromFile();
+      const seed = fromFile ?? {
+        products: [],
+        services: [],
+        courses: [],
+        pooja: [],
+        healing: [],
+        categories: [],
+      };
+      await CatalogModel.create({ _id: "main", ...seed });
+      doc = await CatalogModel.findById("main").lean();
+    }
+    const data: CatalogData = {
+      products: doc?.products ?? [],
+      services: doc?.services ?? [],
+      courses: doc?.courses ?? [],
+      pooja: doc?.pooja ?? [],
+      healing: doc?.healing ?? [],
+      categories: doc?.categories ?? [],
     };
-    await CatalogModel.create({ _id: "main", ...seed });
-    doc = await CatalogModel.findById("main").lean();
+    catalogDocCache = data;
+    return data;
+  })();
+
+  try {
+    return await catalogDocPromise;
+  } finally {
+    catalogDocPromise = null;
   }
-  return {
-    products: doc?.products ?? [],
-    services: doc?.services ?? [],
-    courses: doc?.courses ?? [],
-    pooja: doc?.pooja ?? [],
-    healing: doc?.healing ?? [],
-    categories: doc?.categories ?? [],
-  };
 }
 
 async function saveCatalog(data: CatalogData) {
@@ -58,6 +79,7 @@ async function saveCatalog(data: CatalogData) {
     { $set: data },
     { upsert: true, new: true }
   );
+  catalogDocCache = data;
 }
 
 export async function mongoGetAll<T extends CatalogType>(type: T): Promise<CatalogData[T]> {
@@ -139,7 +161,18 @@ export async function mongoDeleteCategory(id: string) {
 export async function seedCatalogToMongo(seed: CatalogData) {
   await connectDB();
   const existing = await CatalogModel.findById("main");
-  if (existing) return existing.toObject();
+  if (existing) {
+    catalogDocCache = {
+      products: existing.products ?? [],
+      services: existing.services ?? [],
+      courses: existing.courses ?? [],
+      pooja: existing.pooja ?? [],
+      healing: existing.healing ?? [],
+      categories: existing.categories ?? [],
+    };
+    return existing.toObject();
+  }
   await CatalogModel.create({ _id: "main", ...seed });
+  catalogDocCache = seed;
   return seed;
 }

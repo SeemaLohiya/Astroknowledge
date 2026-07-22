@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { fetchCatalogItems, invalidateCatalogCache } from "./catalog-cache";
+import { fetchCatalogItems, invalidateCatalogCache, peekCatalogCache } from "./catalog-cache";
 import { getStaticCatalog } from "./static-data";
 import { CatalogType } from "./types";
 
@@ -27,6 +27,13 @@ export function useCatalog<T>(type: CatalogType, options?: Options) {
 
   useEffect(() => {
     if (!live) return;
+
+    const cached = peekCatalogCache<T>(type);
+    if (cached) {
+      setItems(cached);
+      return;
+    }
+
     let cancelled = false;
     setLoading(true);
     fetchCatalogItems<T>(type)

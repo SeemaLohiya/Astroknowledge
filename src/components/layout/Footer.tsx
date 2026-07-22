@@ -43,7 +43,7 @@ export function Footer() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gold/10 via-transparent to-transparent" />
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/50 to-transparent" />
 
-      <div className="relative mx-auto max-w-7xl px-4 py-16">
+      <div className="relative mx-auto max-w-screen-2xl px-4 py-16">
         <FadeIn>
           <div className="mb-12 flex flex-col items-center gap-6 rounded-2xl border border-gold/20 bg-white p-8 backdrop-blur-sm md:flex-row shadow-sm shadow-orange/5">
             <FounderImage size="md" />

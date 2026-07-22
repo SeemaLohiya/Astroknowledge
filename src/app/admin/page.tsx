@@ -44,7 +44,7 @@ interface Analytics {
 
 const QUICK_LINKS = [
   { href: "/admin/bookings", label: "Bookings", icon: Calendar },
-  { href: "/admin/orders", label: "Orders", icon: Package },
+  { href: "/admin/items/products", label: "Products orders", icon: Package },
   { href: "/admin/payments", label: "Payments", icon: IndianRupee },
   { href: "/admin/catalog", label: "Shop & Photos", icon: Package },
   { href: "/admin/users", label: "Users", icon: Users },
@@ -60,15 +60,15 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 function BarChart({ data, maxValue }: { data: { label: string; value: number }[]; maxValue: number }) {
   return (
-    <div className="flex items-end gap-2 h-32">
+    <div className="flex items-end gap-1.5 h-36 overflow-x-auto pb-1">
       {data.map((d) => (
-        <div key={d.label} className="flex flex-1 flex-col items-center gap-1">
+        <div key={d.label} className="flex min-w-[28px] flex-1 flex-col items-center gap-1">
           <div
             className="w-full rounded-t-lg bg-gradient-to-t from-gold to-orange transition-all duration-500"
             style={{ height: `${maxValue > 0 ? Math.max(8, (d.value / maxValue) * 100) : 8}%` }}
           />
-          <span className="text-[10px] text-text-muted">{d.label}</span>
-          {d.value > 0 && <span className="text-[9px] font-medium text-gold">₹{(d.value / 1000).toFixed(0)}k</span>}
+          <span className="text-[9px] text-text-muted">{d.label}</span>
+          {d.value > 0 && <span className="text-[8px] font-medium text-gold">₹{(d.value / 1000).toFixed(0)}k</span>}
         </div>
       ))}
     </div>
@@ -134,9 +134,9 @@ export default function AdminPage() {
   const cards = analytics
     ? [
         { icon: IndianRupee, label: "Total Revenue", value: analytics.revenue, color: "from-gold to-gold-bright", format: true, href: "/admin/payments" },
-        { icon: Package, label: "Orders", value: analytics.totalOrders, color: "from-gold-dark to-gold", href: "/admin/orders" },
+        { icon: Package, label: "Orders", value: analytics.totalOrders, color: "from-gold-dark to-gold", href: "/admin/items/products" },
         { icon: Users, label: "Users", value: analytics.totalUsers, sub: `+${analytics.newUsersThisMonth} this month`, color: "from-gold to-orange", href: "/admin/users" },
-        { icon: TrendingUp, label: "Avg Order", value: analytics.avgOrderValue, color: "from-orange to-gold", format: true, href: "/admin/orders" },
+        { icon: TrendingUp, label: "Avg Order", value: analytics.avgOrderValue, color: "from-orange to-gold", format: true, href: "/admin/items/products" },
       ]
     : [];
 
@@ -214,12 +214,16 @@ export default function AdminPage() {
             <div className="rounded-2xl border border-gold/15 bg-white/80 p-6">
               <h2 className="mb-4 flex items-center gap-2 font-semibold text-text-primary">
                 <BarChart3 className="h-5 w-5 text-gold" />
-                Monthly Revenue (6 months)
+                Monthly Revenue (12 months)
               </h2>
-              <BarChart
-                data={analytics.monthlyRevenue.map((m) => ({ label: m.month, value: m.amount }))}
-                maxValue={maxMonthly}
-              />
+              {analytics.monthlyRevenue.some((m) => m.amount > 0) ? (
+                <BarChart
+                  data={analytics.monthlyRevenue.map((m) => ({ label: m.month, value: m.amount }))}
+                  maxValue={maxMonthly}
+                />
+              ) : (
+                <p className="py-8 text-center text-sm text-text-muted">No paid revenue in the last 12 months yet</p>
+              )}
             </div>
           </RevealOnScroll>
 
@@ -374,7 +378,7 @@ export default function AdminPage() {
           <div className="rounded-2xl border border-gold/15 bg-white/80 p-6">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="font-semibold text-text-primary">Recent Orders</h2>
-              <Link href="/admin/orders" className="text-xs font-semibold text-gold hover:underline">View all</Link>
+              <Link href="/admin/items/products" className="text-xs font-semibold text-gold hover:underline">View all</Link>
             </div>
             {recentOrders.length === 0 ? (
               <p className="text-sm text-text-muted">No orders yet</p>

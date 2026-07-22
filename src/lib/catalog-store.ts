@@ -20,9 +20,12 @@ interface CatalogData {
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const CATALOG_PATH = path.join(DATA_DIR, "catalog.json");
+const CATALOG_TTL_MS = 120_000;
 
 let memoryCache: CatalogData | null = null;
 let memoryMtime = 0;
+let memoryTimestamp = 0;
+let seedPromise: Promise<unknown> | null = null;
 
 function seedCatalog(): CatalogData {
   return {
@@ -35,18 +38,25 @@ function seedCatalog(): CatalogData {
   };
 }
 
-function readCatalog(): CatalogData {
+function readCatalog(forceRefresh = false): CatalogData {
+  const now = Date.now();
+  if (!forceRefresh && memoryCache && now - memoryTimestamp < CATALOG_TTL_MS) return memoryCache;
+
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
   if (!fs.existsSync(CATALOG_PATH)) {
     const seed = seedCatalog();
     fs.writeFileSync(CATALOG_PATH, JSON.stringify(seed, null, 2), "utf-8");
     memoryCache = seed;
     memoryMtime = fs.statSync(CATALOG_PATH).mtimeMs;
+    memoryTimestamp = now;
     return seed;
   }
   try {
     const mtime = fs.statSync(CATALOG_PATH).mtimeMs;
-    if (memoryCache && mtime === memoryMtime) return memoryCache;
+    if (!forceRefresh && memoryCache && mtime === memoryMtime) {
+      memoryTimestamp = now;
+      return memoryCache;
+    }
 
     const data = JSON.parse(fs.readFileSync(CATALOG_PATH, "utf-8")) as CatalogData;
     if (!data.categories) data.categories = JSON.parse(JSON.stringify(productCategories));
@@ -59,12 +69,14 @@ function readCatalog(): CatalogData {
     }
     memoryCache = data;
     memoryMtime = mtime;
+    memoryTimestamp = now;
     return data;
   } catch {
     const seed = seedCatalog();
     fs.writeFileSync(CATALOG_PATH, JSON.stringify(seed, null, 2), "utf-8");
     memoryCache = seed;
     memoryMtime = fs.statSync(CATALOG_PATH).mtimeMs;
+    memoryTimestamp = now;
     return seed;
   }
 }
@@ -74,6 +86,7 @@ function writeCatalog(data: CatalogData) {
   fs.writeFileSync(CATALOG_PATH, JSON.stringify(data, null, 2), "utf-8");
   memoryCache = data;
   memoryMtime = fs.statSync(CATALOG_PATH).mtimeMs;
+  memoryTimestamp = Date.now();
 }
 
 function slugify(text: string) {
@@ -85,10 +98,27 @@ function slugify(text: string) {
 }
 
 async function ensureMongoSeeded() {
-  await mongoCatalog.seedCatalogToMongo(readCatalog());
+  if (seedPromise) return seedPromise;
+  seedPromise = (async () => {
+    await mongoCatalog.seedCatalogToMongo(readCatalog());
+  })();
+  try {
+    await seedPromise;
+  } finally {
+    seedPromise = null;
+  }
 }
 
 export const catalogStore = {
+  async getSnapshot(): Promise<CatalogData> {
+    if (isRemotePersistEnabled()) {
+      await ensureMongoSeeded();
+      const { getCatalogDoc } = await import("./db/catalog-repo");
+      return getCatalogDoc() as Promise<CatalogData>;
+    }
+    return readCatalog();
+  },
+
   async getAll<T extends CatalogType>(type: T): Promise<CatalogData[T]> {
     if (isRemotePersistEnabled()) {
       await ensureMongoSeeded();

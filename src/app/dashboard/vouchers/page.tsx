@@ -66,6 +66,14 @@ export default function DashboardVouchersPage() {
                 </span>
               </div>
               <p className="mt-3 text-xs text-text-muted">Valid until {v.validUntil}</p>
+              <p className="mt-2 text-xs text-text-body">
+                Applies to:{" "}
+                <span className="font-medium text-text-primary">
+                  {!v.applicableItemTypes?.length
+                    ? "All items"
+                    : v.applicableItemTypes.map((t) => t.charAt(0).toUpperCase() + t.slice(1)).join(", ")}
+                </span>
+              </p>
             </motion.div>
           ))}
         </div>

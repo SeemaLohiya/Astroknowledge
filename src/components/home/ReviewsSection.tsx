@@ -22,9 +22,8 @@ function ReviewCard({ review, lang }: { review: Review; lang: "en" | "hi" }) {
         ))}
       </div>
       <p className="text-text-body text-sm leading-relaxed line-clamp-4">&ldquo;{comment}&rdquo;</p>
-      <div className="mt-4 flex items-center justify-between border-t border-gold/10 pt-3">
+      <div className="mt-4 flex items-center border-t border-gold/10 pt-3">
         <span className="font-semibold text-gold-bright text-sm">{review.name}</span>
-        <span className="text-xs text-text-muted">{review.date}</span>
       </div>
     </div>
   );
@@ -43,7 +42,7 @@ export function ReviewsSection() {
       <div className="absolute inset-0 bg-aurora opacity-30" />
       <SectionBackdrop variant="warm" />
 
-      <div className="relative mx-auto max-w-7xl px-4">
+      <div className="relative mx-auto max-w-screen-2xl px-4">
         <SectionHeader
           title={<>{main} <span className="text-gradient-gold">{accent}</span></>}
           subtitle={c.sections.reviewsSubtitle}

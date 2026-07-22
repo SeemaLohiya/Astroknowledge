@@ -15,10 +15,10 @@ export interface NavDropdown {
 const NAV: Record<Lang, NavDropdown[]> = {
   en: [
     {
-      label: "Services",
+      label: "Consultancy Services",
       href: "/services",
       items: [
-        { href: "/services#kundali-vishleshan", label: "Kundali Vishleshan", desc: "Complete horoscope reading" },
+        { href: "/services#kundali-vishleshan", label: "Kundali Analysis", desc: "Complete horoscope reading" },
         { href: "/services#kundli-milan", label: "Kundli Milan", desc: "Marriage compatibility" },
         { href: "/services#vastu-consultancy", label: "Vastu Consultancy", desc: "Home & office Vastu" },
         { href: "/services#numerology", label: "Numerology", desc: "Name & number analysis" },
@@ -53,7 +53,7 @@ const NAV: Record<Lang, NavDropdown[]> = {
   ],
   hi: [
     {
-      label: "सेवाएं",
+      label: "परामर्श सेवाएं",
       href: "/services",
       items: [
         { href: "/services#kundali-vishleshan", label: "कुंडली विश्लेषण", desc: "संपूर्ण कुंडली विश्लेषण" },

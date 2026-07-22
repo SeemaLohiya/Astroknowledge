@@ -6,19 +6,21 @@ import { vouchersStore } from "@/lib/vouchers-store";
 import { getPaidServices, hasPaidServiceAccess } from "@/lib/purchases";
 import { paymentsStore } from "@/lib/payments-store";
 import { CartItem } from "@/lib/types";
+import { addressesStore } from "@/lib/addresses-store";
 
 export async function POST(req: NextRequest) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Please login to continue" }, { status: 401 });
 
   const body = await req.json();
-  const { userName, userPhone, userEmail, items, total, voucherCode } = body as {
+  const { userName, userPhone, userEmail, items, total, voucherCode, shippingAddressId } = body as {
     userName: string;
     userPhone: string;
     userEmail?: string;
     items: CartItem[];
     total: number;
     voucherCode?: string;
+    shippingAddressId?: string;
   };
 
   if (!userName?.trim() || !userPhone?.trim() || !items?.length) {
@@ -36,6 +38,32 @@ export async function POST(req: NextRequest) {
       { error: e instanceof Error ? e.message : "Invalid cart items" },
       { status: 400 }
     );
+  }
+
+  const needsAddress = validatedItems.some((i) => i.itemType === "product" || i.itemType === "pooja");
+  let shippingAddress: string | undefined;
+  if (needsAddress) {
+    if (!shippingAddressId?.trim()) {
+      return NextResponse.json(
+        { error: "Delivery address is required for products and pooja" },
+        { status: 400 }
+      );
+    }
+    const addresses = await addressesStore.getByUser(session.userId);
+    const addr = addresses.find((a) => a.id === shippingAddressId);
+    if (!addr) {
+      return NextResponse.json({ error: "Selected delivery address not found" }, { status: 400 });
+    }
+    shippingAddress = [
+      addr.name,
+      addr.phone,
+      addr.line1,
+      addr.line2,
+      `${addr.city}, ${addr.state}, ${addr.country} ${addr.pincode}`,
+      addr.locationLink ? `Location: ${addr.locationLink}` : "",
+    ]
+      .filter(Boolean)
+      .join(" · ");
   }
 
   let finalTotal = serverTotal;
@@ -71,6 +99,7 @@ export async function POST(req: NextRequest) {
     discountAmount: discountAmount || undefined,
     voucherCode: voucherCode?.trim().toUpperCase(),
     voucherId,
+    shippingAddress,
   });
 
   if (voucherId) await vouchersStore.incrementUsage(voucherId);

@@ -9,20 +9,21 @@ import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { cartKey, useCartStore } from "@/lib/cart-store";
 import { useCartHydrated } from "@/lib/use-cart-hydrated";
 import { parseResponseJson } from "@/lib/fetch-json";
-import { CartItem } from "@/lib/types";
+import { CartItem, SavedAddress, Voucher } from "@/lib/types";
 import { SafeImage } from "@/components/ui/SafeImage";
-import { Gift, IndianRupee, Tag } from "lucide-react";
+import { Gift, IndianRupee, MapPin, Tag } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
-import { Voucher } from "@/lib/types";
 import Link from "next/link";
+import { fetchJson } from "@/lib/fetch-json";
 
 async function proceedToPayment(
   form: { userName: string; userPhone: string; userEmail: string },
   items: CartItem[],
   total: number,
-  voucherCode?: string
+  voucherCode?: string,
+  shippingAddressId?: string
 ) {
   if (form.userName.trim() && form.userPhone.trim()) {
     await fetch("/api/users/profile", {
@@ -42,6 +43,7 @@ async function proceedToPayment(
       items,
       total,
       voucherCode: voucherCode || undefined,
+      shippingAddressId: shippingAddressId || undefined,
     }),
   });
   const data = await parseResponseJson<{ payment?: { id: string }; error?: string }>(res);
@@ -65,6 +67,13 @@ export default function CheckoutPage() {
   const [discountAmount, setDiscountAmount] = useState(0);
   const [myVouchers, setMyVouchers] = useState<Voucher[]>([]);
   const [validatingVoucher, setValidatingVoucher] = useState(false);
+  const [addresses, setAddresses] = useState<SavedAddress[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState("");
+
+  const needsDeliveryAddress = useMemo(
+    () => items.some((i) => i.itemType === "product" || i.itemType === "pooja"),
+    [items]
+  );
 
   const subtotal = total;
   const finalTotal = Math.max(0, subtotal - discountAmount);
@@ -80,6 +89,12 @@ export default function CheckoutPage() {
     fetch("/api/vouchers")
       .then((r) => r.json())
       .then((d: { vouchers?: Voucher[] }) => setMyVouchers(d.vouchers || []));
+    void fetchJson<{ addresses?: SavedAddress[] }>("/api/addresses").then((res) => {
+      const list = res.data?.addresses || [];
+      setAddresses(list);
+      const def = list.find((a) => a.isDefault) || list[0];
+      if (def) setSelectedAddressId(def.id);
+    });
   }, [user]);
 
   const applyVoucher = async (code?: string) => {
@@ -135,10 +150,20 @@ export default function CheckoutPage() {
       toast.error(ch.namePhoneRequired);
       return;
     }
+    if (needsDeliveryAddress && !selectedAddressId) {
+      toast.error("Please select a delivery address for products or pooja");
+      return;
+    }
 
     setLoading(true);
     try {
-      const paymentId = await proceedToPayment(resolvedForm, items, finalTotal, appliedCode || undefined);
+      const paymentId = await proceedToPayment(
+        resolvedForm,
+        items,
+        finalTotal,
+        appliedCode || undefined,
+        needsDeliveryAddress ? selectedAddressId : undefined
+      );
       router.push(`/payment?id=${paymentId}`);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : ch.checkoutFailed);
@@ -190,6 +215,65 @@ export default function CheckoutPage() {
                 <input required type="email" value={resolvedForm.userEmail} disabled className="w-full rounded-xl border border-gold/20 bg-orange/5 px-4 py-3 text-sm disabled:opacity-60" />
               </div>
             </FadeIn>
+
+            {needsDeliveryAddress && (
+              <FadeIn delay={0.05} className="rounded-2xl glass-card p-6 space-y-4">
+                <h2 className="flex items-center gap-2 font-semibold text-text-primary">
+                  <MapPin className="h-5 w-5 text-gold" /> Delivery address *
+                </h2>
+                <p className="text-xs text-text-muted">
+                  Required for products and pooja. Add or edit addresses in your{" "}
+                  <Link href="/dashboard/profile" className="text-gold hover:underline">
+                    profile
+                  </Link>
+                  .
+                </p>
+                {addresses.length === 0 ? (
+                  <div className="rounded-xl border border-dashed border-gold/30 bg-orange/5 p-4 text-sm text-text-body">
+                    No saved address yet.{" "}
+                    <Link href="/dashboard/profile" className="font-semibold text-gold hover:underline">
+                      Add an address
+                    </Link>{" "}
+                    then return to checkout.
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {addresses.map((addr) => (
+                      <label
+                        key={addr.id}
+                        className={`flex cursor-pointer gap-3 rounded-xl border p-3 text-sm ${
+                          selectedAddressId === addr.id ? "border-gold bg-gold/5" : "border-gold/15 bg-orange/5"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="shippingAddress"
+                          checked={selectedAddressId === addr.id}
+                          onChange={() => setSelectedAddressId(addr.id)}
+                          className="mt-1"
+                        />
+                        <span>
+                          <span className="font-medium text-text-primary">
+                            {addr.label} — {addr.name}
+                          </span>
+                          <br />
+                          <span className="text-text-muted">
+                            {addr.line1}
+                            {addr.line2 ? `, ${addr.line2}` : ""}, {addr.city}, {addr.state} — {addr.pincode}
+                          </span>
+                          {addr.locationLink ? (
+                            <>
+                              <br />
+                              <span className="text-xs text-gold">Location link saved</span>
+                            </>
+                          ) : null}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </FadeIn>
+            )}
 
             <FadeIn delay={0.1} className="rounded-2xl glass-card p-6">
               <h2 className="font-semibold text-text-primary mb-4">{ch.orderTitle} ({items.length})</h2>

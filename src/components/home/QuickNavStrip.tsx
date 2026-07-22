@@ -32,7 +32,7 @@ export function QuickNavStrip() {
       <div className="pointer-events-none absolute inset-0 bg-mesh opacity-[0.12]" />
       <div className="pointer-events-none absolute left-1/2 top-0 h-px w-2/3 -translate-x-1/2 bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
 
-      <div className="relative mx-auto max-w-7xl px-4">
+      <div className="relative mx-auto max-w-screen-2xl px-4">
         <RevealOnScroll variant="fade-down">
           <p className="mb-4 text-center text-xs font-semibold uppercase tracking-[0.2em] text-text-muted">
             Explore · Consult · Transform

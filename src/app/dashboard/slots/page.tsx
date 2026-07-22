@@ -31,7 +31,6 @@ function SlotsContent() {
   const [paidServices, setPaidServices] = useState<PaidServiceItem[]>([]);
   const [accessLoading, setAccessLoading] = useState(true);
   const [booking, setBooking] = useState<string | null>(null);
-  const [cancelling, setCancelling] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState("");
 
   const birthComplete = user ? isBirthProfileComplete(user) : false;
@@ -103,25 +102,6 @@ function SlotsContent() {
     }
   };
 
-  const handleCancel = async (slotId: string) => {
-    setCancelling(slotId);
-    try {
-      const res = await fetch(`/api/slots/${slotId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "cancel" }),
-      });
-      const data = await parseResponseJson<{ message?: string; error?: string }>(res);
-      if (!res.ok || !data) throw new Error(data?.error || d.failedCancel);
-      toast.success(data.message || d.slotCancelled);
-      reload();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : d.failedCancel);
-    } finally {
-      setCancelling(null);
-    }
-  };
-
   if (accessLoading || profileLoading) {
     return <p className="py-20 text-center text-text-muted">{c.common.loading}</p>;
   }
@@ -137,7 +117,7 @@ function SlotsContent() {
         <div className="mt-6 flex flex-wrap gap-3 justify-center">
           <Button href="/services" variant="secondary">{d.browseServices}</Button>
           <Button href="/courses" variant="outline">Courses</Button>
-          <Button href="/dashboard/purchases" variant="outline">{d.purchases}</Button>
+          <Button href="/dashboard/services" variant="outline">{d.purchases}</Button>
         </div>
       </FadeIn>
     );
@@ -171,7 +151,7 @@ function SlotsContent() {
                     </p>
                   </div>
                   <Button href={`/dashboard/slots?service=${service.id}`} variant="secondary" size="sm">
-                    <Calendar className="h-4 w-4" /> {booked ? "Manage" : d.book}
+                    <Calendar className="h-4 w-4" /> {booked ? "View" : d.book}
                   </Button>
                 </div>
               </FadeIn>
@@ -180,8 +160,7 @@ function SlotsContent() {
         </div>
         <p className="mt-6 text-center text-sm text-text-muted">
           {d.orGoToPurchases}{" "}
-          <Link href="/dashboard/purchases" className="text-gold hover:underline">{d.purchases}</Link>{" "}
-          {d.orGoToPurchasesSuffix}
+          <Link href="/dashboard/services" className="text-gold hover:underline">Consultancy Services</Link>
         </p>
       </>
     );
@@ -220,7 +199,10 @@ function SlotsContent() {
         <>
           {existingForItem ? (
             <FadeIn className="mb-6 rounded-2xl border border-yellow-500/30 bg-yellow-500/5 p-5">
-              <p className="text-sm font-semibold text-yellow-900 mb-1">{d.oneSlotRule}</p>
+              <p className="mb-1 text-sm font-semibold text-yellow-900">{d.oneSlotRule}</p>
+              <p className="mb-3 text-xs text-text-muted">
+                This booking stays locked until the consultation is marked completed by the admin.
+              </p>
               <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-white/70 px-4 py-3">
                 <div>
                   <p className="font-medium text-text-primary">
@@ -230,14 +212,6 @@ function SlotsContent() {
                     {existingForItem.status === "pending" ? c.booking.pendingConfirm : c.booking.confirmed}
                   </p>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={cancelling === existingForItem.id}
-                  onClick={() => handleCancel(existingForItem.id)}
-                >
-                  {cancelling === existingForItem.id ? "..." : d.cancelSlot}
-                </Button>
               </div>
             </FadeIn>
           ) : (
@@ -301,14 +275,6 @@ function SlotsContent() {
                     <span className={`text-xs px-2 py-0.5 rounded-full ${slot.status === "pending" ? "bg-yellow-500/20 text-yellow-700" : "bg-green-500/20 text-green-700"}`}>
                       {slot.status === "pending" ? c.booking.pendingConfirm : c.booking.confirmed}
                     </span>
-                    <button
-                      type="button"
-                      disabled={cancelling === slot.id}
-                      onClick={() => handleCancel(slot.id)}
-                      className="text-xs font-semibold text-red-600 hover:underline disabled:opacity-50"
-                    >
-                      {cancelling === slot.id ? "..." : d.cancelSlot}
-                    </button>
                   </div>
                 </div>
               ))}

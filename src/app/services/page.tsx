@@ -38,7 +38,7 @@ export default function ServicesPage() {
           <RevealOnScroll variant="fade-down" className="mb-8 text-center">
             <span className="inline-flex items-center gap-2 rounded-full border border-amber-300/50 bg-gradient-to-r from-gold/15 to-orange/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-gold">
               <Sparkles className="h-3.5 w-3.5 animate-icon-bounce" />
-              Vedic Consultation Services
+              Vedic Consultancy Services
             </span>
           </RevealOnScroll>
 

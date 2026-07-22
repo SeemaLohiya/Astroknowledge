@@ -6,8 +6,10 @@ import { fetchJson } from "@/lib/fetch-json";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { User } from "@/lib/types";
 import { Ban, Download, KeyRound, RotateCcw, Search, Trash2, User as UserIcon } from "lucide-react";
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 type SafeUser = Omit<User, "password">;
 
@@ -20,6 +22,7 @@ const EXPORT_FORMATS = [
 
 export default function AdminUsersPage() {
   const { c } = useLanguage();
+  const router = useRouter();
   const [users, setUsers] = useState<SafeUser[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -174,13 +177,25 @@ export default function AdminUsersPage() {
                 {users.map((u) => {
                   const suspended = u.accountStatus === "suspended";
                   return (
-                    <tr key={u.id} className={`border-b border-gold/10 hover:bg-orange/5 ${suspended ? "opacity-75" : ""}`}>
+                    <tr
+                      key={u.id}
+                      className={`border-b border-gold/10 hover:bg-orange/5 cursor-pointer ${suspended ? "opacity-75" : ""}`}
+                      onClick={() => {
+                        router.push(`/admin/users/${u.id}`);
+                      }}
+                    >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange/15">
                             <UserIcon className="h-4 w-4 text-gold" />
                           </div>
-                          <span className="font-medium text-text-primary">{u.name}</span>
+                          <Link
+                            href={`/admin/users/${u.id}`}
+                            className="font-medium text-text-primary hover:text-gold hover:underline"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {u.name}
+                          </Link>
                         </div>
                       </td>
                       <td className="px-4 py-3 text-text-body">{u.email}</td>
@@ -195,7 +210,7 @@ export default function AdminUsersPage() {
                         )}
                       </td>
                       <td className="px-4 py-3 text-text-muted text-xs">{u.createdAt}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                         <div className="flex justify-end gap-1.5">
                           <button
                             type="button"

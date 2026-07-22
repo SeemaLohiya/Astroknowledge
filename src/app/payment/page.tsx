@@ -10,14 +10,18 @@ import { SITE } from "@/lib/constants";
 import { useCartStore } from "@/lib/cart-store";
 import { fetchJson, parseResponseJson } from "@/lib/fetch-json";
 import { PaymentRecord } from "@/lib/types";
-import { CreditCard, IndianRupee, ShieldCheck, Upload, Zap } from "lucide-react";
+import { IndianRupee, ShieldCheck, Upload, CreditCard } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
+/** Kept for future Razorpay re-enable — not offered in UI while locked. */
 declare global {
   interface Window {
-    Razorpay?: new (options: Record<string, unknown>) => { open: () => void };
+    Razorpay?: new (options: Record<string, unknown>) => {
+      open: () => void;
+      on: (event: string, handler: (response: { error?: { description?: string } }) => void) => void;
+    };
   }
 }
 
@@ -34,6 +38,8 @@ function loadRazorpayScript() {
     document.body.appendChild(script);
   });
 }
+
+const RAZORPAY_ENABLED = Boolean(process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID);
 
 function PaymentContent() {
   const { c } = useLanguage();
@@ -62,8 +68,32 @@ function PaymentContent() {
       else router.push("/cart");
       setLoading(false);
     });
-    void loadRazorpayScript().then(setRazorpayReady);
+    if (RAZORPAY_ENABLED) void loadRazorpayScript().then(setRazorpayReady);
   }, [paymentId, router]);
+
+  const completeRazorpayPayment = async (payload: {
+    razorpay_order_id: string;
+    razorpay_payment_id: string;
+    razorpay_signature: string;
+  }) => {
+    const verifyRes = await fetch("/api/verify-payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        paymentId,
+        razorpay_order_id: payload.razorpay_order_id,
+        razorpay_payment_id: payload.razorpay_payment_id,
+        razorpay_signature: payload.razorpay_signature,
+      }),
+    });
+    const verifyData = await parseResponseJson<{ error?: string; success?: boolean }>(verifyRes);
+    if (!verifyRes.ok || !verifyData?.success) {
+      throw new Error(verifyData?.error || p.paymentFailed);
+    }
+    clearCart();
+    toast.success(p.paymentSuccess);
+    router.push("/dashboard/slots");
+  };
 
   const handleUploadProof = async (file: File) => {
     setUploading(true);
@@ -104,10 +134,11 @@ function PaymentContent() {
   };
 
   const handleRazorpay = async () => {
-    if (!paymentId || !payment) return;
+    if (!RAZORPAY_ENABLED || !paymentId || !payment) return;
     setPaying("razorpay");
     try {
       const orderRes = await fetchJson<{
+        order_id?: string;
         orderId?: string;
         amount?: number;
         keyId?: string;
@@ -115,22 +146,24 @@ function PaymentContent() {
         userEmail?: string;
         userPhone?: string;
         error?: string;
-      }>("/api/checkout/razorpay-order", {
+      }>("/api/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ paymentId }),
       });
 
-      if (!orderRes.ok || !orderRes.data?.orderId) {
+      const orderId = orderRes.data?.order_id || orderRes.data?.orderId;
+      if (!orderRes.ok || !orderId) {
         throw new Error(orderRes.error || orderRes.data?.error || p.razorpayDisabledDesc);
       }
 
-      const { orderId, amount, keyId, userName, userEmail, userPhone } = orderRes.data;
+      const orderData = orderRes.data!;
+      const { amount, keyId, userName, userEmail, userPhone } = orderData;
       const loaded = razorpayReady || (await loadRazorpayScript());
       if (!loaded || !window.Razorpay) throw new Error("Could not load Razorpay checkout");
 
       const rzp = new window.Razorpay({
-        key: keyId,
+        key: keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount,
         currency: "INR",
         name: SITE.name,
@@ -144,11 +177,7 @@ function PaymentContent() {
           razorpay_signature: string;
         }) => {
           try {
-            await finalizePayment("razorpay", {
-              razorpayOrderId: response.razorpay_order_id,
-              razorpayPaymentId: response.razorpay_payment_id,
-              razorpaySignature: response.razorpay_signature,
-            });
+            await completeRazorpayPayment(response);
           } catch (e) {
             toast.error(e instanceof Error ? e.message : p.paymentFailed);
           } finally {
@@ -156,8 +185,15 @@ function PaymentContent() {
           }
         },
         modal: {
-          ondismiss: () => setPaying(null),
+          ondismiss: () => {
+            setPaying(null);
+            toast.error("Payment cancelled");
+          },
         },
+      });
+      rzp.on("payment.failed", (response: { error?: { description?: string } }) => {
+        setPaying(null);
+        toast.error(response.error?.description || p.paymentFailed);
       });
       rzp.open();
     } catch (e) {
@@ -247,32 +283,24 @@ function PaymentContent() {
           </div>
         </FadeIn>
 
-        <FadeIn delay={0.05} className="mb-6 rounded-2xl border-2 border-gold/30 bg-gradient-to-br from-gold/10 to-orange/5 p-6">
-          <div className="flex items-start gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-gold to-orange text-white shadow-md">
-              <Zap className="h-6 w-6" />
+        {RAZORPAY_ENABLED ? (
+          <FadeIn delay={0.05} className="mb-6 rounded-2xl border-2 border-gold/30 bg-gradient-to-br from-gold/10 to-orange/5 p-6">
+            <div className="flex items-start gap-3">
+              <CreditCard className="h-8 w-8 text-gold shrink-0" />
+              <div className="flex-1">
+                <h3 className="font-bold text-text-primary">{p.razorpayTitle}</h3>
+                <p className="mt-1 text-xs text-text-body">{p.razorpayDesc}</p>
+                <Button onClick={handleRazorpay} variant="secondary" size="lg" className="mt-4 w-full" disabled={!!paying}>
+                  {paying === "razorpay" ? p.submitting : `Pay ₹${payment.amount.toLocaleString("en-IN")} via Razorpay`}
+                </Button>
+              </div>
             </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-text-primary">{p.razorpayTitle}</h3>
-              <p className="mt-1 text-xs text-text-body">{p.razorpayDesc}</p>
-              <Button
-                onClick={handleRazorpay}
-                variant="secondary"
-                size="lg"
-                className="mt-4 w-full"
-                disabled={!!paying}
-              >
-                <CreditCard className="h-4 w-4" />
-                {paying === "razorpay" ? p.submitting : `Pay ₹${payment.amount.toLocaleString("en-IN")} via Razorpay`}
-              </Button>
-              <p className="mt-2 text-[10px] text-text-muted">UPI, Cards, Net Banking — instant access after payment</p>
-            </div>
-          </div>
-        </FadeIn>
-
-        <FadeIn className="mb-4 text-center">
-          <span className="inline-block rounded-full bg-gold/10 px-4 py-1 text-xs font-semibold text-gold">OR</span>
-        </FadeIn>
+          </FadeIn>
+        ) : (
+          <FadeIn delay={0.05} className="mb-6 rounded-2xl border border-gold/20 bg-orange/5 p-4 text-sm text-text-body">
+            {p.razorpayDisabledDesc}
+          </FadeIn>
+        )}
 
         <FadeIn className="rounded-2xl glass-card p-6 space-y-4">
           <div className="flex items-start gap-3 mb-2">

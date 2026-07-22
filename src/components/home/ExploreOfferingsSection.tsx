@@ -22,9 +22,9 @@ export function ExploreOfferingsSection() {
 
   return (
     <section id="offerings" className="relative py-20 overflow-hidden">
-      <div className="absolute inset-0 bg-mesh opacity-10" />
+      <div className="absolute inset-0 bg-mesh opacity-10 pointer-events-none" />
       <SectionBackdrop variant="warm" />
-      <div className="relative mx-auto max-w-7xl px-4">
+      <div className="relative mx-auto max-w-screen-2xl px-4">
         <SectionHeader
           title={<>{o.title} <ShimmerText className="text-gradient-gold">{o.titleAccent}</ShimmerText></>}
           subtitle={o.subtitle}

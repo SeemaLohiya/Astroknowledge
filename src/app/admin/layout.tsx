@@ -5,16 +5,20 @@ import { SITE } from "@/lib/constants";
 import { fetchJson } from "@/lib/fetch-json";
 import {
   Bell,
+  BookOpen,
   Calendar,
   CreditCard,
   ExternalLink,
   FileText,
+  Flame,
   Gift,
+  Heart,
   LayoutDashboard,
   LogOut,
   Menu,
   Package,
   Settings,
+  Sparkles,
   Users,
   X,
 } from "lucide-react";
@@ -26,7 +30,6 @@ import { useCallback, useEffect, useState } from "react";
 const navItems = [
   { href: "/admin", icon: LayoutDashboard, label: "Overview", exact: true },
   { href: "/admin/bookings", icon: Calendar, label: "Bookings" },
-  { href: "/admin/orders", icon: Package, label: "Orders" },
   { href: "/admin/payments", icon: CreditCard, label: "Payments" },
   { href: "/admin/users", icon: Users, label: "Users" },
   { href: "/admin/vouchers", icon: Gift, label: "Vouchers" },
@@ -35,15 +38,72 @@ const navItems = [
   { href: "/admin/notifications", icon: Bell, label: "Notifications" },
 ];
 
+const itemsNav = [
+  { href: "/admin/items/products", icon: Package, label: "Products orders" },
+  { href: "/admin/items/services", icon: Sparkles, label: "Consultancy Services orders" },
+  { href: "/admin/items/pooja", icon: Flame, label: "Pooja orders" },
+  { href: "/admin/items/healing", icon: Heart, label: "Healing orders" },
+  { href: "/admin/items/courses", icon: BookOpen, label: "Courses orders" },
+];
+
 function isActive(pathname: string, href: string, exact?: boolean) {
   if (exact) return pathname === href;
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 function AdminNav({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
+  const itemsActive = pathname.startsWith("/admin/items") || pathname.startsWith("/admin/orders");
   return (
     <nav className="space-y-1">
-      {navItems.map((item) => {
+      {navItems.slice(0, 2).map((item) => {
+        const active = isActive(pathname, item.href, item.exact);
+        return (
+          <Link key={item.href} href={item.href} onClick={onNavigate}>
+            <div
+              className={cn(
+                "flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-all duration-200",
+                active
+                  ? "bg-gradient-to-r from-gold to-orange font-semibold text-white shadow-md shadow-gold/20"
+                  : "text-text-body hover:bg-orange/8 hover:text-gold"
+              )}
+            >
+              <item.icon className="h-4 w-4" />
+              {item.label}
+            </div>
+          </Link>
+        );
+      })}
+
+      <div className="pt-2">
+        <p
+          className={cn(
+            "px-4 pb-1 text-[10px] font-bold uppercase tracking-widest",
+            itemsActive ? "text-gold" : "text-text-muted"
+          )}
+        >
+          Items
+        </p>
+        {itemsNav.map((item) => {
+          const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+          return (
+            <Link key={item.href} href={item.href} onClick={onNavigate}>
+              <div
+                className={cn(
+                  "flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition-all duration-200",
+                  active
+                    ? "bg-gradient-to-r from-gold to-orange font-semibold text-white shadow-md shadow-gold/20"
+                    : "text-text-body hover:bg-orange/8 hover:text-gold"
+                )}
+              >
+                <item.icon className="h-4 w-4 shrink-0" />
+                <span className="leading-tight">{item.label}</span>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+
+      {navItems.slice(2).map((item) => {
         const active = isActive(pathname, item.href, item.exact);
         return (
           <Link key={item.href} href={item.href} onClick={onNavigate}>
@@ -120,7 +180,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (authState === "loading") {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-20 text-center text-text-muted">
+      <div className="mx-auto max-w-screen-2xl px-4 py-20 text-center text-text-muted">
         Loading admin panel…
       </div>
     );
@@ -146,7 +206,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 md:py-8">
+    <div className="mx-auto max-w-screen-2xl px-4 py-6 md:py-8">
       <div className="mb-6 flex items-center justify-between rounded-2xl border border-gold/20 bg-gradient-to-r from-gold/10 via-orange/5 to-cream px-4 py-3 lg:hidden">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-gold">Admin Panel</p>

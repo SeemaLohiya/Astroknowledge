@@ -33,7 +33,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         return NextResponse.json(
           {
             error:
-              "You already have one slot booked for this item. Cancel it first to book a different time.",
+              "You already have one slot booked for this item. It stays locked until the consultation is completed.",
             existingSlotId: existing.id,
           },
           { status: 409 }
@@ -83,22 +83,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   }
 
   if (body.action === "cancel") {
-    const slot = await slotsStore.cancelByUser(id, session.userId);
-    if (!slot) {
-      return NextResponse.json(
-        { error: "Cannot cancel this slot. It may already be released or not belong to you." },
-        { status: 400 }
-      );
-    }
-    await logNotification({
-      type: "slot_cancelled",
-      userId: session.userId,
-      userName: session.name,
-      referenceId: id,
-      message: `${session.name} cancelled their slot booking`,
-      channel: "system",
-    });
-    return NextResponse.json({ slot, message: "Slot cancelled. You can now book a different time." });
+    return NextResponse.json(
+      { error: "Users cannot cancel slots. Your booking stays locked until the consultation is completed." },
+      { status: 403 }
+    );
   }
 
   if (session.role !== "admin") {

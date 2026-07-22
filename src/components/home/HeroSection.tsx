@@ -3,25 +3,27 @@
 import { SITE, telLink, whatsappLink } from "@/lib/constants";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { ExpertShowcase } from "./ExpertShowcase";
-import { HeroJyotishBackground } from "./HeroJyotishBackground";
 import { Button } from "../ui/Button";
-import { Award, MessageCircle, Phone, Sparkles, Star, Users } from "lucide-react";
+import { WhatsAppIcon } from "@/components/ui/SocialIcons";
+import { Award, Phone, Sparkles, Star, Users } from "lucide-react";
 
 export function HeroSection() {
   const { c } = useLanguage();
 
   return (
     <section className="relative overflow-hidden">
-      <HeroJyotishBackground />
+      <div className="mx-auto max-w-screen-2xl px-3 py-8 sm:px-4 sm:py-10 md:py-12 lg:px-6 lg:py-14">
+        <div className="hero-surface relative isolate overflow-hidden rounded-[2rem] border border-gold/15 bg-white/70 px-4 py-6 shadow-[0_20px_70px_rgba(234,88,12,0.08)] backdrop-blur-xl sm:px-6 sm:py-8 lg:px-8 lg:py-10">
+          <div className="hero-surface-glow pointer-events-none absolute inset-0" />
+          <div className="hero-surface-glow hero-surface-glow-alt pointer-events-none absolute inset-0" />
+          <div className="pointer-events-none absolute -left-24 top-12 z-[2] h-64 w-64 rounded-full bg-gold/15 blur-3xl animate-breathe" />
+          <div
+            className="pointer-events-none absolute -right-24 bottom-8 z-[2] h-72 w-72 rounded-full bg-indigo/10 blur-3xl animate-breathe"
+            style={{ animationDelay: "1.2s" }}
+          />
 
-      <div className="pointer-events-none absolute -left-32 top-20 z-[2] h-64 w-64 rounded-full bg-gold/15 blur-3xl animate-breathe" />
-      <div
-        className="pointer-events-none absolute -right-32 bottom-10 z-[2] h-72 w-72 rounded-full bg-indigo/10 blur-3xl animate-breathe"
-        style={{ animationDelay: "1.2s" }}
-      />
-
-      <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center gap-10 px-3 py-12 sm:px-4 sm:py-14 md:py-16 lg:flex-row lg:py-20">
-        <div className="hero-copy-panel flex-1 text-center lg:text-left animate-fade-in-up">
+          <div className="relative z-10 mx-auto flex flex-col items-center gap-10 lg:flex-row">
+            <div className="hero-copy-panel flex-1 text-center lg:text-left animate-fade-in-up">
           <div className="hero-badge-glow mb-5 inline-flex items-center gap-2 rounded-full border border-indigo/25 bg-white/85 px-4 py-2 text-sm shadow-sm backdrop-blur-md">
             <Sparkles className="h-4 w-4 text-gold animate-icon-bounce" />
             <span className="font-semibold text-gold">{c.hero.badge}</span>
@@ -50,7 +52,7 @@ export function HeroSection() {
             <span className="text-text-dim"> • </span>
             <span className="font-semibold text-gold-bright">{SITE.rating}{c.hero.ratingLabel}</span>
             <span className="text-text-dim"> — </span>
-            {c.hero.descTail}
+            Personalized Vedic guidance for career, marriage, health and spiritual growth.
           </p>
 
           <div className="hero-cta-pop mt-8 flex flex-wrap justify-center gap-4 lg:justify-start" style={{ animationDelay: "0.45s" }}>
@@ -61,7 +63,7 @@ export function HeroSection() {
               {c.sections.coursesTitle}
             </Button>
             <Button href={whatsappLink()} variant="whatsapp" size="lg">
-              <MessageCircle className="h-5 w-5" /> {c.hero.whatsapp}
+              <WhatsAppIcon className="h-5 w-5" /> {c.hero.whatsapp}
             </Button>
           </div>
 
@@ -91,8 +93,16 @@ export function HeroSection() {
           </div>
         </div>
 
-        <div className="flex flex-1 w-full justify-center lg:min-w-[46%] lg:justify-end lg:pl-2">
-          <ExpertShowcase />
+            <div className="flex flex-1 w-full justify-center lg:min-w-[46%] lg:justify-end lg:pl-2">
+              <div className="relative w-full">
+                <div className="hero-floating-card absolute -left-3 bottom-5 hidden rounded-2xl border border-gold/20 bg-white/85 p-3 text-sm shadow-lg shadow-gold/10 backdrop-blur-md lg:block">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-gold">Trusted guidance</p>
+                  <p className="mt-1 text-sm font-semibold text-text-primary">Personalized remedies & spiritual clarity</p>
+                </div>
+                <ExpertShowcase />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

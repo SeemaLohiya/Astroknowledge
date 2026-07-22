@@ -85,7 +85,17 @@ export default function AdminVouchersPage() {
       toast.error("Assign at least one user");
       return;
     }
-    const payload = { ...form, code: form.code.trim().toUpperCase() };
+    const usageLimitRaw = form.usageLimit;
+    const payload = {
+      ...form,
+      code: form.code.trim().toUpperCase(),
+      usageLimit:
+        usageLimitRaw === undefined || usageLimitRaw === null || Number.isNaN(Number(usageLimitRaw))
+          ? null
+          : Number(usageLimitRaw),
+      applicableItemTypes: form.applicableItemTypes ?? [],
+      applicableItemIds: form.applicableItemIds ?? [],
+    };
     const res = editing
       ? await fetch(`/api/admin/vouchers/${editing.id}`, {
           method: "PUT",
@@ -305,8 +315,21 @@ export default function AdminVouchersPage() {
                   <input type="number" value={form.maxDiscount ?? ""} onChange={(e) => setForm({ ...form, maxDiscount: e.target.value ? Number(e.target.value) : undefined })} className="mt-1 w-full rounded-xl border border-gold/20 px-3 py-2 text-sm" />
                 </div>
                 <div>
-                  <label className="text-xs text-text-muted">Usage limit</label>
-                  <input type="number" value={form.usageLimit ?? ""} onChange={(e) => setForm({ ...form, usageLimit: e.target.value ? Number(e.target.value) : undefined })} className="mt-1 w-full rounded-xl border border-gold/20 px-3 py-2 text-sm" />
+                  <label className="text-xs text-text-muted">Usage limit (blank = unlimited)</label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={form.usageLimit ?? ""}
+                    onChange={(e) => {
+                      const raw = e.target.value.trim();
+                      setForm({
+                        ...form,
+                        usageLimit: raw === "" ? undefined : Math.max(1, Number(raw) || 1),
+                      });
+                    }}
+                    placeholder="Unlimited"
+                    className="mt-1 w-full rounded-xl border border-gold/20 px-3 py-2 text-sm"
+                  />
                 </div>
                 <div className="flex items-end">
                   <label className="flex items-center gap-2 text-sm">
@@ -317,12 +340,17 @@ export default function AdminVouchersPage() {
               </div>
 
               <div className="mt-4">
-                <p className="text-xs font-semibold text-text-muted mb-2">Applicable item types (empty = all)</p>
-                <div className="flex flex-wrap gap-2">
+                <p className="text-xs font-semibold text-text-muted mb-2">Applicable item types (none selected = all)</p>
+                <div className="flex flex-wrap gap-3">
                   {ITEM_TYPES.map((t) => (
-                    <button key={t} type="button" onClick={() => toggleItemType(t)} className={`rounded-full px-3 py-1 text-xs capitalize ${(form.applicableItemTypes || []).includes(t) ? "bg-gold text-white" : "bg-orange/10 text-text-body"}`}>
+                    <label key={t} className="flex items-center gap-2 rounded-xl border border-gold/15 bg-white/70 px-3 py-2 text-xs capitalize cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={(form.applicableItemTypes || []).includes(t)}
+                        onChange={() => toggleItemType(t)}
+                      />
                       {t}
-                    </button>
+                    </label>
                   ))}
                 </div>
               </div>

@@ -86,9 +86,11 @@ async function createOrderFromPayment(payment: PaymentRecord) {
       name: i.name,
       price: i.price,
       quantity: i.quantity,
+      itemType: i.itemType,
     })),
     total: payment.amount,
     status: "processing",
+    shippingAddress: payment.shippingAddress,
   });
 }
 
@@ -116,6 +118,7 @@ export const paymentsStore = {
     discountAmount?: number;
     voucherCode?: string;
     voucherId?: string;
+    shippingAddress?: string;
   }) => {
     const payments = await getPaymentsList();
     const payment: PaymentRecord = {
@@ -133,6 +136,7 @@ export const paymentsStore = {
       voucherCode: data.voucherCode,
       voucherId: data.voucherId,
       status: "pending",
+      shippingAddress: data.shippingAddress,
       items: data.items.map((i) => ({
         id: i.id,
         itemType: i.itemType,

@@ -176,7 +176,7 @@ export function CosmicElementsSection() {
       <div className="navgraha-stars pointer-events-none absolute inset-0 opacity-40" />
       <div className="navgraha-constellation pointer-events-none absolute inset-0 opacity-30" />
 
-      <div className="relative mx-auto max-w-7xl px-4">
+      <div className="relative mx-auto max-w-screen-2xl px-4">
         <RevealOnScroll variant="blur-up" className="mb-12 text-center">
           <h2 className="heading-display text-3xl font-bold md:text-4xl">
             {c.sections.cosmicTitle.split(" ")[0]}{" "}

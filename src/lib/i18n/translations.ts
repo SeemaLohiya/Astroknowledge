@@ -3,7 +3,7 @@ export type Lang = "en" | "hi";
 export const translations: Record<Lang, Record<string, string>> = {
   en: {
     home: "Home",
-    services: "Services",
+    services: "Consultancy Services",
     courses: "Courses",
     products: "Products",
     pooja: "Pooja",
@@ -28,7 +28,7 @@ export const translations: Record<Lang, Record<string, string>> = {
   },
   hi: {
     home: "होम",
-    services: "सेवाएं",
+    services: "परामर्श सेवाएं",
     courses: "पाठ्यक्रम",
     products: "उत्पाद",
     pooja: "पूजा",

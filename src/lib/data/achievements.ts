@@ -89,16 +89,16 @@ export const achievementPhotos: AchievementPhoto[] = [
   {
     id: "p2",
     image: "/images/achievements/events/02-vedamritam-summit.png",
-    title: "International Astrology Research Summit 2023",
-    titleHindi: "अंतर्राष्ट्रीय ज्योतिष अनुसंधान समिट २०२३",
+    title: "International Astrology Research Summit",
+    titleHindi: "अंतर्राष्ट्रीय ज्योतिष अनुसंधान समिट",
     alt: "Certificate of participation at Vedamritam Astro-Vastu Summit, Jaipur",
   },
   {
     id: "p3",
     image: "/images/achievements/events/03-nakshatra-2024.png",
-    title: "Nakshatra 2024 — Holistic Wellness",
-    titleHindi: "नक्षत्र २०२४ — समग्र कल्याण",
-    alt: "Award presentation at Nakshatra 2024 holistic wellness convention",
+    title: "Nakshatra — Holistic Wellness",
+    titleHindi: "नक्षत्र — समग्र कल्याण",
+    alt: "Award presentation at Nakshatra holistic wellness convention",
   },
   {
     id: "p4",
@@ -131,9 +131,9 @@ export const achievementPhotos: AchievementPhoto[] = [
   {
     id: "p9",
     image: "/images/achievements/events/09-jaipur-jyotish-group.png",
-    title: "Jaipur Jyotish Utsav 2025",
-    titleHindi: "जयपुर ज्योतिष उत्सव २०२५",
-    alt: "Group photo at Jaipur Jyotish Utsav, December 2025",
+    title: "Jaipur Jyotish Utsav",
+    titleHindi: "जयपुर ज्योतिष उत्सव",
+    alt: "Group photo at Jaipur Jyotish Utsav",
   },
   {
     id: "p10",

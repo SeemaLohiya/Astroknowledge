@@ -10,6 +10,21 @@ import { isBirthProfileComplete } from "@/lib/profile";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { Mail, Pencil, Phone, User as UserIcon } from "lucide-react";
 
+function formatDobDisplay(iso?: string) {
+  if (!iso) return "—";
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+  if (m) return `${m[3]}/${m[2]}/${m[1]}`;
+  try {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return iso;
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    return `${dd}/${mm}/${d.getFullYear()}`;
+  } catch {
+    return iso;
+  }
+}
+
 export default function ProfilePage() {
   const { c } = useLanguage();
   const d = c.dashboard;
@@ -35,7 +50,7 @@ export default function ProfilePage() {
         <h1 className="font-display text-2xl font-bold text-text-primary mb-2">
           {d.profileTitle} <span className="text-gradient-gold">{d.profileTitleAccent}</span>
         </h1>
-        <p className="text-sm text-text-muted mb-6">Manage your contact, birth details and delivery addresses.</p>
+        <p className="text-sm text-text-muted mb-6">Manage your contact details, birth information and delivery address for consultations and orders.</p>
       </FadeIn>
 
       <FadeIn>
@@ -74,7 +89,7 @@ export default function ProfilePage() {
               </div>
             ))}
             {user.gender && <p><span className="text-text-muted">Gender:</span> {user.gender}</p>}
-            <p><span className="text-text-muted">{d.dob}</span> {user.dobUnknown ? d.notKnown : user.dob || "—"}</p>
+            <p><span className="text-text-muted">{d.dob}</span> {user.dobUnknown ? d.notKnown : formatDobDisplay(user.dob)}</p>
             <p><span className="text-text-muted">{d.birthTime}</span> {user.birthTimeUnknown ? d.notKnown : user.birthTime || "—"}</p>
             <p><span className="text-text-muted">{d.birthPlace}</span> {user.birthPlaceUnknown ? d.notKnown : user.birthPlace || "—"}</p>
           </div>

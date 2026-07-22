@@ -23,7 +23,8 @@ const CosmicElementsSection = dynamic(
 export default function HomePage() {
   return (
     <PageTransition>
-      <HeroSection />
+      <div className="home-page-shell relative overflow-hidden">
+        <HeroSection />
       <SectionPartition variant="bold" />
       <SectionBand variant="peach">
         <HomeStatsSection />
@@ -82,6 +83,7 @@ export default function HomePage() {
       <SectionBand variant="lavender">
         <FAQSection />
       </SectionBand>
+      </div>
     </PageTransition>
   );
 }

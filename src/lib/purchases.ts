@@ -23,10 +23,10 @@ export interface PaidServiceItem {
   name: string;
   image: string;
   price: number;
-  itemType: "service" | "course";
+  itemType: "service";
 }
 
-/** Paid services and courses that unlock online slot booking (no physical delivery). */
+/** Paid consultancy services that unlock online slot booking (courses use Resources instead). */
 export async function getPaidServices(userId: string): Promise<PaidServiceItem[]> {
   const seen = new Set<string>();
   const items: PaidServiceItem[] = [];
@@ -34,14 +34,14 @@ export async function getPaidServices(userId: string): Promise<PaidServiceItem[]
   for (const purchase of await getUserPurchases(userId)) {
     if (purchase.paymentStatus !== "paid") continue;
     for (const item of purchase.items ?? []) {
-      if ((item.itemType !== "service" && item.itemType !== "course") || seen.has(item.id)) continue;
+      if (item.itemType !== "service" || seen.has(item.id)) continue;
       seen.add(item.id);
       items.push({
         id: item.id,
         name: item.name,
         image: item.image,
         price: item.price,
-        itemType: item.itemType,
+        itemType: "service",
       });
     }
   }

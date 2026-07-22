@@ -9,7 +9,7 @@ import { Award, Calendar, MapPin, Sparkles, Star, Users, Zap } from "lucide-reac
 import Link from "next/link";
 
 const SKILLS = [
-  { label: "Kundali", href: "/services#kundali-vishleshan" },
+  { label: "Kundali Analysis", href: "/services#kundali-vishleshan" },
   { label: "Vastu", href: "/services#vastu-consultancy" },
   { label: "Remedies", href: "/products" },
   { label: "Pooja", href: "/pooja" },

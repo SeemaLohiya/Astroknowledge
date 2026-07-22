@@ -2,6 +2,7 @@
 
 import { fetchJson } from "@/lib/fetch-json";
 import { isBirthProfileComplete } from "@/lib/profile";
+import { scheduleIdle } from "@/lib/schedule-idle";
 import { User } from "@/lib/types";
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
@@ -70,7 +71,9 @@ export function ProfileGate({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    void refresh();
+    return scheduleIdle(() => {
+      void refresh();
+    });
   }, [refresh]);
 
   useEffect(() => {

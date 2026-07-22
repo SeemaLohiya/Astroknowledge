@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
     state: body.state?.trim() || "",
     country: body.country?.trim() || "India",
     pincode: body.pincode?.trim() || "",
+    locationLink: body.locationLink?.trim() || undefined,
     isDefault: !!body.isDefault,
   });
   return NextResponse.json({ address }, { status: 201 });

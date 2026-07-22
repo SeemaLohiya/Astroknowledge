@@ -3,7 +3,7 @@ import { getSession } from "@/lib/auth";
 import { contentStore } from "@/lib/content-store";
 import { defaultAcharyaImage, resolveAcharyaImage } from "@/lib/site-branding";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export async function GET() {
   const content = await contentStore.get();

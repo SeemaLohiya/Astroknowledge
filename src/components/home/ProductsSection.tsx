@@ -18,7 +18,7 @@ export function ProductsSection() {
     <section id="products" className="relative py-24 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-orange/5 to-transparent" />
       <SectionBackdrop variant="warm" />
-      <div className="relative mx-auto max-w-7xl px-4">
+      <div className="relative mx-auto max-w-screen-2xl px-4">
         <SectionHeader
           title={<>{c.sections.productsTitle.split(" ").slice(0, -1).join(" ")} <span className="text-gradient-gold">{c.sections.productsTitle.split(" ").slice(-1)[0]}</span></>}
           subtitle={c.sections.productsSubtitle}

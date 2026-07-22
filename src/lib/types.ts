@@ -1,3 +1,9 @@
+export interface CourseResourceLink {
+  id: string;
+  label: string;
+  url: string;
+}
+
 export interface User {
   id: string;
   name: string;
@@ -22,6 +28,8 @@ export interface User {
   birthTimeUnknown?: boolean;
   birthPlaceUnknown?: boolean;
   birthDetailsUpdatedAt?: string;
+  /** Extra course resource links pasted by admin for this user (merged with course defaults). */
+  courseResources?: { courseId: string; links: CourseResourceLink[] }[];
 }
 
 export interface Service {
@@ -47,6 +55,8 @@ export interface Course {
   image: string;
   features: string[];
   popular?: boolean;
+  /** Default resource links shown to buyers (WhatsApp, lectures, material, certificates). */
+  resources?: CourseResourceLink[];
 }
 
 export type CatalogType = "products" | "services" | "courses" | "pooja" | "healing";
@@ -68,7 +78,7 @@ export interface BookingSlot {
   dobUnknown?: boolean;
   birthTimeUnknown?: boolean;
   birthPlaceUnknown?: boolean;
-  status: "available" | "pending" | "booked" | "blocked";
+  status: "available" | "pending" | "booked" | "blocked" | "completed";
   paymentStatus?: "unpaid" | "pending" | "paid" | "refunded";
   paymentAmount?: number;
   bookedAt?: string;
@@ -137,6 +147,7 @@ export interface PaymentRecord {
   paymentProofImage?: string;
   adminComment?: string;
   items: { id: string; itemType: CartItemType; name: string; price: number; quantity: number; image: string }[];
+  shippingAddress?: string;
   createdAt: string;
 }
 
@@ -222,7 +233,7 @@ export interface Order {
   id: string;
   userId: string;
   userName: string;
-  items: { productId: string; name: string; price: number; quantity: number }[];
+  items: { productId: string; name: string; price: number; quantity: number; itemType?: CartItemType }[];
   total: number;
   status: OrderStatus;
   trackingId?: string;
@@ -243,6 +254,8 @@ export interface SavedAddress {
   state: string;
   country: string;
   pincode: string;
+  /** Optional Google Maps / location share link */
+  locationLink?: string;
   isDefault: boolean;
   createdAt: string;
 }

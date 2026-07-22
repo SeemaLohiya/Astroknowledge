@@ -3,7 +3,7 @@ import { getSession } from "@/lib/auth";
 import { catalogStore } from "@/lib/catalog-store";
 import { CatalogType } from "@/lib/types";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 const VALID_TYPES: CatalogType[] = ["products", "services", "courses", "pooja", "healing"];
 
