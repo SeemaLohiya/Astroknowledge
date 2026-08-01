@@ -35,6 +35,23 @@ export const metadata: Metadata = {
   category: "Astrology",
   keywords: SEO_KEYWORDS,
   manifest: "/manifest.webmanifest",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  alternates: {
+    canonical: SITE.url,
+    types: {
+      "application/xml": absoluteUrl("/sitemap.xml"),
+    },
+  },
   icons: {
     icon: [
       { url: "/images/logo.png", type: "image/png" },
@@ -57,6 +74,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="alternate" hrefLang="en-IN" href={SITE.url} />
         <link rel="alternate" hrefLang="hi-IN" href={SITE.url} />
         <link rel="alternate" hrefLang="x-default" href={SITE.url} />
+        <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
       </head>
       <body className="bg-cosmic min-h-screen antialiased">
         <AppProviders>

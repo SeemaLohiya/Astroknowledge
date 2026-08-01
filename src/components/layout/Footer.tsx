@@ -195,6 +195,12 @@ export function Footer() {
             <Link href="/refund" className="hover:text-gold">
               {c.footer.refund}
             </Link>
+            <a href="/sitemap.xml" className="hover:text-gold">
+              Sitemap
+            </a>
+            <a href="/robots.txt" className="hover:text-gold">
+              Robots
+            </a>
           </div>
         </div>
       </div>
