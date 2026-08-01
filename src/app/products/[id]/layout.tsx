@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { products } from "@/lib/data/products";
 import { SITE } from "@/lib/constants";
-import { pageMetadata } from "@/lib/seo";
+import { SchemaScript } from "@/components/seo/SchemaScript";
+import { pageMetadata, productJsonLd } from "@/lib/seo";
 
 type Props = { params: Promise<{ id: string }>; children: React.ReactNode };
 
@@ -11,20 +12,38 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!product) {
     return pageMetadata({
-      title: `Product | ${SITE.name}`,
-      description: `Shop spiritual products at ${SITE.name}.`,
+      title: `Spiritual Products | ${SITE.name}`,
+      description: `Shop authentic spiritual products, Rudraksha, yantras and Vedic remedies at ${SITE.name}, Jaipur.`,
       path: `/products/${id}`,
     });
   }
 
   return pageMetadata({
-    title: `${product.name} | Buy Online — ${SITE.name}`,
-    description: product.description.slice(0, 155),
+    title: `${product.name} — Buy Online Jaipur | ${SITE.name}`,
+    description: `${product.description.slice(0, 140)} Shop at AstroKnowledge with guidance from ${SITE.acharya}.`,
     path: `/products/${product.id}`,
     image: product.image,
   });
 }
 
-export default function ProductDetailLayout({ children }: { children: React.ReactNode }) {
-  return children;
+export default async function ProductDetailLayout({ params, children }: Props) {
+  const { id } = await params;
+  const product = products.find((p) => p.id === id);
+
+  return (
+    <>
+      {product && (
+        <SchemaScript
+          data={productJsonLd({
+            id: product.id,
+            name: product.name,
+            description: product.description,
+            image: product.image,
+            price: product.price,
+          })}
+        />
+      )}
+      {children}
+    </>
+  );
 }

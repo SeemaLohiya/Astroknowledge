@@ -3,8 +3,8 @@ import { SITE } from "@/lib/constants";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
-  title: `Astrology Courses | Learn Vedic Wisdom — ${SITE.name}`,
-  description: `Learn Vedic astrology with ${SITE.acharya} at AstroKnowledge. Structured courses on Kundali, remedies and spiritual practice for beginners and enthusiasts.`,
+  title: `Vedic Astrology Courses Online | Learn with ${SITE.acharya}`,
+  description: `Join astrology courses at AstroKnowledge Jaipur. Learn Kundali reading, rituals, Numerology & Vastu from ${SITE.acharya}. Certification programs for beginners and serious students.`,
   path: "/courses",
 });
 

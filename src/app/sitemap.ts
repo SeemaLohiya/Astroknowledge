@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
-import { SITE } from "@/lib/constants";
-import { PUBLIC_ROUTES, absoluteUrl } from "@/lib/seo";
+import { courses } from "@/lib/data/courses";
 import { products } from "@/lib/data/products";
+import { services } from "@/lib/data/services";
+import { absoluteUrl, PUBLIC_ROUTES } from "@/lib/seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -17,12 +18,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: absoluteUrl(`/products/${p.id}`),
     lastModified: now,
     changeFrequency: "weekly" as const,
+    priority: 0.75,
+  }));
+
+  const serviceAnchors: MetadataRoute.Sitemap = services.map((s) => ({
+    url: absoluteUrl(`/services#${s.id}`),
+    lastModified: now,
+    changeFrequency: "weekly" as const,
     priority: 0.7,
   }));
 
-  return [...staticPages, ...productPages];
+  const courseAnchors: MetadataRoute.Sitemap = courses.map((c) => ({
+    url: absoluteUrl(`/courses#${c.id}`),
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.65,
+  }));
+
+  return [...staticPages, ...productPages, ...serviceAnchors, ...courseAnchors];
 }
 
-/** Ensure sitemap uses production host even if env is missing at build. */
 export const dynamic = "force-static";
-void SITE;

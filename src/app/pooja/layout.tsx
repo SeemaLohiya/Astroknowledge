@@ -3,8 +3,8 @@ import { SITE } from "@/lib/constants";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
-  title: `Pooja Services | Vedic Rituals Online — ${SITE.name}`,
-  description: `Book authentic Vedic pooja services with AstroKnowledge. ${SITE.acharya} guides traditional rituals for peace, prosperity and spiritual wellbeing.`,
+  title: `Online Pooja Services | Vedic Rituals Jaipur — ${SITE.name}`,
+  description: `Book authentic Vedic pooja services online with AstroKnowledge. Traditional rituals for peace, prosperity and spiritual wellbeing guided by ${SITE.acharya} in Jaipur.`,
   path: "/pooja",
 });
 

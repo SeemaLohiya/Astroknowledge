@@ -3,7 +3,7 @@ import { SITE } from "@/lib/constants";
 
 const SITE_URL = SITE.url.replace(/\/$/, "");
 
-/** Brand + service keywords — includes common misspellings for brand search. */
+/** Brand + service keywords — includes common misspellings and local search terms. */
 export const SEO_KEYWORDS = [
   "AstroKnowledge",
   "Astro Knowledge",
@@ -14,20 +14,55 @@ export const SEO_KEYWORDS = [
   "Seema Lohiya",
   "Seema Lohiya astrologer",
   "best vedic astrologer Jaipur",
+  "best astrologer in Jaipur",
+  "top astrologer Rajasthan",
+  "vedic astrology Jaipur",
+  "online astrologer India",
   "vedic astrology",
   "kundali analysis",
   "kundali vishleshan",
   "kundli milan",
+  "marriage astrology",
   "horoscope",
+  "janam kundli",
   "vastu shastra",
+  "vastu consultant Jaipur",
   "numerology",
+  "palmistry",
   "online astrology consultation",
-  "pooja services",
+  "pooja services online",
   "spiritual healing",
-  "rudraksha",
+  "rudraksha online",
+  "yantra shop",
+  "gemstones astrology",
   "astrology courses",
   "Jaipur astrologer",
+  "astrologer near me Jaipur",
+  "famous astrologer India",
 ];
+
+export const SERVICE_KEYWORDS = [
+  ...SEO_KEYWORDS,
+  "kundali vishleshan price",
+  "kundli milan online",
+  "vastu consultancy Jaipur",
+  "numerology consultation",
+  "ask astrologer question",
+];
+
+export const PRODUCT_KEYWORDS = [
+  ...SEO_KEYWORDS,
+  "buy rudraksha online",
+  "spiritual products India",
+  "energized yantra",
+  "astrology remedies products",
+];
+
+function googleVerification(): Metadata["verification"] | undefined {
+  const token = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
+  if (!token) return undefined;
+  return { google: token };
+}
 
 export function absoluteUrl(path = "/") {
   if (path.startsWith("http")) return path;
@@ -60,6 +95,7 @@ export function pageMetadata({
     description,
     keywords: keywords.join(", "),
     alternates: { canonical: url },
+    verification: googleVerification(),
     openGraph: {
       title: fullTitle,
       description,
@@ -98,7 +134,7 @@ export function pageMetadata({
   };
 }
 
-export const DEFAULT_DESCRIPTION = `AstroKnowledge by ${SITE.acharya} — expert Vedic astrology in Jaipur. Kundali analysis, Kundli Milan, Vastu, Numerology, Pooja, healing & courses. ${SITE.experience}+ years · ${SITE.clients} clients · ${SITE.rating}/5 rated.`;
+export const DEFAULT_DESCRIPTION = `AstroKnowledge by ${SITE.acharya} — #1 trusted Vedic astrologer in Jaipur, Rajasthan. Online Kundali Vishleshan, Kundli Milan, Vastu Shastra, Numerology, Pooja, spiritual healing, Rudraksha & astrology courses. ${SITE.experience}+ years · ${SITE.clients} clients · ${SITE.rating}/5 rated. Book consultation today.`;
 
 export function organizationJsonLd() {
   return {
@@ -119,7 +155,7 @@ export function organizationJsonLd() {
       addressRegion: "Rajasthan",
       addressCountry: "IN",
     },
-    sameAs: [SITE.youtube, SITE.instagram, SITE.facebook].filter(Boolean),
+    sameAs: [SITE.youtube, SITE.instagram, SITE.facebook, SITE.mapsUrl].filter(Boolean),
     founder: {
       "@type": "Person",
       name: SITE.acharya,
@@ -165,6 +201,17 @@ export function localBusinessJsonLd() {
       "@type": "Country",
       name: "India",
     },
+    hasMap: SITE.mapsUrl,
+    knowsAbout: [
+      "Vedic Astrology",
+      "Kundali Vishleshan",
+      "Kundli Milan",
+      "Vastu Shastra",
+      "Numerology",
+      "Palmistry",
+      "Pooja",
+      "Spiritual Healing",
+    ],
   };
 }
 
@@ -179,7 +226,7 @@ export function personJsonLd() {
     worksFor: { "@id": `${SITE_URL}/#organization` },
     url: absoluteUrl("/about"),
     image: absoluteUrl(SITE.acharyaImage),
-    sameAs: [SITE.youtube, SITE.instagram, SITE.facebook].filter(Boolean),
+    sameAs: [SITE.youtube, SITE.instagram, SITE.facebook, SITE.mapsUrl].filter(Boolean),
     description: `${SITE.acharya}, ${SITE.acharyaTitle} at ${SITE.name} with ${SITE.experience}+ years of Vedic astrology experience and ${SITE.clients} happy clients.`,
   };
 }
@@ -216,6 +263,70 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
       name: item.name,
       item: absoluteUrl(item.path),
     })),
+  };
+}
+
+export function productJsonLd(product: {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  price: number;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description,
+    image: absoluteUrl(product.image),
+    sku: product.id,
+    brand: { "@type": "Brand", name: SITE.name },
+    offers: {
+      "@type": "Offer",
+      url: absoluteUrl(`/products/${product.id}`),
+      priceCurrency: "INR",
+      price: product.price,
+      availability: "https://schema.org/InStock",
+      seller: { "@id": `${SITE_URL}/#organization` },
+    },
+  };
+}
+
+export function servicesCatalogJsonLd(
+  services: { id: string; title: string; description: string; price: number; image: string }[]
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Vedic Astrology Consultancy Services",
+    itemListElement: services.map((service, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      item: {
+        "@type": "Service",
+        name: service.title,
+        description: service.description,
+        image: absoluteUrl(service.image),
+        provider: { "@id": `${SITE_URL}/#organization` },
+        areaServed: "India",
+        offers: {
+          "@type": "Offer",
+          price: service.price,
+          priceCurrency: "INR",
+          url: absoluteUrl(`/services#${service.id}`),
+        },
+      },
+    })),
+  };
+}
+
+export function contactPageJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    name: `Contact ${SITE.name}`,
+    url: absoluteUrl("/contact"),
+    mainEntity: { "@id": `${SITE_URL}/#localbusiness` },
   };
 }
 

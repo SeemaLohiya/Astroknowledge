@@ -14,7 +14,7 @@ import { DEFAULT_DESCRIPTION, pageMetadata } from "@/lib/seo";
 import { siteContent } from "@/lib/i18n/site-content";
 
 export const metadata: Metadata = pageMetadata({
-  title: `${SITE.name} | Best Vedic Astrologer Jaipur — ${SITE.acharya}`,
+  title: `Best Vedic Astrologer in Jaipur | ${SITE.acharya} — ${SITE.name}`,
   description: DEFAULT_DESCRIPTION,
   path: "/",
   image: SITE.acharyaImage,

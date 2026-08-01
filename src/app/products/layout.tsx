@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { SITE } from "@/lib/constants";
-import { pageMetadata } from "@/lib/seo";
+import { PRODUCT_KEYWORDS, pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
-  title: `Spiritual Products | Rudraksha & Remedies — ${SITE.name}`,
-  description: `Shop energized spiritual products from AstroKnowledge — Rudraksha, yantras and Vedic remedies recommended by ${SITE.acharya}.`,
+  title: `Rudraksha, Yantras & Spiritual Products — Shop Online Jaipur`,
+  description: `Buy authentic Rudraksha, gemstones, yantras and Vedic spiritual products online from ${SITE.name}. Energized remedies recommended by ${SITE.acharya}, Jaipur's trusted astrologer.`,
   path: "/products",
+  keywords: PRODUCT_KEYWORDS,
 });
 
 export default function ProductsLayout({ children }: { children: React.ReactNode }) {

@@ -22,7 +22,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   ...pageMetadata({
-    title: `${SITE.name} | Best Vedic Astrologer Jaipur — ${SITE.acharya}`,
+    title: `Best Vedic Astrologer in Jaipur | ${SITE.acharya} — ${SITE.name}`,
     description: DEFAULT_DESCRIPTION,
     path: "/",
     image: SITE.acharyaImage,

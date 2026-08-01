@@ -37,6 +37,7 @@ export function HeroSection() {
           </p>
 
           <h1 className="heading-display hero-title-main text-reveal text-4xl font-bold leading-[1.1] md:text-5xl lg:text-[3.4rem]">
+            <span className="sr-only">AstroKnowledge — Best Vedic Astrologer in Jaipur, Rajasthan. </span>
             {SITE.acharya}
           </h1>
 
