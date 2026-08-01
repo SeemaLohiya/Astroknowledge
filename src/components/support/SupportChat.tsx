@@ -8,6 +8,7 @@ import {
   SupportThread,
 } from "@/lib/types";
 import {
+  ArrowLeft,
   FileText,
   Link2,
   Paperclip,
@@ -95,9 +96,10 @@ type SupportChatProps = {
   threadId?: string | null;
   emptyHint?: string;
   onSent?: () => void;
+  onBack?: () => void;
 };
 
-export function SupportChat({ mode, threadId, emptyHint, onSent }: SupportChatProps) {
+export function SupportChat({ mode, threadId, emptyHint, onSent, onBack }: SupportChatProps) {
   const [thread, setThread] = useState<SupportThread | null>(null);
   const [messages, setMessages] = useState<SupportMessage[]>([]);
   const [text, setText] = useState("");
@@ -230,7 +232,7 @@ export function SupportChat({ mode, threadId, emptyHint, onSent }: SupportChatPr
 
   if (mode === "admin" && !threadId) {
     return (
-      <div className="flex h-[min(70vh,640px)] items-center justify-center rounded-2xl border border-gold/15 bg-[#efeae2] p-8 text-center text-sm text-text-muted">
+      <div className="flex h-[min(calc(100dvh-14rem),640px)] items-center justify-center rounded-2xl border border-gold/15 bg-[#efeae2] p-6 text-center text-sm text-text-muted sm:p-8">
         {emptyHint || "Select a user conversation to reply"}
       </div>
     );
@@ -238,7 +240,7 @@ export function SupportChat({ mode, threadId, emptyHint, onSent }: SupportChatPr
 
   if (loadError && !thread) {
     return (
-      <div className="flex h-[min(70vh,640px)] flex-col items-center justify-center gap-3 rounded-2xl border border-gold/15 bg-[#efeae2] p-8 text-center">
+      <div className="flex h-[min(calc(100dvh-14rem),640px)] flex-col items-center justify-center gap-3 rounded-2xl border border-gold/15 bg-[#efeae2] p-6 text-center sm:p-8">
         <p className="text-sm text-red-600">{loadError}</p>
         <button
           type="button"
@@ -257,7 +259,7 @@ export function SupportChat({ mode, threadId, emptyHint, onSent }: SupportChatPr
 
   if (loading) {
     return (
-      <div className="flex h-[min(70vh,640px)] items-center justify-center rounded-2xl border border-gold/15 bg-[#efeae2] text-sm text-text-muted">
+      <div className="flex h-[min(calc(100dvh-14rem),640px)] items-center justify-center rounded-2xl border border-gold/15 bg-[#efeae2] text-sm text-text-muted">
         Loading chat…
       </div>
     );
@@ -267,8 +269,18 @@ export function SupportChat({ mode, threadId, emptyHint, onSent }: SupportChatPr
   const headerInitials = (mode === "admin" ? thread?.userName || "U" : "AK").slice(0, 2).toUpperCase();
 
   return (
-    <div className="flex h-[min(70vh,640px)] flex-col overflow-hidden rounded-2xl border border-gold/20 bg-[#efeae2] shadow-sm">
-      <div className="flex items-center gap-3 border-b border-black/5 bg-[#075e54] px-4 py-3 text-white">
+    <div className="flex h-[min(calc(100dvh-14rem),640px)] flex-col overflow-hidden rounded-2xl border border-gold/20 bg-[#efeae2] shadow-sm">
+      <div className="flex items-center gap-2 border-b border-black/5 bg-[#075e54] px-3 py-3 text-white sm:gap-3 sm:px-4">
+        {mode === "admin" && onBack && (
+          <button
+            type="button"
+            onClick={onBack}
+            className="rounded-full p-1.5 hover:bg-white/10 lg:hidden"
+            aria-label="Back to conversations"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+        )}
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-sm font-bold">
           {headerInitials}
         </div>

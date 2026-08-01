@@ -27,7 +27,14 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "threadId required" }, { status: 400 });
     }
 
-    const thread = await supportStore.getThread(threadId);
+    let thread = await supportStore.getThread(threadId);
+    if (!thread && session.role === "admin" && threadId.startsWith("thread-")) {
+      const userId = threadId.slice("thread-".length);
+      const user = await store.users.findById(userId);
+      if (user && user.role === "user") {
+        thread = await supportStore.ensureThread({ id: user.id, name: user.name, email: user.email });
+      }
+    }
     if (!thread) return NextResponse.json({ error: "Thread not found" }, { status: 404 });
 
     if (session.role !== "admin" && thread.userId !== session.userId) {
