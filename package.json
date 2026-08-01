@@ -16,7 +16,9 @@
     "db:provision:api": "node scripts/provision-atlas-api.mjs",
     "db:wire-render": "node scripts/configure-render-mongo.mjs",
     "seo:submit": "node scripts/submit-seo-indexing.mjs",
-    "deploy:live": "node scripts/deploy-live.mjs"
+    "deploy:live": "node scripts/deploy-live.mjs",
+    "security:render": "node scripts/configure-render-security.mjs",
+    "security:cloudflare": "node scripts/configure-cloudflare.mjs"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.13",

@@ -1,0 +1,6 @@
+Contact: mailto:astroknowledge01@gmail.com
+Preferred-Languages: en, hi
+Canonical: https://astroknowledge.in/.well-known/security.txt
+Policy: https://astroknowledge.in/privacy
+
+# Report security issues to the email above. Do not test on production without permission.

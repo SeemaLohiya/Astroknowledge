@@ -57,6 +57,10 @@ function buckets() {
 }
 
 export function clientIp(req: NextRequest): string {
+  // Behind Cloudflare proxy
+  const cfConnecting = req.headers.get("cf-connecting-ip")?.trim();
+  if (cfConnecting) return cfConnecting;
+
   const forwarded = req.headers.get("x-forwarded-for");
   if (forwarded) return forwarded.split(",")[0]?.trim() || "unknown";
   return req.headers.get("x-real-ip")?.trim() || "unknown";
@@ -133,7 +137,7 @@ export function checkFirewall(req: NextRequest): FirewallVerdict {
     pruneBuckets();
 
     if (authRoute(pathname)) {
-      return rateLimit(`auth:${ip}`, 12, 60_000);
+      return rateLimit(`auth:${ip}`, 8, 60_000);
     }
     if (uploadRoute(pathname)) {
       return rateLimit(`upload:${ip}`, 25, 60_000);
