@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AUTH_COOKIE, authCookieOptions, createToken, sanitizeUser } from "@/lib/auth";
+import { readJsonBody } from "@/lib/security/api-guard";
 import { store } from "@/lib/store";
 
 export async function POST(req: NextRequest) {
-  const { email, password } = await req.json();
+  const body = await readJsonBody<{ email?: string; password?: string }>(req);
+  if (!body) {
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  }
+
+  const { email, password } = body;
   const user = await store.users.findByEmail(email?.trim().toLowerCase() ?? "");
 
   if (!user || user.password !== password) {

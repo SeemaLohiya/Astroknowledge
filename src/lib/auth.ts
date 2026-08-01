@@ -4,7 +4,11 @@ import { User } from "./types";
 
 function getSecret() {
   const env = process.env.JWT_SECRET?.trim();
-  return new TextEncoder().encode(env && env.length >= 16 ? env : "astroknowledge-secret-key-2026");
+  const fallback = "astroknowledge-secret-key-2026";
+  if (process.env.NODE_ENV === "production" && (!env || env.length < 32 || env === fallback)) {
+    console.error("[security] Set a strong JWT_SECRET (32+ chars) in production.");
+  }
+  return new TextEncoder().encode(env && env.length >= 16 ? env : fallback);
 }
 
 export interface SessionPayload {
@@ -49,7 +53,7 @@ export function authCookieOptions() {
   return {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax" as const,
+    sameSite: "strict" as const,
     maxAge: AUTH_MAX_AGE,
     path: "/",
   };
