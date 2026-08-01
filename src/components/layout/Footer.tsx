@@ -19,6 +19,7 @@ import {
 import Link from "next/link";
 
 const QUICK_LINKS = [
+  { label: "Best Astrologer Jaipur", href: "/best-astrologer-jaipur", icon: Sparkles },
   { label: "Consultancy Services", href: "/services", icon: Sparkles },
   { label: "Courses", href: "/courses", icon: BookOpen },
   { label: "Book Consultation", href: "/dashboard/services?tab=book", icon: Calendar },

@@ -58,10 +58,16 @@ export const PRODUCT_KEYWORDS = [
   "astrology remedies products",
 ];
 
-function googleVerification(): Metadata["verification"] | undefined {
-  const token = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
-  if (!token) return undefined;
-  return { google: token };
+function siteVerification(): Metadata["verification"] | undefined {
+  const google = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
+  const bing = process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION?.trim();
+  const yandex = process.env.NEXT_PUBLIC_YANDEX_SITE_VERIFICATION?.trim();
+  if (!google && !bing && !yandex) return undefined;
+  return {
+    ...(google ? { google } : {}),
+    ...(bing ? { other: { "msvalidate.01": bing } } : {}),
+    ...(yandex ? { yandex } : {}),
+  };
 }
 
 export function absoluteUrl(path = "/") {
@@ -95,7 +101,7 @@ export function pageMetadata({
     description,
     keywords: keywords.join(", "),
     alternates: { canonical: url },
-    verification: googleVerification(),
+    verification: siteVerification(),
     openGraph: {
       title: fullTitle,
       description,
@@ -336,6 +342,7 @@ export const PUBLIC_ROUTES: {
   priority: number;
 }[] = [
   { path: "/", changeFrequency: "daily", priority: 1 },
+  { path: "/best-astrologer-jaipur", changeFrequency: "weekly", priority: 0.98 },
   { path: "/about", changeFrequency: "weekly", priority: 0.9 },
   { path: "/services", changeFrequency: "weekly", priority: 0.95 },
   { path: "/courses", changeFrequency: "weekly", priority: 0.85 },
