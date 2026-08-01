@@ -32,7 +32,11 @@ export async function GET(req: NextRequest) {
       const userId = threadId.slice("thread-".length);
       const user = await store.users.findById(userId);
       if (user && user.role === "user") {
-        thread = await supportStore.ensureThread({ id: user.id, name: user.name, email: user.email });
+        thread = await supportStore.ensureThread({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        });
       }
     }
     if (!thread) return NextResponse.json({ error: "Thread not found" }, { status: 404 });
@@ -90,6 +94,17 @@ export async function POST(req: NextRequest) {
     let thread;
     if (session.role === "admin" && requestedThreadId) {
       thread = await supportStore.getThread(requestedThreadId);
+      if (!thread && requestedThreadId.startsWith("thread-")) {
+        const userId = requestedThreadId.slice("thread-".length);
+        const user = await store.users.findById(userId);
+        if (user && user.role === "user") {
+          thread = await supportStore.ensureThread({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+          });
+        }
+      }
       if (!thread) return NextResponse.json({ error: "Thread not found" }, { status: 404 });
     } else {
       const user = await store.users.findById(session.userId);

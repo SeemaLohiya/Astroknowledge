@@ -97,9 +97,10 @@ type SupportChatProps = {
   emptyHint?: string;
   onSent?: () => void;
   onBack?: () => void;
+  showBackOnMobile?: boolean;
 };
 
-export function SupportChat({ mode, threadId, emptyHint, onSent, onBack }: SupportChatProps) {
+export function SupportChat({ mode, threadId, emptyHint, onSent, onBack, showBackOnMobile }: SupportChatProps) {
   const [thread, setThread] = useState<SupportThread | null>(null);
   const [messages, setMessages] = useState<SupportMessage[]>([]);
   const [text, setText] = useState("");
@@ -230,9 +231,11 @@ export function SupportChat({ mode, threadId, emptyHint, onSent, onBack }: Suppo
     }
   };
 
+  const chatShell = "flex h-[min(60vh,640px)] flex-col overflow-hidden rounded-2xl border border-gold/20 bg-[#efeae2] shadow-sm sm:h-[min(70vh,640px)]";
+
   if (mode === "admin" && !threadId) {
     return (
-      <div className="flex h-[min(calc(100dvh-14rem),640px)] items-center justify-center rounded-2xl border border-gold/15 bg-[#efeae2] p-6 text-center text-sm text-text-muted sm:p-8">
+      <div className={`${chatShell} items-center justify-center p-8 text-center text-sm text-text-muted`}>
         {emptyHint || "Select a user conversation to reply"}
       </div>
     );
@@ -240,7 +243,7 @@ export function SupportChat({ mode, threadId, emptyHint, onSent, onBack }: Suppo
 
   if (loadError && !thread) {
     return (
-      <div className="flex h-[min(calc(100dvh-14rem),640px)] flex-col items-center justify-center gap-3 rounded-2xl border border-gold/15 bg-[#efeae2] p-6 text-center sm:p-8">
+      <div className={`${chatShell} flex-col items-center justify-center gap-3 p-8 text-center`}>
         <p className="text-sm text-red-600">{loadError}</p>
         <button
           type="button"
@@ -259,7 +262,7 @@ export function SupportChat({ mode, threadId, emptyHint, onSent, onBack }: Suppo
 
   if (loading) {
     return (
-      <div className="flex h-[min(calc(100dvh-14rem),640px)] items-center justify-center rounded-2xl border border-gold/15 bg-[#efeae2] text-sm text-text-muted">
+      <div className={`${chatShell} items-center justify-center text-sm text-text-muted`}>
         Loading chat…
       </div>
     );
@@ -269,9 +272,9 @@ export function SupportChat({ mode, threadId, emptyHint, onSent, onBack }: Suppo
   const headerInitials = (mode === "admin" ? thread?.userName || "U" : "AK").slice(0, 2).toUpperCase();
 
   return (
-    <div className="flex h-[min(calc(100dvh-14rem),640px)] flex-col overflow-hidden rounded-2xl border border-gold/20 bg-[#efeae2] shadow-sm">
+    <div className={chatShell}>
       <div className="flex items-center gap-2 border-b border-black/5 bg-[#075e54] px-3 py-3 text-white sm:gap-3 sm:px-4">
-        {mode === "admin" && onBack && (
+        {showBackOnMobile && onBack && (
           <button
             type="button"
             onClick={onBack}

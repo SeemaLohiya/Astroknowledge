@@ -1,7 +1,13 @@
 import { isRemotePersistEnabled } from "./db/persist";
 import * as mongoMeta from "./db/mongo-meta-repo";
 import { readJsonFile, writeJsonFile } from "./json-store";
+import { store } from "./store";
 import { SupportMessage, SupportThread } from "./types";
+
+export type AdminSupportContact = SupportThread & {
+  hasMessages: boolean;
+  userPhone?: string;
+};
 
 type SupportData = {
   threads: SupportThread[];
@@ -41,6 +47,62 @@ export const supportStore = {
   async listThreads(): Promise<SupportThread[]> {
     const data = await load();
     return [...data.threads].sort((a, b) => b.lastMessageAt.localeCompare(a.lastMessageAt));
+  },
+
+  async listAdminInbox(search = ""): Promise<AdminSupportContact[]> {
+    const data = await load();
+    const q = search.trim().toLowerCase();
+    const users = (await store.users.getAll()).filter(
+      (u) => u.role === "user" && u.accountStatus !== "suspended"
+    );
+    const threadByUser = new Map(data.threads.map((t) => [t.userId, t]));
+    const messageThreadIds = new Set(data.messages.map((m) => m.threadId));
+
+    let contacts: AdminSupportContact[] = users.map((user) => {
+      const existing = threadByUser.get(user.id);
+      if (existing) {
+        return {
+          ...existing,
+          hasMessages: messageThreadIds.has(existing.id),
+          userPhone: user.phone,
+        };
+      }
+      return {
+        id: `thread-${user.id}`,
+        userId: user.id,
+        userName: user.name,
+        userEmail: user.email,
+        lastMessageAt: "",
+        lastMessagePreview: "",
+        unreadByAdmin: 0,
+        unreadByUser: 0,
+        createdAt: user.createdAt,
+        updatedAt: user.createdAt,
+        hasMessages: false,
+        userPhone: user.phone,
+      };
+    });
+
+    if (q) {
+      contacts = contacts.filter(
+        (c) =>
+          c.userName.toLowerCase().includes(q) ||
+          c.userEmail.toLowerCase().includes(q) ||
+          c.userId.toLowerCase().includes(q) ||
+          (c.userPhone || "").toLowerCase().includes(q)
+      );
+    }
+
+    contacts.sort((a, b) => {
+      if (a.unreadByAdmin !== b.unreadByAdmin) return b.unreadByAdmin - a.unreadByAdmin;
+      if (a.hasMessages !== b.hasMessages) return a.hasMessages ? -1 : 1;
+      if (a.lastMessageAt && b.lastMessageAt) return b.lastMessageAt.localeCompare(a.lastMessageAt);
+      if (a.lastMessageAt) return -1;
+      if (b.lastMessageAt) return 1;
+      return a.userName.localeCompare(b.userName);
+    });
+
+    return contacts;
   },
 
   async getThread(threadId: string): Promise<SupportThread | null> {
