@@ -114,10 +114,16 @@ function SlotsContent() {
         </div>
         <h1 className="font-display text-2xl font-bold text-text-primary">{d.bookConsultation}</h1>
         <p className="mt-3 text-sm text-text-body">{d.noPaidServices}</p>
-        <div className="mt-6 flex flex-wrap gap-3 justify-center">
-          <Button href="/services" variant="secondary">{d.browseServices}</Button>
-          <Button href="/courses" variant="outline">Courses</Button>
-          <Button href="/dashboard/services" variant="outline">{d.purchases}</Button>
+        <div className="relative z-10 mt-6 flex flex-wrap gap-3 justify-center">
+          <Button href="/services" variant="secondary" className="relative z-10 pointer-events-auto">
+            {d.exploreServices}
+          </Button>
+          <Button href="/courses" variant="outline" className="relative z-10 pointer-events-auto">
+            Courses
+          </Button>
+          <Button href="/dashboard/services" variant="outline" className="relative z-10 pointer-events-auto">
+            {d.purchases}
+          </Button>
         </div>
       </FadeIn>
     );

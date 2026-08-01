@@ -26,6 +26,18 @@ export function getDisplayStatus(
       if (orderStatus === "cancelled") return s.cancelled;
       return s.ordered;
     }
+    if (itemType === "pooja") {
+      if (orderStatus === "delivered") return s.poojaCompleted;
+      if (orderStatus === "processing" || orderStatus === "shipped") return s.poojaTeamConnect;
+      if (orderStatus === "cancelled") return s.cancelled;
+      return s.poojaPurchased;
+    }
+    if (itemType === "healing") {
+      if (orderStatus === "delivered") return s.healingCompleted;
+      if (orderStatus === "processing" || orderStatus === "shipped") return s.healingTeamConnect;
+      if (orderStatus === "cancelled") return s.cancelled;
+      return s.healingPurchased;
+    }
     if (orderStatus === "delivered") return s.delivered;
     if (orderStatus === "shipped") return s.shipped;
     if (orderStatus === "processing") return s.processing;
@@ -46,6 +58,12 @@ const STYLE_KEYS: Record<string, string> = {
   processing: "bg-gold/20 text-gold",
   confirmed: "bg-gold/20 text-gold",
   cancelled: "bg-red-500/20 text-red-400",
+  poojaPurchased: "bg-gold/20 text-gold",
+  poojaTeamConnect: "bg-blue-500/20 text-blue-700",
+  poojaCompleted: "bg-green-500/20 text-green-600",
+  healingPurchased: "bg-gold/20 text-gold",
+  healingTeamConnect: "bg-blue-500/20 text-blue-700",
+  healingCompleted: "bg-green-500/20 text-green-600",
 };
 
 function statusKey(
@@ -65,6 +83,18 @@ function statusKey(
       if (orderStatus === "pending") return "ordered";
       if (orderStatus === "cancelled") return "cancelled";
       return "ordered";
+    }
+    if (itemType === "pooja") {
+      if (orderStatus === "delivered") return "poojaCompleted";
+      if (orderStatus === "processing" || orderStatus === "shipped") return "poojaTeamConnect";
+      if (orderStatus === "cancelled") return "cancelled";
+      return "poojaPurchased";
+    }
+    if (itemType === "healing") {
+      if (orderStatus === "delivered") return "healingCompleted";
+      if (orderStatus === "processing" || orderStatus === "shipped") return "healingTeamConnect";
+      if (orderStatus === "cancelled") return "cancelled";
+      return "healingPurchased";
     }
     if (orderStatus === "delivered") return "delivered";
     if (orderStatus === "shipped") return "shipped";

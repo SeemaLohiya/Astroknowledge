@@ -48,6 +48,8 @@ yarn-error.log*
 /data/payments.json
 /data/notifications.json
 /data/vouchers.json
+/data/support.json
+/data/admin-revenue.json
 /data/atlas-credentials.local.json
 /tools/atlas/
 /tools/atlas-cli.zip

@@ -21,8 +21,7 @@ function ZodiacDetail({ sign, hi }: { sign: ZodiacSignDetail; hi: boolean }) {
         </div>
         <div className="min-w-0 flex-1">
           <h4 className="font-display text-xl font-bold text-text-primary">
-            {hi ? sign.hindi : sign.sign}{" "}
-            <span className="text-sm font-normal text-text-muted">({sign.dates})</span>
+            {hi ? sign.hindi : sign.sign}
           </h4>
           <p className="mt-1 text-sm font-medium" style={{ color: sign.color }}>
             {hi ? sign.elementHindi : sign.element} · {hi ? sign.rulerHindi : sign.ruler}

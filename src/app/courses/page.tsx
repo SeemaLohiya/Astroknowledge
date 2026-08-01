@@ -7,6 +7,7 @@ import { ZodiacSection } from "@/components/zodiac/ZodiacSection";
 import { CatalogActions } from "@/components/cart/CatalogActions";
 import { FounderImage } from "@/components/animations/FounderImage";
 import { PageBanner } from "@/components/ui/PageBanner";
+import { ExpandableText } from "@/components/ui/ExpandableText";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { localizedDesc, localizedFeatures, localizedSessionDesc, localizedTitle } from "@/lib/i18n/site-content";
 import { useCatalog } from "@/lib/use-catalog";
@@ -56,15 +57,26 @@ export default function CoursesPage() {
                           <h2 className="text-xl font-bold text-text-primary group-hover:text-gold transition-colors">
                             {localizedTitle(course, lang)}
                           </h2>
-                          <p className="mt-2 text-sm text-text-body">{localizedDesc(course, lang)}</p>
+                          <ExpandableText
+                            text={localizedDesc(course, lang) || ""}
+                            maxLines={3}
+                            className="mt-2 text-sm text-text-body"
+                            showMoreLabel={lang === "hi" ? "और देखें" : "Show more"}
+                            showLessLabel={lang === "hi" ? "कम देखें" : "Show less"}
+                          />
                           {sessionDesc && (
                             <div className="mt-4 rounded-xl border border-gold/15 bg-orange/[0.04] p-4">
                               <h3 className="mb-2 text-xs font-bold uppercase tracking-wide text-gold">{p.sessionDetails}</h3>
                               <div className="space-y-2">
                                 {sessionDesc.split(/\n\n+/).filter(Boolean).map((para, i) => (
-                                  <p key={i} className="text-xs leading-relaxed text-text-body">
-                                    {para.trim()}
-                                  </p>
+                                  <ExpandableText
+                                    key={i}
+                                    text={para.trim()}
+                                    maxLines={2}
+                                    className="text-xs leading-relaxed text-text-body"
+                                    showMoreLabel={lang === "hi" ? "और देखें" : "Show more"}
+                                    showLessLabel={lang === "hi" ? "कम देखें" : "Show less"}
+                                  />
                                 ))}
                               </div>
                             </div>

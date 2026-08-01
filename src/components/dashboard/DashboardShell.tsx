@@ -13,6 +13,7 @@ import {
   Calendar,
   Flame,
   Gift,
+  Headphones,
   Heart,
   LayoutDashboard,
   LogOut,
@@ -23,6 +24,7 @@ import {
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
+import { useSupportUnread } from "@/lib/use-support-unread";
 
 export default function DashboardShell({ children }: { children: React.ReactNode }) {
   const { c } = useLanguage();
@@ -30,6 +32,17 @@ export default function DashboardShell({ children }: { children: React.ReactNode
   const router = useRouter();
   const handleLogout = useLogout();
   const { user, loading, authReady } = useProfile();
+  const supportUnread = useSupportUnread("user");
+
+  const badgeFor = (href: string) =>
+    href === "/dashboard/support" && supportUnread > 0 ? supportUnread : 0;
+
+  const NavBadge = ({ count }: { count: number }) =>
+    count > 0 ? (
+      <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-bold text-white">
+        {count > 9 ? "9+" : count}
+      </span>
+    ) : null;
 
   const navItems = useMemo(
     () => [
@@ -38,6 +51,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
       { href: "/dashboard/services", icon: Sparkles, label: "Consultancy Services" },
       { href: "/dashboard/slots", icon: Calendar, label: "Book Consultation" },
       { href: "/dashboard/courses", icon: BookOpen, label: "Courses" },
+      { href: "/dashboard/support", icon: Headphones, label: "Support" },
       { href: "/dashboard/pooja", icon: Flame, label: "Pooja" },
       { href: "/dashboard/healing", icon: Heart, label: "Healing" },
       { href: "/dashboard/notifications", icon: Bell, label: "Notifications" },
@@ -89,12 +103,17 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium transition-colors",
+                  "relative flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium transition-colors",
                   active ? "bg-gold text-white" : "border border-gold/20 bg-white text-text-body"
                 )}
               >
                 <item.icon className="h-3.5 w-3.5" />
                 {item.label}
+                {badgeFor(item.href) > 0 && (
+                  <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">
+                    {badgeFor(item.href) > 9 ? "9+" : badgeFor(item.href)}
+                  </span>
+                )}
               </Link>
             );
           })}
@@ -129,7 +148,8 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                     whileHover={{ x: 4 }}
                   >
                     <item.icon className="h-4 w-4" />
-                    {item.label}
+                    <span className="flex-1">{item.label}</span>
+                    <NavBadge count={badgeFor(item.href)} />
                   </motion.div>
                 </Link>
               ))}

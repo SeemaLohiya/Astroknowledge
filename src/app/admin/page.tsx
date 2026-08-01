@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatedCounter } from "@/components/animations/AnimatedCounter";
+import { MonthlyRevenueEditor } from "@/components/admin/MonthlyRevenueEditor";
 import { PageTransition } from "@/components/animations/PageTransition";
 import { RevealOnScroll } from "@/components/animations/RevealOnScroll";
 import { fetchJson } from "@/lib/fetch-json";
@@ -38,7 +39,9 @@ interface Analytics {
   methodCounts: { razorpay: number; admin_approval: number };
   categoryRevenue: Record<string, number>;
   categoryCounts: Record<string, number>;
-  monthlyRevenue: { month: string; amount: number }[];
+  monthlyRevenue: { key: string; month: string; amount: number; computedAmount: number; note?: string; isOverride?: boolean }[];
+  extraMonthlyRevenue?: { key: string; month: string; amount: number; note?: string; isExtra?: boolean }[];
+  revenueSummaryNote?: string;
   bookingStats: { total: number; pending: number; confirmed: number; completed: number };
   recentRevenue: { id: string; userName: string; amount: number; method?: string; createdAt: string }[];
 }
@@ -127,7 +130,20 @@ export default function AdminPage() {
     };
   }, [load]);
 
-  const maxMonthly = analytics ? Math.max(...analytics.monthlyRevenue.map((m) => m.amount), 1) : 1;
+  const chartMonths = analytics
+    ? [
+        ...analytics.monthlyRevenue,
+        ...(analytics.extraMonthlyRevenue || []).map((e) => ({
+          key: e.key,
+          month: e.month,
+          amount: e.amount,
+          computedAmount: 0,
+          note: e.note,
+          isOverride: true,
+        })),
+      ]
+    : [];
+  const maxMonthly = chartMonths.length ? Math.max(...chartMonths.map((m) => m.amount), 1) : 1;
   const maxCategory = analytics
     ? Math.max(...Object.values(analytics.categoryRevenue), 1)
     : 1;
@@ -248,14 +264,21 @@ export default function AdminPage() {
                 <BarChart3 className="h-5 w-5 text-gold" />
                 Monthly Revenue (12 months)
               </h2>
-              {analytics.monthlyRevenue.some((m) => m.amount > 0) ? (
+              {chartMonths.some((m) => m.amount > 0) ? (
                 <BarChart
-                  data={analytics.monthlyRevenue.map((m) => ({ label: m.month, value: m.amount }))}
+                  data={chartMonths.map((m) => ({ label: m.month, value: m.amount }))}
                   maxValue={maxMonthly}
                 />
               ) : (
                 <p className="py-8 text-center text-sm text-text-muted">No paid revenue in the last 12 months yet</p>
               )}
+              <div className="mt-6 border-t border-gold/10 pt-6">
+                <MonthlyRevenueEditor
+                  months={analytics.monthlyRevenue}
+                  summaryNote={analytics.revenueSummaryNote}
+                  onSaved={() => void load(true)}
+                />
+              </div>
             </div>
           </RevealOnScroll>
 

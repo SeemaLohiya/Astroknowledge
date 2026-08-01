@@ -6,18 +6,27 @@ import { Button } from "@/components/ui/Button";
 import { SITE } from "@/lib/constants";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { Calendar, Sparkles } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export function QuickConsultCTA() {
   const { c } = useLanguage();
+  const pathname = usePathname();
+
+  const exploreHref =
+    pathname === "/services" || pathname.startsWith("/services/")
+      ? "/products"
+      : pathname === "/products" || pathname.startsWith("/products/")
+        ? "/services"
+        : "/services";
 
   return (
     <section className="relative overflow-hidden py-16">
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-gold/15 via-orange/10 to-gold/15" />
       <div className="pointer-events-none absolute inset-0 bg-mesh opacity-20" />
 
-      <div className="relative mx-auto max-w-5xl px-4">
+      <div className="relative z-10 mx-auto max-w-5xl px-4">
         <FadeIn scroll variant="zoom">
-          <div className="relative overflow-hidden rounded-3xl border border-gold/25 bg-white/90 p-8 text-center shadow-xl shadow-orange/10 md:p-12">
+          <div className="relative z-10 overflow-hidden rounded-3xl border border-gold/25 bg-white/90 p-8 text-center shadow-xl shadow-orange/10 md:p-12">
             <Sparkles className="mx-auto mb-4 h-8 w-8 animate-pulse-glow text-gold" />
             <h2 className="font-display text-2xl font-bold text-text-primary md:text-3xl">
               {c.hero.bookConsultation}{" "}
@@ -27,11 +36,11 @@ export function QuickConsultCTA() {
               {SITE.experience} {c.hero.yearsLabel} · {SITE.rating}{c.hero.ratingLabel} · {c.hero.descTail}
             </p>
 
-            <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <Button href="/dashboard/slots" variant="secondary" size="lg" className="cta-shimmer-btn">
+            <div className="relative z-10 mt-6 flex flex-wrap justify-center gap-3">
+              <Button href="/dashboard/slots" variant="secondary" size="lg" className="cta-shimmer-btn relative z-10">
                 <Calendar className="h-5 w-5" /> {c.hero.bookConsultation}
               </Button>
-              <Button href="/services" variant="outline" size="lg">
+              <Button href={exploreHref} variant="outline" size="lg" className="relative z-10">
                 {c.offerings.exploreNow}
               </Button>
             </div>

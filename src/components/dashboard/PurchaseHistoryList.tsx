@@ -5,6 +5,7 @@ import { ItemNextStep } from "@/components/dashboard/ItemNextStep";
 import { OrderTracking } from "@/components/dashboard/OrderTracking";
 import { Button } from "@/components/ui/Button";
 import { SafeImage } from "@/components/ui/SafeImage";
+import { isBookingItemType } from "@/lib/booking-order-status";
 import { fetchJson } from "@/lib/fetch-json";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { getDisplayStatus, getStatusStyle } from "@/lib/purchase-display";
@@ -127,11 +128,15 @@ export function PurchaseHistoryList({
         <p className="py-12 text-center text-text-muted">{c.common.loading}</p>
       ) : filtered.length === 0 ? (
         <FadeIn>
-          <div className="rounded-2xl glass-card p-12 text-center">
+          <div className="relative z-10 rounded-2xl glass-card p-12 text-center">
             <TypeIcon className="mx-auto mb-4 h-12 w-12 text-text-muted" />
             <p className="text-text-body">{emptyLabel || d.noPurchases}</p>
-            <Button href={EXPLORE[itemType]} variant="secondary" className="mt-4">
-              Explore
+            <Button
+              href={EXPLORE[itemType]}
+              variant="secondary"
+              className="relative z-10 mt-4 pointer-events-auto"
+            >
+              {itemType === "service" ? d.exploreServices : "Explore"}
             </Button>
           </div>
         </FadeIn>
@@ -197,7 +202,9 @@ export function PurchaseHistoryList({
                         paymentId={purchase.paymentId}
                       />
                     )}
-                    {linkedOrder && item.itemType === "product" && <OrderTracking order={linkedOrder} />}
+                    {linkedOrder && (item.itemType === "product" || isBookingItemType(item.itemType)) && (
+                      <OrderTracking order={linkedOrder} itemType={item.itemType} />
+                    )}
                     {renderExtra?.({ item, purchase })}
                   </div>
                 </motion.div>

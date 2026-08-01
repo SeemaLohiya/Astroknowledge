@@ -12,10 +12,10 @@ import {
   User,
   Voucher,
 } from "@/lib/types";
-import { ArrowLeft, Link2, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Link2, Pencil, Plus, Trash2, X } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 
 type SafeUser = Omit<User, "password">;
@@ -49,6 +49,12 @@ export default function AdminUserDetailPage() {
   const [resourceLinks, setResourceLinks] = useState<{ label: string; url: string }[]>([
     { label: "", url: "" },
   ]);
+  const [editingLink, setEditingLink] = useState<{
+    courseId: string;
+    linkId: string;
+    label: string;
+    url: string;
+  } | null>(null);
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -76,6 +82,26 @@ export default function AdminUserDetailPage() {
     void load();
   }, [load]);
 
+  const persistCourseResources = async (next: NonNullable<SafeUser["courseResources"]>) => {
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/users/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ courseResources: next }),
+      });
+      const data = await parseResponseJson<{ user?: SafeUser; error?: string }>(res);
+      if (!res.ok) throw new Error(data?.error || "Save failed");
+      setUser(data?.user || null);
+      return true;
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Save failed");
+      return false;
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const saveCourseResources = async () => {
     if (!user || !courseId) {
       toast.error("Select a course");
@@ -96,29 +122,40 @@ export default function AdminUserDetailPage() {
     const existing = [...(user.courseResources || [])];
     const idx = existing.findIndex((e) => e.courseId === courseId);
     if (idx >= 0) {
-      const merged = [...existing[idx].links];
-      links.forEach((l) => merged.push(l));
-      existing[idx] = { courseId, links: merged };
+      existing[idx] = { courseId, links: [...existing[idx].links, ...links] };
     } else {
       existing.push({ courseId, links });
     }
 
-    setSaving(true);
-    try {
-      const res = await fetch(`/api/users/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ courseResources: existing }),
-      });
-      const data = await parseResponseJson<{ user?: SafeUser; error?: string }>(res);
-      if (!res.ok) throw new Error(data?.error || "Save failed");
-      setUser(data?.user || null);
+    const ok = await persistCourseResources(existing);
+    if (ok) {
       setResourceLinks([{ label: "", url: "" }]);
       toast.success("Course resources saved");
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Save failed");
-    } finally {
-      setSaving(false);
+    }
+  };
+
+  const updateResourceLink = async () => {
+    if (!user || !editingLink) return;
+    const label = editingLink.label.trim() || "Resource";
+    const url = editingLink.url.trim();
+    if (!url) {
+      toast.error("URL is required");
+      return;
+    }
+    const next = (user.courseResources || []).map((entry) =>
+      entry.courseId === editingLink.courseId
+        ? {
+            ...entry,
+            links: entry.links.map((l) =>
+              l.id === editingLink.linkId ? { ...l, label, url } : l
+            ),
+          }
+        : entry
+    );
+    const ok = await persistCourseResources(next);
+    if (ok) {
+      setEditingLink(null);
+      toast.success("Link updated");
     }
   };
 
@@ -131,23 +168,32 @@ export default function AdminUserDetailPage() {
           : entry
       )
       .filter((e) => e.links.length > 0);
-    setSaving(true);
-    try {
-      const res = await fetch(`/api/users/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ courseResources: next }),
-      });
-      const data = await parseResponseJson<{ user?: SafeUser; error?: string }>(res);
-      if (!res.ok) throw new Error(data?.error || "Remove failed");
-      setUser(data?.user || null);
-      toast.success("Link removed");
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Remove failed");
-    } finally {
-      setSaving(false);
-    }
+    const ok = await persistCourseResources(next);
+    if (ok) toast.success("Link removed");
   };
+
+  const purchasedCourseIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const o of orders) {
+      for (const item of o.items) {
+        if (item.itemType === "course" || courses.some((c) => c.id === item.productId)) {
+          ids.add(item.productId);
+        }
+      }
+    }
+    for (const p of payments) {
+      if (p.status !== "paid") continue;
+      for (const item of p.items) {
+        if (item.itemType === "course") ids.add(item.id);
+      }
+    }
+    return ids;
+  }, [orders, payments, courses]);
+
+  const courseOptions = useMemo(() => {
+    const purchased = courses.filter((c) => purchasedCourseIds.has(c.id));
+    return purchased.length ? purchased : courses;
+  }, [courses, purchasedCourseIds]);
 
   if (loading) {
     return <p className="py-16 text-center text-text-muted">Loading user…</p>;
@@ -277,7 +323,8 @@ export default function AdminUserDetailPage() {
           <Link2 className="h-5 w-5 text-gold" /> Course resource links
         </h2>
         <p className="mb-4 text-xs text-text-muted">
-          Paste extra resource URLs for this user (merged with course defaults on their dashboard).
+          Send personal resource links for this user&apos;s purchased courses. They appear under Resources on
+          their dashboard Courses page. You can edit or remove links anytime.
         </p>
 
         {(user.courseResources || []).length > 0 && (
@@ -287,20 +334,82 @@ export default function AdminUserDetailPage() {
               return (
                 <div key={entry.courseId} className="rounded-xl border border-gold/10 bg-orange/5 p-3">
                   <p className="mb-2 text-sm font-semibold text-text-primary">{courseTitle}</p>
-                  <ul className="space-y-1">
+                  <ul className="space-y-2">
                     {entry.links.map((l: CourseResourceLink) => (
-                      <li key={l.id} className="flex items-center justify-between gap-2 text-xs">
-                        <a href={l.url} target="_blank" rel="noopener noreferrer" className="truncate text-gold hover:underline">
-                          {l.label}: {l.url}
-                        </a>
-                        <button
-                          type="button"
-                          disabled={saving}
-                          onClick={() => void removeResourceLink(entry.courseId, l.id)}
-                          className="shrink-0 rounded-lg p-1 text-red-500 hover:bg-red-50"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
+                      <li key={l.id}>
+                        {editingLink?.linkId === l.id && editingLink.courseId === entry.courseId ? (
+                          <div className="grid gap-2 rounded-lg border border-gold/20 bg-white p-2 sm:grid-cols-2">
+                            <input
+                              value={editingLink.label}
+                              onChange={(e) =>
+                                setEditingLink({ ...editingLink, label: e.target.value })
+                              }
+                              placeholder="Label"
+                              className="rounded-lg border border-gold/20 px-2 py-1.5 text-xs"
+                            />
+                            <input
+                              value={editingLink.url}
+                              onChange={(e) =>
+                                setEditingLink({ ...editingLink, url: e.target.value })
+                              }
+                              placeholder="URL"
+                              className="rounded-lg border border-gold/20 px-2 py-1.5 text-xs"
+                            />
+                            <div className="flex gap-1 sm:col-span-2">
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                disabled={saving}
+                                onClick={() => void updateResourceLink()}
+                              >
+                                Save
+                              </Button>
+                              <button
+                                type="button"
+                                onClick={() => setEditingLink(null)}
+                                className="rounded-lg p-1.5 text-text-muted hover:bg-orange/5"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between gap-2 text-xs">
+                            <a
+                              href={l.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="truncate text-gold hover:underline"
+                            >
+                              {l.label}: {l.url}
+                            </a>
+                            <div className="flex shrink-0 gap-0.5">
+                              <button
+                                type="button"
+                                disabled={saving}
+                                onClick={() =>
+                                  setEditingLink({
+                                    courseId: entry.courseId,
+                                    linkId: l.id,
+                                    label: l.label,
+                                    url: l.url,
+                                  })
+                                }
+                                className="rounded-lg p-1 text-gold hover:bg-gold/10"
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                disabled={saving}
+                                onClick={() => void removeResourceLink(entry.courseId, l.id)}
+                                className="rounded-lg p-1 text-red-500 hover:bg-red-50"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </li>
                     ))}
                   </ul>
@@ -319,9 +428,10 @@ export default function AdminUserDetailPage() {
               className="mt-1 w-full rounded-xl border border-gold/20 px-3 py-2 text-sm"
             >
               <option value="">Select course…</option>
-              {courses.map((c) => (
+              {courseOptions.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.title}
+                  {purchasedCourseIds.has(c.id) ? " (purchased)" : ""}
                 </option>
               ))}
             </select>

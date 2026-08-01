@@ -40,7 +40,7 @@ export function Button({ children, href, onClick, variant = "primary", size = "m
 
   if (href) {
     return (
-      <Link href={href} className={classes}>
+      <Link href={href} className={cn(classes, "relative z-10 pointer-events-auto")}>
         {children}
       </Link>
     );

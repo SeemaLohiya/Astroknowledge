@@ -31,6 +31,15 @@ function safeExt(filename: string, contentType: string): string {
   if (contentType.includes("png")) return "png";
   if (contentType.includes("webp")) return "webp";
   if (contentType.includes("gif")) return "gif";
+  if (contentType.includes("pdf")) return "pdf";
+  if (contentType.includes("mp4")) return "mp4";
+  if (contentType.includes("webm")) return "webm";
+  if (contentType.includes("wordprocessingml")) return "docx";
+  if (contentType.includes("msword")) return "doc";
+  if (contentType.includes("spreadsheetml")) return "xlsx";
+  if (contentType.includes("presentationml")) return "pptx";
+  if (contentType.includes("zip")) return "zip";
+  if (contentType.startsWith("text/")) return "txt";
   return "jpg";
 }
 
@@ -125,7 +134,25 @@ export async function getMedia(id: string): Promise<StoredMedia | null> {
           ? "image/webp"
           : ext === "gif"
             ? "image/gif"
-            : "image/jpeg";
+            : ext === "pdf"
+              ? "application/pdf"
+              : ext === "mp4"
+                ? "video/mp4"
+                : ext === "webm"
+                  ? "video/webm"
+                  : ext === "mov"
+                    ? "video/quicktime"
+                    : ext === "docx"
+                      ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                      : ext === "doc"
+                        ? "application/msword"
+                        : ext === "xlsx"
+                          ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                          : ext === "txt"
+                            ? "text/plain"
+                            : ext === "zip"
+                              ? "application/zip"
+                              : "image/jpeg";
     return { id: safeId, contentType, data, filename: safeId };
   }
 

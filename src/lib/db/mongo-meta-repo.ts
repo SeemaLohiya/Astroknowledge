@@ -1,5 +1,13 @@
 import mongoose, { Schema } from "mongoose";
-import { AdminNotification, BookingSlot, EditableSiteContent, SavedAddress } from "../types";
+import {
+  AdminNotification,
+  BookingSlot,
+  EditableSiteContent,
+  SavedAddress,
+  SupportMessage,
+  SupportThread,
+} from "../types";
+import type { AdminRevenueData } from "../admin-revenue-store";
 import type { PasswordResetRecord } from "../password-reset-store";
 import { connectDB } from "./connect";
 
@@ -19,6 +27,14 @@ const passwordResetBundleSchema = new Schema(
   { _id: { type: String, default: "main" }, records: { type: [Schema.Types.Mixed], default: [] } },
   { _id: false, timestamps: true }
 );
+const supportBundleSchema = new Schema(
+  {
+    _id: { type: String, default: "main" },
+    threads: { type: [Schema.Types.Mixed], default: [] },
+    messages: { type: [Schema.Types.Mixed], default: [] },
+  },
+  { _id: false, timestamps: true }
+);
 
 const SlotBundleModel =
   mongoose.models.SlotBundle ?? mongoose.model("SlotBundle", slotBundleSchema, "slot_bundles");
@@ -31,6 +47,23 @@ const AddressModel =
 const PasswordResetBundleModel =
   mongoose.models.PasswordResetBundle ??
   mongoose.model("PasswordResetBundle", passwordResetBundleSchema, "password_resets");
+const SupportBundleModel =
+  mongoose.models.SupportBundle ??
+  mongoose.model("SupportBundle", supportBundleSchema, "support_chats");
+
+const adminRevenueBundleSchema = new Schema(
+  {
+    _id: { type: String, default: "main" },
+    overrides: { type: Schema.Types.Mixed, default: {} },
+    extraRows: { type: [Schema.Types.Mixed], default: [] },
+    summaryNote: { type: String },
+  },
+  { _id: false, timestamps: true }
+);
+
+const AdminRevenueBundleModel =
+  mongoose.models.AdminRevenueBundle ??
+  mongoose.model("AdminRevenueBundle", adminRevenueBundleSchema, "admin_revenue");
 
 export async function mongoGetSlots(): Promise<BookingSlot[]> {
   await connectDB();
@@ -87,6 +120,49 @@ export async function mongoSavePasswordResets(records: PasswordResetRecord[]) {
   await PasswordResetBundleModel.findByIdAndUpdate(
     "main",
     { $set: { records } },
+    { upsert: true, new: true }
+  );
+}
+
+export async function mongoGetSupport(): Promise<{
+  threads: SupportThread[];
+  messages: SupportMessage[];
+}> {
+  await connectDB();
+  const doc = await SupportBundleModel.findById("main").lean();
+  return {
+    threads: (doc?.threads as SupportThread[]) ?? [],
+    messages: (doc?.messages as SupportMessage[]) ?? [],
+  };
+}
+
+export async function mongoSaveSupport(data: {
+  threads: SupportThread[];
+  messages: SupportMessage[];
+}) {
+  await connectDB();
+  await SupportBundleModel.findByIdAndUpdate(
+    "main",
+    { $set: { threads: data.threads, messages: data.messages } },
+    { upsert: true, new: true }
+  );
+}
+
+export async function mongoGetAdminRevenue(): Promise<AdminRevenueData> {
+  await connectDB();
+  const doc = await AdminRevenueBundleModel.findById("main").lean();
+  return {
+    overrides: (doc?.overrides as AdminRevenueData["overrides"]) ?? {},
+    extraRows: (doc?.extraRows as AdminRevenueData["extraRows"]) ?? [],
+    summaryNote: (doc?.summaryNote as string) || undefined,
+  };
+}
+
+export async function mongoSaveAdminRevenue(data: AdminRevenueData) {
+  await connectDB();
+  await AdminRevenueBundleModel.findByIdAndUpdate(
+    "main",
+    { $set: { overrides: data.overrides, extraRows: data.extraRows, summaryNote: data.summaryNote } },
     { upsert: true, new: true }
   );
 }

@@ -44,7 +44,10 @@ export default function DashboardCoursesPage() {
             ? course.resources
             : DEFAULT_LABELS.map((label, i) => ({ id: `default-${i}`, label, url: "" }));
           const personal = userLinks.find((u) => u.courseId === item.id)?.links || [];
-          const links = [...defaults.filter((l) => l.url), ...personal.filter((l) => l.url)];
+          const links = [
+            ...defaults.filter((l) => l.url).map((l) => ({ ...l, source: "course" as const })),
+            ...personal.filter((l) => l.url).map((l) => ({ ...l, source: "admin" as const })),
+          ];
 
           return (
             <FadeIn className="mt-4">
@@ -59,7 +62,7 @@ export default function DashboardCoursesPage() {
                 ) : (
                   <ul className="space-y-2">
                     {links.map((link) => (
-                      <li key={link.id}>
+                      <li key={`${link.source}-${link.id}`}>
                         <a
                           href={link.url}
                           target="_blank"
@@ -69,6 +72,11 @@ export default function DashboardCoursesPage() {
                           <ExternalLink className="h-3.5 w-3.5" />
                           {link.label}
                         </a>
+                        {link.source === "admin" && (
+                          <span className="ml-2 text-[10px] font-medium uppercase tracking-wide text-text-muted">
+                            Shared with you
+                          </span>
+                        )}
                       </li>
                     ))}
                   </ul>

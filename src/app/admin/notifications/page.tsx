@@ -5,6 +5,7 @@ import { PageTransition } from "@/components/animations/PageTransition";
 import { fetchJson } from "@/lib/fetch-json";
 import { AdminNotification } from "@/lib/types";
 import { Bell } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function AdminNotificationsPage() {
@@ -22,7 +23,7 @@ export default function AdminNotificationsPage() {
         <h1 className="font-display text-2xl font-bold text-text-primary flex items-center gap-2">
           <Bell className="h-7 w-7 text-gold" /> Notifications <span className="text-gradient-gold">Log</span>
         </h1>
-        <p className="text-sm text-text-muted">System actions and WhatsApp-ready confirmations</p>
+        <p className="text-sm text-text-muted">System actions, support messages, and confirmations</p>
       </FadeIn>
 
       <div className="space-y-2">
@@ -37,6 +38,11 @@ export default function AdminNotificationsPage() {
                   {n.type.replace(/_/g, " ")} · {new Date(n.createdAt).toLocaleString("en-IN")}
                   {n.referenceId && ` · Ref: ${n.referenceId}`}
                 </p>
+                {n.type === "support_message" && (
+                  <Link href="/admin/support" className="mt-2 inline-block text-xs font-semibold text-gold hover:underline">
+                    Open support inbox →
+                  </Link>
+                )}
               </div>
             </div>
           </FadeIn>

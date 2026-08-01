@@ -12,6 +12,7 @@ import {
   FileText,
   Flame,
   Gift,
+  Headphones,
   Heart,
   LayoutDashboard,
   LogOut,
@@ -25,6 +26,7 @@ import {
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useLogout } from "@/lib/use-logout";
+import { useSupportUnread } from "@/lib/use-support-unread";
 import { useCallback, useEffect, useState } from "react";
 
 const navItems = [
@@ -32,6 +34,7 @@ const navItems = [
   { href: "/admin/bookings", icon: Calendar, label: "Bookings" },
   { href: "/admin/payments", icon: CreditCard, label: "Payments" },
   { href: "/admin/users", icon: Users, label: "Users" },
+  { href: "/admin/support", icon: Headphones, label: "Support" },
   { href: "/admin/vouchers", icon: Gift, label: "Vouchers" },
   { href: "/admin/catalog", icon: Settings, label: "Shop & Photos" },
   { href: "/admin/content", icon: FileText, label: "Website Text" },
@@ -51,7 +54,15 @@ function isActive(pathname: string, href: string, exact?: boolean) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function AdminNav({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
+function AdminNav({
+  pathname,
+  onNavigate,
+  supportUnread = 0,
+}: {
+  pathname: string;
+  onNavigate?: () => void;
+  supportUnread?: number;
+}) {
   const itemsActive = pathname.startsWith("/admin/items") || pathname.startsWith("/admin/orders");
   return (
     <nav className="space-y-1">
@@ -116,7 +127,12 @@ function AdminNav({ pathname, onNavigate }: { pathname: string; onNavigate?: () 
               )}
             >
               <item.icon className="h-4 w-4" />
-              {item.label}
+              <span className="flex-1">{item.label}</span>
+              {item.href === "/admin/support" && supportUnread > 0 && (
+                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#25D366] px-1.5 text-[10px] font-bold text-white">
+                  {supportUnread > 9 ? "9+" : supportUnread}
+                </span>
+              )}
             </div>
           </Link>
         );
@@ -177,6 +193,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   }, [pathname]);
 
   const handleLogout = useLogout();
+  const supportUnread = useSupportUnread("admin");
 
   if (authState === "loading") {
     return (
@@ -224,7 +241,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
       {mobileOpen && (
         <div className="mb-6 rounded-2xl border border-gold/20 bg-cream/95 p-4 shadow-lg lg:hidden">
-          <AdminNav pathname={pathname} onNavigate={() => setMobileOpen(false)} />
+          <AdminNav pathname={pathname} onNavigate={() => setMobileOpen(false)} supportUnread={supportUnread} />
           <button
             onClick={() => void handleLogout()}
             className="mt-2 flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-red-500 hover:bg-red-50"
@@ -252,7 +269,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
               <p className="mt-1 text-xs text-text-muted">Manage bookings, catalog & users</p>
             </div>
             <div className="p-4">
-              <AdminNav pathname={pathname} />
+              <AdminNav pathname={pathname} supportUnread={supportUnread} />
               <div className="mt-4 space-y-1 border-t border-gold/15 pt-4">
                 <Link
                   href="/"

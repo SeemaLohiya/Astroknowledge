@@ -9,6 +9,7 @@ import { StaggerChildren, StaggerItem } from "../animations/StaggerChildren";
 import { SectionHeader } from "../ui/SectionHeader";
 import { AnimatedCatalogImage } from "@/components/animations/AnimatedCatalogImage";
 import { CatalogActions } from "@/components/cart/CatalogActions";
+import { ExpandableText } from "@/components/ui/ExpandableText";
 import { Button } from "../ui/Button";
 import { ArrowRight, Clock, IndianRupee, Star } from "lucide-react";
 import Link from "next/link";
@@ -50,7 +51,15 @@ export function CoursesSection() {
                       {localizedTitle(course, lang)}
                       <ArrowRight className="h-4 w-4 shrink-0 opacity-0 transition-all group-hover:opacity-100 text-gold" />
                     </h3>
-                    <p className="mt-2 line-clamp-2 text-sm text-text-body">{localizedDesc(course, lang)}</p>
+                    <ExpandableText
+                      text={localizedDesc(course, lang) || ""}
+                      maxLines={2}
+                      maxChars={100}
+                      className="mt-2 text-sm text-text-body"
+                      showMoreLabel={lang === "hi" ? "और देखें" : "Show more"}
+                      showLessLabel={lang === "hi" ? "कम देखें" : "Show less"}
+                      preventNavigation
+                    />
                     <div className="mt-4 flex items-center justify-between">
                       <span className="flex items-center gap-1 text-sm text-text-muted"><Clock className="h-3 w-3" />{course.duration}</span>
                       <span className="flex items-center gap-1 font-bold text-gold-bright"><IndianRupee className="h-4 w-4" />{course.price.toLocaleString("en-IN")}</span>

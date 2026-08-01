@@ -5,6 +5,7 @@ import { PageTransition } from "@/components/animations/PageTransition";
 import { fetchJson } from "@/lib/fetch-json";
 import { AdminNotification } from "@/lib/types";
 import { Bell } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function DashboardNotificationsPage() {
@@ -26,7 +27,9 @@ export default function DashboardNotificationsPage() {
         <h1 className="mb-2 font-display text-2xl font-bold text-text-primary">
           My <span className="text-gradient-gold">Notifications</span>
         </h1>
-        <p className="mb-6 text-sm text-text-muted">Updates about payments, bookings, and orders</p>
+        <p className="mb-6 text-sm text-text-muted">
+          Updates about payments, bookings, orders, and support replies
+        </p>
       </FadeIn>
 
       {loading ? (
@@ -45,6 +48,14 @@ export default function DashboardNotificationsPage() {
                 <p className="mt-1 text-[11px] text-text-muted">
                   {new Date(n.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
                 </p>
+                {n.type === "support_message" && (
+                  <Link
+                    href="/dashboard/support"
+                    className="mt-2 inline-block text-xs font-semibold text-gold hover:underline"
+                  >
+                    Open support chat →
+                  </Link>
+                )}
               </div>
             </FadeIn>
           ))}

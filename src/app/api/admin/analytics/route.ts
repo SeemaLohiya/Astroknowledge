@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
+import { adminRevenueStore } from "@/lib/admin-revenue-store";
 import { paymentsStore } from "@/lib/payments-store";
 import { slotsStore } from "@/lib/slots-store";
 import { store } from "@/lib/store";
@@ -77,10 +78,29 @@ export async function GET() {
       const key = monthKey(p.createdAt);
       if (key in monthlyMap) monthlyMap[key] += p.amount;
     });
-    const monthlyRevenue = Object.entries(monthlyMap).map(([key, amount]) => {
+    const revenueData = await adminRevenueStore.get();
+    const monthlyRevenue = Object.entries(monthlyMap).map(([key, computed]) => {
       const [, m] = key.split("-");
-      return { month: MONTH_LABELS[parseInt(m, 10) - 1], amount };
+      const override = revenueData.overrides[key];
+      return {
+        key,
+        month: MONTH_LABELS[parseInt(m, 10) - 1],
+        amount: override?.amount ?? computed,
+        computedAmount: computed,
+        note: override?.note,
+        isOverride: override !== undefined,
+      };
     });
+
+    const extraMonthlyRevenue = (revenueData.extraRows || []).map((row) => ({
+      key: row.id,
+      month: row.label,
+      amount: row.amount,
+      computedAmount: 0,
+      note: row.note,
+      isOverride: true,
+      isExtra: true,
+    }));
 
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
     const newUsersThisMonth = users.filter((u) => new Date(u.createdAt) >= thirtyDaysAgo).length;
@@ -120,6 +140,8 @@ export async function GET() {
       categoryRevenue,
       categoryCounts,
       monthlyRevenue,
+      extraMonthlyRevenue,
+      revenueSummaryNote: revenueData.summaryNote,
       bookingStats,
       recentRevenue: [...paid]
         .sort((a, b) => b.createdAt.localeCompare(a.createdAt))

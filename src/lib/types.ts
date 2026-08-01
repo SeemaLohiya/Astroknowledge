@@ -262,13 +262,47 @@ export interface SavedAddress {
 
 export interface AdminNotification {
   id: string;
-  type: "payment_approved" | "payment_rejected" | "payment_received" | "booking_confirmed" | "order_shipped" | "payment_submitted" | "booking_submitted" | "slot_booked" | "slot_confirmed" | "slot_cancelled";
+  type: "payment_approved" | "payment_rejected" | "payment_received" | "booking_confirmed" | "order_shipped" | "payment_submitted" | "booking_submitted" | "slot_booked" | "slot_confirmed" | "slot_cancelled" | "support_message";
   userId?: string;
   userName?: string;
   referenceId?: string;
   message: string;
   channel: "system" | "whatsapp";
   createdAt: string;
+}
+
+export type SupportAttachmentKind = "image" | "video" | "pdf" | "doc" | "file" | "link";
+
+export interface SupportAttachment {
+  url: string;
+  name: string;
+  mimeType: string;
+  size: number;
+  kind: SupportAttachmentKind;
+}
+
+export interface SupportMessage {
+  id: string;
+  threadId: string;
+  senderId: string;
+  senderRole: "user" | "admin";
+  senderName: string;
+  text?: string;
+  attachment?: SupportAttachment;
+  createdAt: string;
+}
+
+export interface SupportThread {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  lastMessageAt: string;
+  lastMessagePreview: string;
+  unreadByAdmin: number;
+  unreadByUser: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface EditableSiteContent {
