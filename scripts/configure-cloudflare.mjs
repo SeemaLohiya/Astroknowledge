@@ -11,6 +11,7 @@
 const DOMAIN = process.env.CLOUDFLARE_DOMAIN || "astroknowledge.in";
 const CF_TOKEN = process.env.CLOUDFLARE_API_TOKEN;
 const RENDER_CNAME = process.env.RENDER_SUBDOMAIN || "astroknowledge.onrender.com";
+const RAILWAY_CNAME = process.env.RAILWAY_CNAME_TARGET || "xxd3id76.up.railway.app";
 const RENDER_A = "216.24.57.1";
 const GODADDY_KEY = process.env.GODADDY_API_KEY;
 const GODADDY_SECRET = process.env.GODADDY_API_SECRET;
