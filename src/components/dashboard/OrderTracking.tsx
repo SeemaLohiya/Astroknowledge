@@ -1,7 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
-import { isBookingItemType, isConsultancyItemType } from "@/lib/booking-order-status";
+import { isBookingItemType, isConsultancyItemType, isCourseItemType } from "@/lib/booking-order-status";
 import { CartItemType, Order } from "@/lib/types";
 import { Package } from "lucide-react";
 
@@ -10,21 +10,34 @@ const BOOKING_STATUS_ORDER: Order["status"][] = ["pending", "processing", "deliv
 
 const CONSULTANCY_STATUS_ORDER: Order["status"][] = ["pending", "processing", "delivered"];
 
+const COURSE_STATUS_ORDER: Order["status"][] = ["pending", "processing", "delivered"];
+
 export function OrderTracking({ order, itemType = "product" }: { order: Order; itemType?: CartItemType }) {
   const { c } = useLanguage();
   const d = c.dashboard;
   const isBooking = isBookingItemType(itemType);
   const isConsultancy = isConsultancyItemType(itemType);
-  const statusOrder = isConsultancy
-    ? CONSULTANCY_STATUS_ORDER
-    : isBooking
-      ? BOOKING_STATUS_ORDER
-      : PRODUCT_STATUS_ORDER;
+  const isCourse = isCourseItemType(itemType);
+  const statusOrder = isCourse
+    ? COURSE_STATUS_ORDER
+    : isConsultancy
+      ? CONSULTANCY_STATUS_ORDER
+      : isBooking
+        ? BOOKING_STATUS_ORDER
+        : PRODUCT_STATUS_ORDER;
   const currentIdx = statusOrder.indexOf(
-    (order.status === "shipped" && (isBooking || isConsultancy) ? "processing" : order.status) as Order["status"]
+    (order.status === "shipped" && (isBooking || isConsultancy || isCourse) ? "processing" : order.status) as Order["status"]
   );
 
-  const labels: Record<Order["status"], string> = isConsultancy
+  const labels: Record<Order["status"], string> = isCourse
+    ? {
+        pending: d.courseOrderPurchased,
+        processing: d.courseOrderStarted,
+        shipped: d.courseOrderStarted,
+        delivered: d.courseOrderCompleted,
+        cancelled: d.orderCancelled,
+      }
+    : isConsultancy
     ? {
         pending: d.serviceOrderPurchased,
         processing: d.serviceOrderBooked,

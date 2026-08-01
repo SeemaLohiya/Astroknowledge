@@ -12,6 +12,7 @@ import {
 } from "@/lib/voucher-users";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatVoucherDiscount } from "@/lib/voucher-display";
+import { normalizeVoucherInput, validateVoucherInput } from "@/lib/voucher-input";
 import { Gift, Plus, Search, Trash2, Users, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
@@ -95,21 +96,17 @@ export default function AdminVouchersPage() {
       toast.error("Assign at least one user or select All users");
       return;
     }
-    const usageLimitRaw = form.usageLimit;
-    const payload = {
+    const payload = normalizeVoucherInput({
       ...form,
-      code: form.code.trim().toUpperCase(),
-      discountValue: Number(form.discountValue) || 0,
-      minOrderAmount: Number(form.minOrderAmount) || 0,
-      maxDiscount: form.maxDiscount === undefined || form.maxDiscount === null ? undefined : Number(form.maxDiscount),
-      usageLimit:
-        usageLimitRaw === undefined || usageLimitRaw === null || Number.isNaN(Number(usageLimitRaw))
-          ? null
-          : Number(usageLimitRaw),
-      applicableItemTypes: form.applicableItemTypes ?? [],
-      applicableItemIds: form.applicableItemIds ?? [],
+      code: form.code,
+      label: form.label,
       assignedUserIds: assigned.includes(VOUCHER_ALL_USERS) ? [VOUCHER_ALL_USERS] : assigned,
-    };
+    });
+    const validationError = validateVoucherInput(payload);
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
     const res = editing
       ? await fetch(`/api/admin/vouchers/${editing.id}`, {
           method: "PUT",

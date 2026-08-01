@@ -75,6 +75,7 @@ export default function CheckoutPage() {
     () => items.some((i) => i.itemType === "product" || i.itemType === "pooja"),
     [items]
   );
+  const hasProducts = useMemo(() => items.some((i) => i.itemType === "product"), [items]);
 
   const subtotal = total;
   const finalTotal = Math.max(0, subtotal - discountAmount);
@@ -203,6 +204,11 @@ export default function CheckoutPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <FadeIn className="rounded-2xl glass-card p-6 space-y-4">
               <h2 className="font-semibold text-text-primary">{ch.yourAccount}</h2>
+              {hasProducts && (
+                <p className="rounded-xl border border-gold/20 bg-gold/5 px-3 py-2 text-xs text-text-body">
+                  Please confirm your name, phone, and delivery address for product orders.
+                </p>
+              )}
               <div>
                 <label className="block text-xs text-text-muted mb-1">{ch.fullName} *</label>
                 <input required value={resolvedForm.userName} onChange={(e) => setForm({ ...form, userName: e.target.value })} className="w-full rounded-xl border border-gold/20 bg-orange/5 px-4 py-3 text-sm" />

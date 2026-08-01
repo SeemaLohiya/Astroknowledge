@@ -5,7 +5,7 @@ import { ItemNextStep } from "@/components/dashboard/ItemNextStep";
 import { OrderTracking } from "@/components/dashboard/OrderTracking";
 import { Button } from "@/components/ui/Button";
 import { SafeImage } from "@/components/ui/SafeImage";
-import { isBookingItemType, isConsultancyItemType } from "@/lib/booking-order-status";
+import { isBookingItemType, isConsultancyItemType, isCourseItemType } from "@/lib/booking-order-status";
 import { fetchJson } from "@/lib/fetch-json";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { getDisplayStatus, getStatusStyle } from "@/lib/purchase-display";
@@ -230,7 +230,8 @@ export function PurchaseHistoryList({
                     {linkedOrder &&
                       (item.itemType === "product" ||
                         isBookingItemType(item.itemType) ||
-                        isConsultancyItemType(item.itemType)) && (
+                        isConsultancyItemType(item.itemType) ||
+                        isCourseItemType(item.itemType)) && (
                       <OrderTracking order={linkedOrder} itemType={item.itemType} />
                     )}
                     {renderExtra?.({ item, purchase })}

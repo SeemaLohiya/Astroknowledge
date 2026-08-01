@@ -4,6 +4,8 @@ export const BOOKING_ITEM_TYPES: CartItemType[] = ["pooja", "healing"];
 
 export const CONSULTANCY_ORDER_STATUSES: OrderStatus[] = ["pending", "processing", "delivered", "cancelled"];
 
+export const COURSE_ORDER_STATUSES: OrderStatus[] = ["pending", "processing", "delivered", "cancelled"];
+
 export const BOOKING_ORDER_STATUSES: OrderStatus[] = ["pending", "processing", "delivered", "cancelled"];
 
 const SHARED_LABELS: Record<OrderStatus, string> = {
@@ -42,6 +44,34 @@ export function isBookingItemType(itemType?: CartItemType): itemType is "pooja" 
 
 export function isConsultancyItemType(itemType?: CartItemType): itemType is "service" {
   return itemType === "service";
+}
+
+export function isCourseItemType(itemType?: CartItemType): itemType is "course" {
+  return itemType === "course";
+}
+
+const COURSE_LABELS: Record<OrderStatus, string> = {
+  pending: "Purchased",
+  processing: "Started",
+  shipped: "Started",
+  delivered: "Completed",
+  cancelled: "Cancelled",
+};
+
+const COURSE_NOTES: Record<OrderStatus, string> = {
+  pending: "Payment received — your course enrollment is confirmed.",
+  processing: "Your course has started.",
+  shipped: "Your course has started.",
+  delivered: "Course completed successfully.",
+  cancelled: "This course order was cancelled.",
+};
+
+export function courseStatusLabel(status: OrderStatus): string {
+  return COURSE_LABELS[status] || status;
+}
+
+export function courseStatusNote(status: OrderStatus): string {
+  return COURSE_NOTES[status] || `Status updated to ${courseStatusLabel(status)}`;
 }
 
 const CONSULTANCY_LABELS: Record<OrderStatus, string> = {

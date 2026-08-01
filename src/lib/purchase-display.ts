@@ -44,6 +44,12 @@ export function getDisplayStatus(
       if (orderStatus === "cancelled") return s.cancelled;
       return s.servicePurchased;
     }
+    if (itemType === "course") {
+      if (orderStatus === "delivered") return s.courseCompleted;
+      if (orderStatus === "processing" || orderStatus === "shipped") return s.courseStarted;
+      if (orderStatus === "cancelled") return s.cancelled;
+      return s.coursePurchased;
+    }
     if (orderStatus === "delivered") return s.delivered;
     if (orderStatus === "shipped") return s.shipped;
     if (orderStatus === "processing") return s.processing;
@@ -73,6 +79,9 @@ const STYLE_KEYS: Record<string, string> = {
   servicePurchased: "bg-gold/20 text-gold",
   serviceBooked: "bg-blue-500/20 text-blue-700",
   serviceDone: "bg-green-500/20 text-green-600",
+  coursePurchased: "bg-gold/20 text-gold",
+  courseStarted: "bg-blue-500/20 text-blue-700",
+  courseCompleted: "bg-green-500/20 text-green-600",
 };
 
 function statusKey(
@@ -110,6 +119,12 @@ function statusKey(
       if (orderStatus === "processing" || orderStatus === "shipped") return "serviceBooked";
       if (orderStatus === "cancelled") return "cancelled";
       return "servicePurchased";
+    }
+    if (itemType === "course") {
+      if (orderStatus === "delivered") return "courseCompleted";
+      if (orderStatus === "processing" || orderStatus === "shipped") return "courseStarted";
+      if (orderStatus === "cancelled") return "cancelled";
+      return "coursePurchased";
     }
     if (orderStatus === "delivered") return "delivered";
     if (orderStatus === "shipped") return "shipped";

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
+import { normalizeVoucherInput, validateVoucherInput } from "@/lib/voucher-input";
 import { vouchersStore } from "@/lib/vouchers-store";
-import { Voucher } from "@/lib/types";
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
@@ -9,11 +9,25 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { id } = await params;
-  const body = (await req.json()) as Partial<Voucher>;
-  const updated = await vouchersStore.update(id, body);
-  if (!updated) return NextResponse.json({ error: "Voucher not found" }, { status: 404 });
-  return NextResponse.json({ voucher: updated });
+  try {
+    const { id } = await params;
+    const existing = await vouchersStore.getById(id);
+    if (!existing) return NextResponse.json({ error: "Voucher not found" }, { status: 404 });
+
+    const body = await req.json();
+    const input = normalizeVoucherInput({ ...existing, ...body });
+    const validationError = validateVoucherInput(input);
+    if (validationError) return NextResponse.json({ error: validationError }, { status: 400 });
+
+    const updated = await vouchersStore.update(id, input);
+    if (!updated) return NextResponse.json({ error: "Voucher not found" }, { status: 404 });
+    return NextResponse.json({ voucher: updated });
+  } catch (e) {
+    return NextResponse.json(
+      { error: e instanceof Error ? e.message : "Failed to update voucher" },
+      { status: 400 }
+    );
+  }
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

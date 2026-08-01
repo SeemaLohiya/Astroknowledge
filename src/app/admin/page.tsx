@@ -64,18 +64,27 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 function BarChart({ data, maxValue }: { data: { label: string; value: number }[]; maxValue: number }) {
+  const chartHeight = 120;
   return (
-    <div className="flex items-end gap-1.5 h-36 overflow-x-auto pb-1">
-      {data.map((d) => (
-        <div key={d.label} className="flex min-w-[28px] flex-1 flex-col items-center gap-1">
-          <div
-            className="w-full rounded-t-lg bg-gradient-to-t from-gold to-orange transition-all duration-500"
-            style={{ height: `${maxValue > 0 ? Math.max(8, (d.value / maxValue) * 100) : 8}%` }}
-          />
-          <span className="text-[9px] text-text-muted">{d.label}</span>
-          {d.value > 0 && <span className="text-[8px] font-medium text-gold">₹{(d.value / 1000).toFixed(0)}k</span>}
-        </div>
-      ))}
+    <div className="flex h-36 items-end gap-1.5 overflow-x-auto pb-1">
+      {data.map((d) => {
+        const barHeight = maxValue > 0 ? Math.max(6, Math.round((d.value / maxValue) * chartHeight)) : 6;
+        return (
+          <div key={`${d.label}-${d.value}`} className="flex min-w-[32px] flex-1 flex-col items-center justify-end gap-1">
+            <div
+              className="w-full min-h-[6px] rounded-t-lg bg-gradient-to-t from-gold to-orange transition-all duration-500"
+              style={{ height: barHeight }}
+              title={`₹${d.value.toLocaleString("en-IN")}`}
+            />
+            <span className="text-[9px] text-text-muted">{d.label}</span>
+            {d.value > 0 && (
+              <span className="text-[8px] font-medium text-gold">
+                {d.value >= 1000 ? `₹${(d.value / 1000).toFixed(0)}k` : `₹${d.value}`}
+              </span>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -287,16 +296,14 @@ export default function AdminPage() {
                 <p className="py-8 text-center text-sm text-text-muted">No paid revenue in the last 12 months yet</p>
               )}
               <div className="mt-6 border-t border-gold/10 pt-6">
-                {revenuePeriod === "monthly" && (
-                  <MonthlyRevenueEditor
-                    months={analytics.monthlyRevenue}
-                    summaryNote={analytics.revenueSummaryNote}
-                    onSaved={() => void load(true)}
-                  />
-                )}
+                <MonthlyRevenueEditor
+                  months={analytics.monthlyRevenue}
+                  summaryNote={analytics.revenueSummaryNote}
+                  onSaved={() => void load(true)}
+                />
                 {revenuePeriod === "weekly" && (
-                  <p className="text-xs text-text-muted">
-                    Weekly view is calculated from verified payments. Switch to Monthly to edit displayed revenue overrides.
+                  <p className="mt-3 text-xs text-text-muted">
+                    Weekly chart uses live payment data. Edit displayed monthly amounts below to include offline revenue.
                   </p>
                 )}
               </div>

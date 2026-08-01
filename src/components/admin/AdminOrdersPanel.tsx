@@ -6,12 +6,16 @@ import { fetchJson } from "@/lib/fetch-json";
 import {
   BOOKING_ORDER_STATUSES,
   CONSULTANCY_ORDER_STATUSES,
+  COURSE_ORDER_STATUSES,
   bookingStatusLabel,
   bookingStatusNote,
   consultancyStatusLabel,
   consultancyStatusNote,
+  courseStatusLabel,
+  courseStatusNote,
   isBookingItemType,
   isConsultancyItemType,
+  isCourseItemType,
 } from "@/lib/booking-order-status";
 import { CartItemType, Order, OrderStatus } from "@/lib/types";
 import { motion } from "framer-motion";
@@ -40,17 +44,25 @@ function resolveItemType(item: Order["items"][number]): CartItemType | null {
 function statusesForType(itemType?: CartItemType): OrderStatus[] {
   if (isBookingItemType(itemType)) return BOOKING_ORDER_STATUSES;
   if (isConsultancyItemType(itemType)) return CONSULTANCY_ORDER_STATUSES;
+  if (isCourseItemType(itemType)) return COURSE_ORDER_STATUSES;
   return PRODUCT_STATUSES;
 }
 
 function statusLabel(status: OrderStatus, itemType?: CartItemType): string {
   if (isBookingItemType(itemType)) return bookingStatusLabel(status, itemType);
   if (isConsultancyItemType(itemType)) return consultancyStatusLabel(status);
+  if (isCourseItemType(itemType)) return courseStatusLabel(status);
   return status;
 }
 
 function statusBadgeClass(status: OrderStatus, itemType?: CartItemType): string {
   if (isConsultancyItemType(itemType)) {
+    if (status === "delivered") return "bg-green-500/20 text-green-700";
+    if (status === "processing" || status === "shipped") return "bg-blue-500/20 text-blue-700";
+    if (status === "cancelled") return "bg-red-500/20 text-red-600";
+    return "bg-gold/20 text-gold";
+  }
+  if (isCourseItemType(itemType)) {
     if (status === "delivered") return "bg-green-500/20 text-green-700";
     if (status === "processing" || status === "shipped") return "bg-blue-500/20 text-blue-700";
     if (status === "cancelled") return "bg-red-500/20 text-red-600";
@@ -117,7 +129,9 @@ export function AdminOrdersPanel({ itemType }: { itemType?: CartItemType }) {
       ? bookingStatusNote(status, itemType)
       : isConsultancyItemType(itemType)
         ? consultancyStatusNote(status)
-        : `Status updated to ${statusLabel(status, itemType)}`;
+        : isCourseItemType(itemType)
+          ? courseStatusNote(status)
+          : `Status updated to ${statusLabel(status, itemType)}`;
 
     const res = await fetch(`/api/orders/${id}`, {
       method: "PATCH",
@@ -151,8 +165,10 @@ export function AdminOrdersPanel({ itemType }: { itemType?: CartItemType }) {
               ? "Update healing progress: Purchased → Team will connect → Healing completed"
               : itemType === "service"
                 ? "Update consultancy progress: Purchased → Booked → Done"
-                : "Status changes sync to the user's My Purchases dashboard"}
-          {itemType && !isBookingItemType(itemType) && itemType !== "service"
+                : itemType === "course"
+                  ? "Update course progress: Purchased → Started → Completed"
+                  : "Status changes sync to the user's My Purchases dashboard"}
+          {itemType && !isBookingItemType(itemType) && itemType !== "service" && itemType !== "course"
             ? ` · filtered to ${itemType} items`
             : ""}
         </p>

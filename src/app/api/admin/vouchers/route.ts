@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
+import { normalizeVoucherInput, validateVoucherInput } from "@/lib/voucher-input";
 import { vouchersStore } from "@/lib/vouchers-store";
-import { Voucher } from "@/lib/types";
-import { isVoucherAssignedToUser, VOUCHER_ALL_USERS } from "@/lib/voucher-users";
+import { isVoucherAssignedToUser } from "@/lib/voucher-users";
 
 export async function GET(req: NextRequest) {
   const session = await getSession();
@@ -39,14 +39,11 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const body = (await req.json()) as Omit<Voucher, "id" | "usedCount" | "createdAt">;
-    if (!body.code?.trim() || !body.label?.trim()) {
-      return NextResponse.json({ error: "Code and label are required" }, { status: 400 });
-    }
-    if (!body.assignedUserIds?.length) {
-      return NextResponse.json({ error: "Assign at least one user or select All users" }, { status: 400 });
-    }
-    const voucher = await vouchersStore.create(body);
+    const body = await req.json();
+    const input = normalizeVoucherInput(body);
+    const validationError = validateVoucherInput(input);
+    if (validationError) return NextResponse.json({ error: validationError }, { status: 400 });
+    const voucher = await vouchersStore.create(input);
     return NextResponse.json({ voucher }, { status: 201 });
   } catch (e) {
     return NextResponse.json(

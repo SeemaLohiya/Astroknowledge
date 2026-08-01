@@ -4,6 +4,7 @@ import { Voucher } from "./types";
 import { isRemotePersistEnabled } from "./db/persist";
 import * as mongo from "./db/app-data-repo";
 import { isVoucherAssignedToUser } from "./voucher-users";
+import { normalizeVoucherInput, VoucherWriteInput } from "./voucher-input";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const VOUCHERS_PATH = path.join(DATA_DIR, "vouchers.json");
@@ -39,20 +40,21 @@ export const vouchersStore = {
     (await getVouchersList()).find((v) => v.code.toUpperCase() === code.trim().toUpperCase()),
   getForUser: async (userId: string) =>
     (await getVouchersList()).filter((v) => v.active && isVoucherAssignedToUser(v, userId)),
-  create: async (data: Omit<Voucher, "id" | "usedCount" | "createdAt"> & { usageLimit?: number | null }) => {
+  create: async (data: VoucherWriteInput | Record<string, unknown>) => {
     const vouchers = await getVouchersList();
-    const code = data.code.trim().toUpperCase();
+    const input = normalizeVoucherInput(data as Record<string, unknown>);
+    const code = input.code;
     if (vouchers.some((v) => v.code === code)) throw new Error("Voucher code already exists");
     const usageLimit =
-      data.usageLimit === null || data.usageLimit === undefined || Number.isNaN(Number(data.usageLimit))
+      input.usageLimit === null || input.usageLimit === undefined
         ? undefined
-        : Number(data.usageLimit);
+        : Number(input.usageLimit);
     const voucher: Voucher = {
-      ...data,
+      ...input,
       code,
       usageLimit,
-      applicableItemTypes: data.applicableItemTypes ?? [],
-      applicableItemIds: data.applicableItemIds ?? [],
+      applicableItemTypes: input.applicableItemTypes ?? [],
+      applicableItemIds: input.applicableItemIds ?? [],
       id: `vch-${Date.now()}`,
       usedCount: 0,
       createdAt: new Date().toISOString(),
@@ -62,25 +64,29 @@ export const vouchersStore = {
     writeVouchers(vouchers);
     return voucher;
   },
-  update: async (id: string, patch: Partial<Voucher> & { usageLimit?: number | null }) => {
+  update: async (id: string, patch: VoucherWriteInput | Record<string, unknown>) => {
     const vouchers = await getVouchersList();
     const idx = vouchers.findIndex((v) => v.id === id);
     if (idx === -1) return null;
-    if (patch.code) patch.code = patch.code.trim().toUpperCase();
+    const input = normalizeVoucherInput({ ...vouchers[idx], ...patch } as Record<string, unknown>);
+    if (vouchers.some((v) => v.code === input.code && v.id !== id)) {
+      throw new Error("Voucher code already exists");
+    }
+    const usageLimit =
+      input.usageLimit === null || input.usageLimit === undefined
+        ? undefined
+        : Number(input.usageLimit);
     const next: Voucher = {
       ...vouchers[idx],
-      ...patch,
+      ...input,
+      usageLimit,
+      applicableItemTypes: input.applicableItemTypes ?? [],
+      applicableItemIds: input.applicableItemIds ?? [],
+      usedCount: vouchers[idx].usedCount,
+      createdAt: vouchers[idx].createdAt,
+      id: vouchers[idx].id,
       updatedAt: new Date().toISOString(),
     };
-    if ("usageLimit" in patch) {
-      next.usageLimit =
-        patch.usageLimit === null || patch.usageLimit === undefined || Number.isNaN(Number(patch.usageLimit))
-          ? undefined
-          : Number(patch.usageLimit);
-    }
-    if ("applicableItemTypes" in patch) {
-      next.applicableItemTypes = patch.applicableItemTypes ?? [];
-    }
     vouchers[idx] = next;
     if (isRemotePersistEnabled()) return mongo.mongoSaveVoucher(vouchers[idx]);
     writeVouchers(vouchers);
