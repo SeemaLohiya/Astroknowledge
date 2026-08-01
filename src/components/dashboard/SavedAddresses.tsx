@@ -96,8 +96,7 @@ export function SavedAddresses({
     setShowForm(true);
   };
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const saveAddress = async () => {
     if (!form.country || !form.state || !form.city) {
       toast.error("Please select country, state and city");
       return;
@@ -109,17 +108,24 @@ export function SavedAddresses({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      if (!res.ok) throw new Error();
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) throw new Error(data.error || d.failedSave);
       toast.success(d.addressSaved);
       setForm(emptyForm);
       setEditingId(null);
       setShowForm(false);
       load();
-    } catch {
-      toast.error(d.failedSave);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : d.failedSave);
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    await saveAddress();
   };
 
   const handleDelete = async (id: string) => {
@@ -225,7 +231,11 @@ export function SavedAddresses({
       </div>
 
       {showForm && (
-        <form onSubmit={handleSave} className="mt-4 space-y-4 border-t border-gold/10 pt-4">
+        <form
+          onSubmit={handleSave}
+          onClick={(e) => e.stopPropagation()}
+          className="mt-4 space-y-4 border-t border-gold/10 pt-4"
+        >
           <p className="text-sm font-semibold text-text-primary">{editingId ? "Edit address" : "Add delivery address"}</p>
           <div className="grid gap-3 sm:grid-cols-2">
             <input
@@ -357,7 +367,7 @@ export function SavedAddresses({
             />
             {d.setDefaultAddress}
           </label>
-          <Button type="submit" variant="secondary" size="sm" disabled={saving} className="w-full sm:w-auto">
+          <Button type="button" variant="secondary" size="sm" disabled={saving} className="w-full sm:w-auto" onClick={() => void saveAddress()}>
             {saving ? c.pleaseWait : d.saveAddress}
           </Button>
         </form>

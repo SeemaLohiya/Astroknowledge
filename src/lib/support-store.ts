@@ -139,4 +139,27 @@ export const supportStore = {
     await save(data);
     return thread;
   },
+
+  async broadcastToUsers(input: {
+    users: { id: string; name: string; email: string }[];
+    senderId: string;
+    senderName: string;
+    text?: string;
+    attachment?: SupportMessage["attachment"];
+  }): Promise<{ sent: number }> {
+    let sent = 0;
+    for (const user of input.users) {
+      const thread = await this.ensureThread(user);
+      await this.addMessage({
+        threadId: thread.id,
+        senderId: input.senderId,
+        senderRole: "admin",
+        senderName: input.senderName,
+        text: input.text,
+        attachment: input.attachment,
+      });
+      sent += 1;
+    }
+    return { sent };
+  },
 };

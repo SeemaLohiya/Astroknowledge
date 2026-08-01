@@ -3,6 +3,7 @@
 import { FadeIn } from "@/components/animations/FadeIn";
 import { PageTransition } from "@/components/animations/PageTransition";
 import { SupportChat } from "@/components/support/SupportChat";
+import { AdminSupportBroadcast } from "@/components/admin/AdminSupportBroadcast";
 import { fetchJson } from "@/lib/fetch-json";
 import { SupportThread } from "@/lib/types";
 import { MessageCircle } from "lucide-react";
@@ -42,6 +43,8 @@ export default function AdminSupportPage() {
           WhatsApp-style chat with users — reply with text, links, images, video, PDF, or docs.
         </p>
       </FadeIn>
+
+      <AdminSupportBroadcast onSent={() => void loadThreads()} />
 
       <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
         <div className="overflow-hidden rounded-2xl border border-gold/15 bg-white/90">

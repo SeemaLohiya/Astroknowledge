@@ -141,8 +141,7 @@ export default function CheckoutPage() {
       }
     : form;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!user) {
       toast.error(ch.loginRequired);
       router.push("/login?redirect=/checkout");
@@ -201,7 +200,7 @@ export default function CheckoutPage() {
             <p className="text-text-body text-sm mb-8">{ch.subtitleLoggedIn}</p>
           </FadeIn>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-6">
             <FadeIn className="rounded-2xl glass-card p-6 space-y-4">
               <h2 className="font-semibold text-text-primary">{ch.yourAccount}</h2>
               {hasProducts && (
@@ -309,10 +308,10 @@ export default function CheckoutPage() {
               )}
             </FadeIn>
 
-            <Button type="submit" variant="secondary" size="lg" className="w-full" disabled={loading}>
+            <Button type="button" variant="secondary" size="lg" className="w-full" disabled={loading} onClick={() => void handleSubmit()}>
               {loading ? c.pleaseWait : c.cart.continueToPayment}
             </Button>
-          </form>
+          </div>
         </div>
       </section>
     </PageTransition>
