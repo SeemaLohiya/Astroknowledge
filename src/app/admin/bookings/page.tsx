@@ -7,7 +7,7 @@ import { SlotCalendar } from "@/components/slots/SlotCalendar";
 import { fetchJson, parseResponseJson } from "@/lib/fetch-json";
 import { useCatalog } from "@/lib/use-catalog";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
-import { BookingSlot, Service } from "@/lib/types";
+import { BookingSlot, Booking, Service } from "@/lib/types";
 import { bookingConfirmMessage, buildWhatsAppUrl } from "@/lib/whatsapp";
 import { AlertCircle, Calendar, Check, CheckCircle2, MessageCircle, Plus, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -16,10 +16,13 @@ import toast from "react-hot-toast";
 const DURATION_PRESETS = ["30 min", "45 min", "1 hr", "1.5 hr", "2 hr"];
 
 type SlotTab = "open" | "booked" | "pending" | "completed";
+type PageView = "slots" | "requests";
 
 export default function AdminBookingsPage() {
   const { c } = useLanguage();
   const [allSlots, setAllSlots] = useState<BookingSlot[]>([]);
+  const [legacyBookings, setLegacyBookings] = useState<Booking[]>([]);
+  const [pageView, setPageView] = useState<PageView>("slots");
   const [pendingCount, setPendingCount] = useState(0);
   const [slotTab, setSlotTab] = useState<SlotTab>("open");
   const [loading, setLoading] = useState(true);
@@ -29,12 +32,18 @@ export default function AdminBookingsPage() {
   const { items: services } = useCatalog<Service>("services");
 
   const loadSlots = useCallback(async () => {
-    const res = await fetchJson<{ slots?: BookingSlot[]; pendingCount?: number }>("/api/slots", { cache: "no-store" });
-    const slots = res.data?.slots || [];
-    const pending = res.data?.pendingCount || 0;
+    const [slotsRes, legacyRes] = await Promise.all([
+      fetchJson<{ slots?: BookingSlot[]; pendingCount?: number }>("/api/slots", { cache: "no-store" }),
+      fetchJson<{ bookings?: Booking[] }>("/api/bookings", { cache: "no-store" }),
+    ]);
+    const slots = slotsRes.data?.slots || [];
+    const pending = slotsRes.data?.pendingCount || 0;
     setAllSlots(slots);
     setPendingCount(pending);
+    setLegacyBookings(legacyRes.data?.bookings || []);
     if (pending > 0) setSlotTab("pending");
+    const pendingRequests = (legacyRes.data?.bookings || []).filter((b) => b.status === "pending").length;
+    if (pendingRequests > 0 && pending === 0) setPageView("requests");
   }, []);
 
   const load = useCallback(async () => {
@@ -125,6 +134,20 @@ export default function AdminBookingsPage() {
     loadSlots();
   };
 
+  const updateLegacyBooking = async (id: string, status: Booking["status"]) => {
+    const res = await fetch(`/api/bookings/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+    if (!res.ok) {
+      toast.error("Failed to update request");
+      return;
+    }
+    toast.success(`Request marked as ${status}`);
+    loadSlots();
+  };
+
   const bookedCount = allSlots.filter((s) => s.status === "booked").length;
   const openCount = allSlots.filter((s) => s.status === "available").length;
   const completedCount = allSlots.filter((s) => s.status === "completed").length;
@@ -133,9 +156,11 @@ export default function AdminBookingsPage() {
     <PageTransition>
       <FadeIn className="mb-6">
         <h1 className="font-display text-2xl font-bold text-text-primary">
-          Manage <span className="text-gradient-gold">Bookings</span>
+          Consultations <span className="text-gradient-gold">& Slots</span>
         </h1>
-        <p className="text-sm text-text-body mt-1">Calendar slots and confirmations — mark completed so users can rebook</p>
+        <p className="text-sm text-text-body mt-1">
+          Manage calendar slots, confirm bookings, and approve consultation requests in one place
+        </p>
         {pendingCount > 0 && (
           <div className="mt-3 flex items-center gap-2 rounded-xl bg-gold/10 border border-gold/30 px-4 py-2 text-sm text-gold">
             <AlertCircle className="h-4 w-4" />
@@ -144,6 +169,78 @@ export default function AdminBookingsPage() {
         )}
       </FadeIn>
 
+      <div className="mb-6 flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => setPageView("slots")}
+          className={`rounded-full px-4 py-2 text-sm font-semibold ${pageView === "slots" ? "bg-gold text-white" : "glass-card"}`}
+        >
+          Calendar slots
+        </button>
+        <button
+          type="button"
+          onClick={() => setPageView("requests")}
+          className={`rounded-full px-4 py-2 text-sm font-semibold ${pageView === "requests" ? "bg-gold text-white" : "glass-card"}`}
+        >
+          Consultation requests
+          {legacyBookings.filter((b) => b.status === "pending").length > 0 && (
+            <span className="ml-1.5 rounded-full bg-white/30 px-1.5 text-xs">
+              {legacyBookings.filter((b) => b.status === "pending").length}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {pageView === "requests" ? (
+        <div className="space-y-3">
+          {legacyBookings.length === 0 ? (
+            <p className="py-12 text-center text-text-muted">No consultation requests yet</p>
+          ) : (
+            legacyBookings.map((b) => (
+              <div key={b.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl glass-card p-4">
+                <div>
+                  <p className="font-medium text-text-primary">
+                    {b.userName} — {b.serviceName}
+                  </p>
+                  <p className="text-sm text-text-muted">
+                    {b.date} at {b.time}
+                    {b.userPhone ? ` · ${b.userPhone}` : ""}
+                  </p>
+                  {b.notes && <p className="mt-1 text-xs text-text-body">{b.notes}</p>}
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-full bg-gold/20 px-2 py-1 text-xs capitalize text-gold">{b.status}</span>
+                  {b.status === "pending" && (
+                    <>
+                      <button
+                        onClick={() => void updateLegacyBooking(b.id, "confirmed")}
+                        className="flex items-center gap-1 rounded-full bg-green-600 px-3 py-1 text-xs text-white"
+                      >
+                        <Check className="h-3 w-3" /> Confirm
+                      </button>
+                      <button
+                        onClick={() => void updateLegacyBooking(b.id, "cancelled")}
+                        className="flex items-center gap-1 rounded-full bg-red-500/20 px-3 py-1 text-xs text-red-500"
+                      >
+                        <X className="h-3 w-3" /> Reject
+                      </button>
+                    </>
+                  )}
+                  {b.status === "confirmed" && (
+                    <button
+                      onClick={() => void updateLegacyBooking(b.id, "completed")}
+                      className="flex items-center gap-1 rounded-full bg-emerald-600 px-3 py-1 text-xs text-white"
+                    >
+                      <CheckCircle2 className="h-3 w-3" /> Complete
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      ) : (
+        <>
       <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-gold/15 bg-orange/5 px-4 py-3 text-center">
           <p className="text-2xl font-bold text-text-primary">{openCount}</p>
@@ -383,6 +480,8 @@ export default function AdminBookingsPage() {
             </div>
           ))}
         </div>
+      )}
+        </>
       )}
     </PageTransition>
   );

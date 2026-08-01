@@ -31,14 +31,14 @@ import { useEffect, useState } from "react";
 const WORKFLOW = [
   { step: "1", title: "Browse & buy", desc: "Services, products, courses, pooja", href: "/services", icon: Sparkles },
   { step: "2", title: "Pay online", desc: "Razorpay or UPI verification", href: "/dashboard/products", icon: Package },
-  { step: "3", title: "Book slot", desc: "After a paid consultancy service", href: "/dashboard/slots", icon: Calendar },
+  { step: "3", title: "Book slot", desc: "After a paid consultancy service", href: "/dashboard/services?tab=book", icon: Calendar },
   { step: "4", title: "Get guidance", desc: "Join your consultation on time", href: "/dashboard/services", icon: Clock },
 ];
 
 const SHORTCUTS = [
   { href: "/dashboard/products", label: "Products", icon: Package },
   { href: "/dashboard/services", label: "Services", icon: Sparkles },
-  { href: "/dashboard/slots", label: "Book slot", icon: Calendar },
+  { href: "/dashboard/services?tab=book", label: "Book slot", icon: Calendar },
   { href: "/dashboard/courses", label: "Courses", icon: BookOpen },
   { href: "/dashboard/pooja", label: "Pooja", icon: Flame },
   { href: "/dashboard/healing", label: "Healing", icon: Heart },
@@ -133,7 +133,7 @@ export default function DashboardPage() {
           </Link>
         </FadeIn>
         <FadeIn delay={0.15}>
-          <Link href="/dashboard/slots">
+          <Link href="/dashboard/services?tab=book">
             <div className="rounded-2xl glass-card p-6 transition-transform hover:-translate-y-1">
               <Clock className="mb-3 h-8 w-8 text-purple-light" />
               <p className="text-3xl font-bold text-text-primary">{serviceCount}</p>
@@ -198,7 +198,7 @@ export default function DashboardPage() {
             <h2 className="flex items-center gap-2 font-semibold text-text-primary">
               <Calendar className="h-5 w-5 text-gold" /> {d.yourBookings}
             </h2>
-            <Link href="/dashboard/services" className="flex items-center gap-1 text-sm text-gold hover:underline">
+            <Link href="/dashboard/services?tab=bookings" className="flex items-center gap-1 text-sm text-gold hover:underline">
               <ArrowRight className="h-4 w-4" />
               {d.viewAllBookings}
             </Link>

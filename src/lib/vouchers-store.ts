@@ -3,6 +3,7 @@ import path from "path";
 import { Voucher } from "./types";
 import { isRemotePersistEnabled } from "./db/persist";
 import * as mongo from "./db/app-data-repo";
+import { isVoucherAssignedToUser } from "./voucher-users";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const VOUCHERS_PATH = path.join(DATA_DIR, "vouchers.json");
@@ -37,7 +38,7 @@ export const vouchersStore = {
   getByCode: async (code: string) =>
     (await getVouchersList()).find((v) => v.code.toUpperCase() === code.trim().toUpperCase()),
   getForUser: async (userId: string) =>
-    (await getVouchersList()).filter((v) => v.active && v.assignedUserIds.includes(userId)),
+    (await getVouchersList()).filter((v) => v.active && isVoucherAssignedToUser(v, userId)),
   create: async (data: Omit<Voucher, "id" | "usedCount" | "createdAt"> & { usageLimit?: number | null }) => {
     const vouchers = await getVouchersList();
     const code = data.code.trim().toUpperCase();

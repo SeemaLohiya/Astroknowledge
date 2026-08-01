@@ -9,9 +9,10 @@ import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { cartKey, useCartStore } from "@/lib/cart-store";
 import { useCartHydrated } from "@/lib/use-cart-hydrated";
 import { parseResponseJson } from "@/lib/fetch-json";
-import { CartItem, SavedAddress, Voucher } from "@/lib/types";
+import { CartItem, Voucher } from "@/lib/types";
 import { SafeImage } from "@/components/ui/SafeImage";
-import { Gift, IndianRupee, MapPin, Tag } from "lucide-react";
+import { SavedAddresses } from "@/components/dashboard/SavedAddresses";
+import { Gift, IndianRupee, Tag } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
@@ -67,7 +68,7 @@ export default function CheckoutPage() {
   const [discountAmount, setDiscountAmount] = useState(0);
   const [myVouchers, setMyVouchers] = useState<Voucher[]>([]);
   const [validatingVoucher, setValidatingVoucher] = useState(false);
-  const [addresses, setAddresses] = useState<SavedAddress[]>([]);
+  const [addresses, setAddresses] = useState<{ id: string }[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState("");
 
   const needsDeliveryAddress = useMemo(
@@ -89,7 +90,7 @@ export default function CheckoutPage() {
     fetch("/api/vouchers")
       .then((r) => r.json())
       .then((d: { vouchers?: Voucher[] }) => setMyVouchers(d.vouchers || []));
-    void fetchJson<{ addresses?: SavedAddress[] }>("/api/addresses").then((res) => {
+    void fetchJson<{ addresses?: { id: string; isDefault?: boolean }[] }>("/api/addresses").then((res) => {
       const list = res.data?.addresses || [];
       setAddresses(list);
       const def = list.find((a) => a.isDefault) || list[0];
@@ -217,61 +218,19 @@ export default function CheckoutPage() {
             </FadeIn>
 
             {needsDeliveryAddress && (
-              <FadeIn delay={0.05} className="rounded-2xl glass-card p-6 space-y-4">
-                <h2 className="flex items-center gap-2 font-semibold text-text-primary">
-                  <MapPin className="h-5 w-5 text-gold" /> Delivery address *
-                </h2>
-                <p className="text-xs text-text-muted">
-                  Required for products and pooja. Add or edit addresses in your{" "}
-                  <Link href="/dashboard/profile" className="text-gold hover:underline">
-                    profile
-                  </Link>
-                  .
-                </p>
-                {addresses.length === 0 ? (
-                  <div className="rounded-xl border border-dashed border-gold/30 bg-orange/5 p-4 text-sm text-text-body">
-                    No saved address yet.{" "}
-                    <Link href="/dashboard/profile" className="font-semibold text-gold hover:underline">
-                      Add an address
-                    </Link>{" "}
-                    then return to checkout.
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {addresses.map((addr) => (
-                      <label
-                        key={addr.id}
-                        className={`flex cursor-pointer gap-3 rounded-xl border p-3 text-sm ${
-                          selectedAddressId === addr.id ? "border-gold bg-gold/5" : "border-gold/15 bg-orange/5"
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="shippingAddress"
-                          checked={selectedAddressId === addr.id}
-                          onChange={() => setSelectedAddressId(addr.id)}
-                          className="mt-1"
-                        />
-                        <span>
-                          <span className="font-medium text-text-primary">
-                            {addr.label} — {addr.name}
-                          </span>
-                          <br />
-                          <span className="text-text-muted">
-                            {addr.line1}
-                            {addr.line2 ? `, ${addr.line2}` : ""}, {addr.city}, {addr.state} — {addr.pincode}
-                          </span>
-                          {addr.locationLink ? (
-                            <>
-                              <br />
-                              <span className="text-xs text-gold">Location link saved</span>
-                            </>
-                          ) : null}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                )}
+              <FadeIn delay={0.05}>
+                <SavedAddresses
+                  selectable
+                  selectedId={selectedAddressId}
+                  onSelect={setSelectedAddressId}
+                  onAddressesChange={(list) => {
+                    setAddresses(list);
+                    if (!selectedAddressId && list.length) {
+                      const def = list.find((a) => a.isDefault) || list[0];
+                      if (def) setSelectedAddressId(def.id);
+                    }
+                  }}
+                />
               </FadeIn>
             )}
 

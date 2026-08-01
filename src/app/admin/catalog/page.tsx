@@ -1,12 +1,13 @@
 "use client";
 
+import { AdminCourseResourceBroadcast } from "@/components/admin/AdminCourseResourceBroadcast";
 import { FadeIn } from "@/components/animations/FadeIn";
 import { PageTransition } from "@/components/animations/PageTransition";
 import { ImageUploadField } from "@/components/ui/ImageUploadField";
 import { SafeImage } from "@/components/ui/SafeImage";
 import { invalidateCatalogCache } from "@/lib/catalog-cache";
 import { fetchJson } from "@/lib/fetch-json";
-import { AchievementPhoto, CatalogType, CertificationEntry, ProductCategory } from "@/lib/types";
+import { AchievementPhoto, CatalogType, CertificationEntry, Course, ProductCategory } from "@/lib/types";
 import { motion } from "framer-motion";
 import { Award, BookOpen, FolderOpen, GraduationCap, Heart, IndianRupee, Package, Plus, Save, Sparkles, Trash2, UserRound, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -825,6 +826,10 @@ export default function AdminCatalogPage() {
             </div>
           </FadeIn>
         </div>
+      )}
+
+      {activeType === "courses" && !isBrandingTab && !isCategoriesTab && !isAchievementsTab && !isCertificationsTab && (
+        <AdminCourseResourceBroadcast courses={items as unknown as Course[]} />
       )}
     </PageTransition>
   );

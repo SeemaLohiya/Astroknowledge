@@ -5,7 +5,8 @@ import { PageTransition } from "@/components/animations/PageTransition";
 import { fetchJson } from "@/lib/fetch-json";
 import { Voucher } from "@/lib/types";
 import { motion } from "framer-motion";
-import { Copy, Gift, IndianRupee } from "lucide-react";
+import { Copy, Gift } from "lucide-react";
+import { formatVoucherDiscount } from "@/lib/voucher-display";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -60,9 +61,8 @@ export default function DashboardVouchersPage() {
                   {v.code}
                   <Copy className="h-4 w-4" />
                 </button>
-                <span className="text-sm font-semibold text-text-primary flex items-center">
-                  <IndianRupee className="h-4 w-4 text-gold" />
-                  {v.discountType === "percent" ? `${v.discountValue}%` : v.discountValue}
+                <span className="text-sm font-semibold text-gold">
+                  {formatVoucherDiscount(v.discountType, v.discountValue, { suffix: "off" })}
                 </span>
               </div>
               <p className="mt-3 text-xs text-text-muted">Valid until {v.validUntil}</p>

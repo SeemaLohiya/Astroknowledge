@@ -40,6 +40,7 @@ interface Analytics {
   categoryRevenue: Record<string, number>;
   categoryCounts: Record<string, number>;
   monthlyRevenue: { key: string; month: string; amount: number; computedAmount: number; note?: string; isOverride?: boolean }[];
+  weeklyRevenue?: { key: string; month: string; amount: number; computedAmount: number }[];
   extraMonthlyRevenue?: { key: string; month: string; amount: number; note?: string; isExtra?: boolean }[];
   revenueSummaryNote?: string;
   bookingStats: { total: number; pending: number; confirmed: number; completed: number };
@@ -86,6 +87,7 @@ export default function AdminPage() {
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [revenuePeriod, setRevenuePeriod] = useState<"weekly" | "monthly">("monthly");
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setRefreshing(true);
@@ -131,17 +133,19 @@ export default function AdminPage() {
   }, [load]);
 
   const chartMonths = analytics
-    ? [
-        ...analytics.monthlyRevenue,
-        ...(analytics.extraMonthlyRevenue || []).map((e) => ({
-          key: e.key,
-          month: e.month,
-          amount: e.amount,
-          computedAmount: 0,
-          note: e.note,
-          isOverride: true,
-        })),
-      ]
+    ? revenuePeriod === "weekly"
+      ? analytics.weeklyRevenue || []
+      : [
+          ...analytics.monthlyRevenue,
+          ...(analytics.extraMonthlyRevenue || []).map((e) => ({
+            key: e.key,
+            month: e.month,
+            amount: e.amount,
+            computedAmount: 0,
+            note: e.note,
+            isOverride: true,
+          })),
+        ]
     : [];
   const maxMonthly = chartMonths.length ? Math.max(...chartMonths.map((m) => m.amount), 1) : 1;
   const maxCategory = analytics
@@ -260,10 +264,20 @@ export default function AdminPage() {
         <div className="mb-8 grid gap-6 lg:grid-cols-2">
           <RevealOnScroll variant="fade-left">
             <div className="rounded-2xl border border-gold/15 bg-white/80 p-6">
-              <h2 className="mb-4 flex items-center gap-2 font-semibold text-text-primary">
-                <BarChart3 className="h-5 w-5 text-gold" />
-                Monthly Revenue (12 months)
-              </h2>
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <h2 className="flex items-center gap-2 font-semibold text-text-primary">
+                  <BarChart3 className="h-5 w-5 text-gold" />
+                  Revenue ({revenuePeriod === "weekly" ? "12 weeks" : "12 months"})
+                </h2>
+                <select
+                  value={revenuePeriod}
+                  onChange={(e) => setRevenuePeriod(e.target.value as "weekly" | "monthly")}
+                  className="rounded-xl border border-gold/20 bg-white px-3 py-1.5 text-xs font-semibold text-text-primary"
+                >
+                  <option value="monthly">Monthly</option>
+                  <option value="weekly">Weekly</option>
+                </select>
+              </div>
               {chartMonths.some((m) => m.amount > 0) ? (
                 <BarChart
                   data={chartMonths.map((m) => ({ label: m.month, value: m.amount }))}
@@ -273,11 +287,18 @@ export default function AdminPage() {
                 <p className="py-8 text-center text-sm text-text-muted">No paid revenue in the last 12 months yet</p>
               )}
               <div className="mt-6 border-t border-gold/10 pt-6">
-                <MonthlyRevenueEditor
-                  months={analytics.monthlyRevenue}
-                  summaryNote={analytics.revenueSummaryNote}
-                  onSaved={() => void load(true)}
-                />
+                {revenuePeriod === "monthly" && (
+                  <MonthlyRevenueEditor
+                    months={analytics.monthlyRevenue}
+                    summaryNote={analytics.revenueSummaryNote}
+                    onSaved={() => void load(true)}
+                  />
+                )}
+                {revenuePeriod === "weekly" && (
+                  <p className="text-xs text-text-muted">
+                    Weekly view is calculated from verified payments. Switch to Monthly to edit displayed revenue overrides.
+                  </p>
+                )}
               </div>
             </div>
           </RevealOnScroll>

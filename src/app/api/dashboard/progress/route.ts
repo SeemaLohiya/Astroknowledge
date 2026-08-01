@@ -25,7 +25,7 @@ export async function GET() {
     { key: "birth", done: isBirthProfileComplete(user), current: !isBirthProfileComplete(user), href: "/dashboard/profile" },
     { key: "purchase", done: userPayments.length > 0, href: "/services" },
     { key: "payment", done: hasPaid, current: hasAwaiting, href: "/dashboard/products" },
-    { key: "book", done: bookings.length > 0 || slots.length > 0, href: "/dashboard/slots" },
+    { key: "book", done: bookings.length > 0 || slots.length > 0, href: "/dashboard/services?tab=book" },
     { key: "confirm", done: hasConfirmedBooking, current: hasPendingBooking, href: "/dashboard/services" },
   ];
 

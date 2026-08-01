@@ -93,12 +93,12 @@ export default function ServicesPage() {
                         name={localizedTitle(service, lang)}
                         price={service.price}
                         image={service.image}
-                        bookHref="/dashboard/slots"
+                        bookHref="/dashboard/services?tab=book"
                         bookLabel={c.hero.bookConsultation}
                         className="mt-4"
                       />
                       <Link
-                        href="/dashboard/slots"
+                        href="/dashboard/services?tab=book"
                         className="mt-2 text-center text-xs font-semibold text-orange transition-colors hover:text-gold sm:hidden"
                       >
                         {c.hero.bookConsultation} →

@@ -78,6 +78,31 @@ export async function GET() {
       const key = monthKey(p.createdAt);
       if (key in monthlyMap) monthlyMap[key] += p.amount;
     });
+
+    const weeklyMap: Record<string, number> = {};
+    const weekLabels: Record<string, string> = {};
+    for (let i = 11; i >= 0; i--) {
+      const end = new Date(now);
+      end.setDate(end.getDate() - i * 7);
+      const start = new Date(end);
+      start.setDate(start.getDate() - 6);
+      const key = `${start.toISOString().slice(0, 10)}`;
+      weeklyMap[key] = 0;
+      weekLabels[key] = `${start.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`;
+    }
+    paid.forEach((p) => {
+      const paidAt = new Date(p.createdAt);
+      for (const key of Object.keys(weeklyMap)) {
+        const start = new Date(key);
+        const end = new Date(start);
+        end.setDate(end.getDate() + 6);
+        end.setHours(23, 59, 59, 999);
+        if (paidAt >= start && paidAt <= end) {
+          weeklyMap[key] += p.amount;
+          break;
+        }
+      }
+    });
     const revenueData = await adminRevenueStore.get();
     const monthlyRevenue = Object.entries(monthlyMap).map(([key, computed]) => {
       const [, m] = key.split("-");
@@ -100,6 +125,13 @@ export async function GET() {
       note: row.note,
       isOverride: true,
       isExtra: true,
+    }));
+
+    const weeklyRevenue = Object.entries(weeklyMap).map(([key, computed]) => ({
+      key,
+      month: weekLabels[key],
+      amount: computed,
+      computedAmount: computed,
     }));
 
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
@@ -140,6 +172,7 @@ export async function GET() {
       categoryRevenue,
       categoryCounts,
       monthlyRevenue,
+      weeklyRevenue,
       extraMonthlyRevenue,
       revenueSummaryNote: revenueData.summaryNote,
       bookingStats,

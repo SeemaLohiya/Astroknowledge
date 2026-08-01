@@ -27,19 +27,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         { status: 403 }
       );
     }
-    if (body.serviceId) {
-      const existing = await slotsStore.getActiveForItem(session.userId, body.serviceId);
-      if (existing) {
-        return NextResponse.json(
-          {
-            error:
-              "You already have one slot booked for this item. It stays locked until the consultation is completed.",
-            existingSlotId: existing.id,
-          },
-          { status: 409 }
-        );
-      }
-    }
     const user = await store.users.findById(session.userId);
     if (!user || !isBirthProfileComplete(user)) {
       return NextResponse.json({ error: "Complete your birth details before booking a slot" }, { status: 403 });

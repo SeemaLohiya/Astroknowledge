@@ -88,7 +88,7 @@ export function UnifiedBookingsList({
             )}
             {(booking.status === "pending" || booking.status === "confirmed") && (
               <p className="mt-2 text-xs text-text-muted">
-                Slot is locked until the consultation is completed by the admin.
+                We will contact you with session details once your booking is confirmed.
               </p>
             )}
           </div>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { logNotification } from "@/lib/notifications-store";
-import { isBookingItemType, bookingStatusLabel, bookingStatusNote } from "@/lib/booking-order-status";
+import { isBookingItemType, bookingStatusLabel, bookingStatusNote, consultancyStatusNote, isConsultancyItemType } from "@/lib/booking-order-status";
 import { store } from "@/lib/store";
 import { CartItemType, Order } from "@/lib/types";
 
@@ -32,9 +32,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   };
 
   const isBooking = isBookingItemType(itemType);
+  const isConsultancy = isConsultancyItemType(itemType);
   const resolvedNote =
     note ||
-    (isBooking ? bookingStatusNote(status, itemType) : `Status updated to ${status}`);
+    (isBooking
+      ? bookingStatusNote(status, itemType!)
+      : isConsultancy
+        ? consultancyStatusNote(status)
+        : `Status updated to ${status}`);
 
   const order = await store.orders.updateStatus(id, status, resolvedNote, isBooking ? undefined : trackingId);
 

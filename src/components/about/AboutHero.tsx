@@ -104,7 +104,7 @@ export function AboutHero() {
             transition={{ delay: 0.4 }}
             className="mt-6 flex flex-wrap justify-center gap-3 lg:justify-start"
           >
-            <Button href="/dashboard/slots" variant="secondary" size="lg">
+            <Button href="/dashboard/services?tab=book" variant="secondary" size="lg">
               {c.about.bookConsultation}
             </Button>
             <Button href={YOUTUBE_CHANNEL_URL} variant="outline" size="lg" className="gap-2">

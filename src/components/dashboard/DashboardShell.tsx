@@ -10,7 +10,6 @@ import { motion } from "framer-motion";
 import {
   Bell,
   BookOpen,
-  Calendar,
   Flame,
   Gift,
   Headphones,
@@ -49,7 +48,6 @@ export default function DashboardShell({ children }: { children: React.ReactNode
       { href: "/dashboard", icon: LayoutDashboard, label: c.dashboard.overview },
       { href: "/dashboard/products", icon: Package, label: "Products" },
       { href: "/dashboard/services", icon: Sparkles, label: "Consultancy Services" },
-      { href: "/dashboard/slots", icon: Calendar, label: "Book Consultation" },
       { href: "/dashboard/courses", icon: BookOpen, label: "Courses" },
       { href: "/dashboard/support", icon: Headphones, label: "Support" },
       { href: "/dashboard/pooja", icon: Flame, label: "Pooja" },
@@ -63,7 +61,10 @@ export default function DashboardShell({ children }: { children: React.ReactNode
 
   const isActive = (href: string) =>
     pathname === href ||
-    (href === "/dashboard/services" && pathname.startsWith("/dashboard/bookings")) ||
+    (href === "/dashboard/services" &&
+      (pathname.startsWith("/dashboard/services") ||
+        pathname.startsWith("/dashboard/slots") ||
+        pathname.startsWith("/dashboard/bookings"))) ||
     (href === "/dashboard/products" && pathname === "/dashboard/purchases") ||
     (href === "/dashboard/profile" && pathname === "/dashboard/kundli");
 

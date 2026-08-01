@@ -37,7 +37,7 @@ export function QuickConsultCTA() {
             </p>
 
             <div className="relative z-10 mt-6 flex flex-wrap justify-center gap-3">
-              <Button href="/dashboard/slots" variant="secondary" size="lg" className="cta-shimmer-btn relative z-10">
+              <Button href="/dashboard/services?tab=book" variant="secondary" size="lg" className="cta-shimmer-btn relative z-10">
                 <Calendar className="h-5 w-5" /> {c.hero.bookConsultation}
               </Button>
               <Button href={exploreHref} variant="outline" size="lg" className="relative z-10">

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { vouchersStore } from "@/lib/vouchers-store";
 import { Voucher } from "@/lib/types";
+import { isVoucherAssignedToUser, VOUCHER_ALL_USERS } from "@/lib/voucher-users";
 
 export async function GET(req: NextRequest) {
   const session = await getSession();
@@ -24,7 +25,7 @@ export async function GET(req: NextRequest) {
         (v.description || "").toLowerCase().includes(search)
     );
   }
-  if (userId) vouchers = vouchers.filter((v) => v.assignedUserIds.includes(userId));
+  if (userId) vouchers = vouchers.filter((v) => isVoucherAssignedToUser(v, userId));
   if (status === "active") vouchers = vouchers.filter((v) => v.active);
   if (status === "inactive") vouchers = vouchers.filter((v) => !v.active);
 
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Code and label are required" }, { status: 400 });
     }
     if (!body.assignedUserIds?.length) {
-      return NextResponse.json({ error: "Assign at least one user" }, { status: 400 });
+      return NextResponse.json({ error: "Assign at least one user or select All users" }, { status: 400 });
     }
     const voucher = await vouchersStore.create(body);
     return NextResponse.json({ voucher }, { status: 201 });

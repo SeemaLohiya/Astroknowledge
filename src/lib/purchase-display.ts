@@ -38,6 +38,12 @@ export function getDisplayStatus(
       if (orderStatus === "cancelled") return s.cancelled;
       return s.healingPurchased;
     }
+    if (itemType === "service") {
+      if (orderStatus === "delivered") return s.serviceDone;
+      if (orderStatus === "processing" || orderStatus === "shipped") return s.serviceBooked;
+      if (orderStatus === "cancelled") return s.cancelled;
+      return s.servicePurchased;
+    }
     if (orderStatus === "delivered") return s.delivered;
     if (orderStatus === "shipped") return s.shipped;
     if (orderStatus === "processing") return s.processing;
@@ -64,6 +70,9 @@ const STYLE_KEYS: Record<string, string> = {
   healingPurchased: "bg-gold/20 text-gold",
   healingTeamConnect: "bg-blue-500/20 text-blue-700",
   healingCompleted: "bg-green-500/20 text-green-600",
+  servicePurchased: "bg-gold/20 text-gold",
+  serviceBooked: "bg-blue-500/20 text-blue-700",
+  serviceDone: "bg-green-500/20 text-green-600",
 };
 
 function statusKey(
@@ -95,6 +104,12 @@ function statusKey(
       if (orderStatus === "processing" || orderStatus === "shipped") return "healingTeamConnect";
       if (orderStatus === "cancelled") return "cancelled";
       return "healingPurchased";
+    }
+    if (itemType === "service") {
+      if (orderStatus === "delivered") return "serviceDone";
+      if (orderStatus === "processing" || orderStatus === "shipped") return "serviceBooked";
+      if (orderStatus === "cancelled") return "cancelled";
+      return "servicePurchased";
     }
     if (orderStatus === "delivered") return "delivered";
     if (orderStatus === "shipped") return "shipped";

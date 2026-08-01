@@ -1,5 +1,6 @@
 import { CartItem, Voucher } from "./types";
 import { vouchersStore } from "./vouchers-store";
+import { isVoucherAssignedToUser } from "./voucher-users";
 
 export interface VoucherApplyResult {
   voucher: Voucher;
@@ -24,7 +25,7 @@ export async function validateVoucherForUser(
   const voucher = await vouchersStore.getByCode(code);
   if (!voucher) throw new Error("Invalid voucher code");
   if (!voucher.active) throw new Error("This voucher is no longer active");
-  if (!voucher.assignedUserIds.includes(userId)) {
+  if (!isVoucherAssignedToUser(voucher, userId)) {
     throw new Error("This voucher is not assigned to your account");
   }
   if (!isWithinDateRange(voucher)) throw new Error("This voucher has expired or is not yet valid");

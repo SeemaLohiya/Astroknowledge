@@ -5,8 +5,14 @@ import { PageTransition } from "@/components/animations/PageTransition";
 import { Button } from "@/components/ui/Button";
 import { fetchJson, parseResponseJson } from "@/lib/fetch-json";
 import { CartItemType, User, Voucher, VoucherDiscountType } from "@/lib/types";
+import {
+  formatVoucherAssignees,
+  isVoucherForAllUsers,
+  VOUCHER_ALL_USERS,
+} from "@/lib/voucher-users";
 import { motion, AnimatePresence } from "framer-motion";
-import { Gift, IndianRupee, Plus, Search, Trash2, Users, X } from "lucide-react";
+import { formatVoucherDiscount } from "@/lib/voucher-display";
+import { Gift, Plus, Search, Trash2, Users, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -61,8 +67,11 @@ export default function AdminVouchersPage() {
   const stats = useMemo(() => ({
     total: vouchers.length,
     active: vouchers.filter((v) => v.active).length,
-    assigned: vouchers.reduce((s, v) => s + v.assignedUserIds.length, 0),
-  }), [vouchers]);
+    assigned: vouchers.reduce(
+      (s, v) => s + (isVoucherForAllUsers(v) ? users.filter((u) => u.role === "user").length : v.assignedUserIds.length),
+      0
+    ),
+  }), [vouchers, users]);
 
   const openCreate = () => {
     setEditing(null);
@@ -81,20 +90,25 @@ export default function AdminVouchersPage() {
       toast.error("Code and label required");
       return;
     }
-    if (!form.assignedUserIds?.length) {
-      toast.error("Assign at least one user");
+    const assigned = form.assignedUserIds || [];
+    if (!assigned.length) {
+      toast.error("Assign at least one user or select All users");
       return;
     }
     const usageLimitRaw = form.usageLimit;
     const payload = {
       ...form,
       code: form.code.trim().toUpperCase(),
+      discountValue: Number(form.discountValue) || 0,
+      minOrderAmount: Number(form.minOrderAmount) || 0,
+      maxDiscount: form.maxDiscount === undefined || form.maxDiscount === null ? undefined : Number(form.maxDiscount),
       usageLimit:
         usageLimitRaw === undefined || usageLimitRaw === null || Number.isNaN(Number(usageLimitRaw))
           ? null
           : Number(usageLimitRaw),
       applicableItemTypes: form.applicableItemTypes ?? [],
       applicableItemIds: form.applicableItemIds ?? [],
+      assignedUserIds: assigned.includes(VOUCHER_ALL_USERS) ? [VOUCHER_ALL_USERS] : assigned,
     };
     const res = editing
       ? await fetch(`/api/admin/vouchers/${editing.id}`, {
@@ -129,10 +143,18 @@ export default function AdminVouchersPage() {
   };
 
   const toggleUser = (userId: string) => {
-    const ids = form.assignedUserIds || [];
+    const ids = (form.assignedUserIds || []).filter((id) => id !== VOUCHER_ALL_USERS);
     setForm({
       ...form,
       assignedUserIds: ids.includes(userId) ? ids.filter((id) => id !== userId) : [...ids, userId],
+    });
+  };
+
+  const toggleAllUsers = () => {
+    const allSelected = (form.assignedUserIds || []).includes(VOUCHER_ALL_USERS);
+    setForm({
+      ...form,
+      assignedUserIds: allSelected ? [] : [VOUCHER_ALL_USERS],
     });
   };
 
@@ -226,16 +248,17 @@ export default function AdminVouchersPage() {
                   <h3 className="mt-2 font-semibold text-text-primary">{v.label}</h3>
                   {v.description && <p className="mt-1 text-sm text-text-body">{v.description}</p>}
                   <div className="mt-3 flex flex-wrap gap-3 text-xs text-text-muted">
-                    <span className="flex items-center gap-1">
-                      <IndianRupee className="h-3 w-3" />
-                      {v.discountType === "percent" ? `${v.discountValue}% off` : `₹${v.discountValue} off`}
+                    <span>
+                      {formatVoucherDiscount(v.discountType, v.discountValue, { suffix: "off" })}
                     </span>
                     <span>{v.validFrom} → {v.validUntil}</span>
                     <span>Used {v.usedCount}{v.usageLimit ? `/${v.usageLimit}` : ""}</span>
                   </div>
                   <p className="mt-2 flex items-center gap-1 text-xs text-gold">
                     <Users className="h-3.5 w-3.5" />
-                    {v.assignedUserIds.length} user(s): {v.assignedUserIds.map((id) => users.find((u) => u.id === id)?.name || id).join(", ")}
+                    {isVoucherForAllUsers(v)
+                      ? "All users"
+                      : `${v.assignedUserIds.length} user(s): ${formatVoucherAssignees(v.assignedUserIds, users)}`}
                   </p>
                 </div>
                 <div className="flex shrink-0 gap-2">
@@ -296,7 +319,16 @@ export default function AdminVouchersPage() {
                 </div>
                 <div>
                   <label className="text-xs text-text-muted">Discount value</label>
-                  <input type="number" value={form.discountValue ?? 0} onChange={(e) => setForm({ ...form, discountValue: Number(e.target.value) })} className="mt-1 w-full rounded-xl border border-gold/20 px-3 py-2 text-sm" />
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={form.discountValue !== undefined && form.discountValue !== null ? String(form.discountValue) : ""}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/[^\d.]/g, "");
+                      setForm({ ...form, discountValue: raw === "" ? undefined : Number(raw) });
+                    }}
+                    className="mt-1 w-full rounded-xl border border-gold/20 px-3 py-2 text-sm"
+                  />
                 </div>
                 <div>
                   <label className="text-xs text-text-muted">Valid from</label>
@@ -308,7 +340,17 @@ export default function AdminVouchersPage() {
                 </div>
                 <div>
                   <label className="text-xs text-text-muted">Min order (₹)</label>
-                  <input type="number" value={form.minOrderAmount ?? 0} onChange={(e) => setForm({ ...form, minOrderAmount: Number(e.target.value) })} className="mt-1 w-full rounded-xl border border-gold/20 px-3 py-2 text-sm" />
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={form.minOrderAmount !== undefined && form.minOrderAmount !== null ? String(form.minOrderAmount) : ""}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/[^\d.]/g, "");
+                      setForm({ ...form, minOrderAmount: raw === "" ? undefined : Number(raw) });
+                    }}
+                    placeholder="0"
+                    className="mt-1 w-full rounded-xl border border-gold/20 px-3 py-2 text-sm"
+                  />
                 </div>
                 <div>
                   <label className="text-xs text-text-muted">Max discount (₹)</label>
@@ -357,10 +399,23 @@ export default function AdminVouchersPage() {
 
               <div className="mt-4">
                 <p className="text-xs font-semibold text-text-muted mb-2">Assign users *</p>
+                <label className="mb-2 flex items-center gap-2 rounded-xl border border-gold/20 bg-gold/5 px-3 py-2 text-sm font-semibold text-gold cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={(form.assignedUserIds || []).includes(VOUCHER_ALL_USERS)}
+                    onChange={toggleAllUsers}
+                  />
+                  All users
+                </label>
                 <div className="max-h-40 overflow-y-auto rounded-xl border border-gold/15 p-2 space-y-1">
                   {users.filter((u) => u.role === "user").map((u) => (
-                    <label key={u.id} className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-orange/5 cursor-pointer">
-                      <input type="checkbox" checked={(form.assignedUserIds || []).includes(u.id)} onChange={() => toggleUser(u.id)} />
+                    <label key={u.id} className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-orange/5 cursor-pointer ${(form.assignedUserIds || []).includes(VOUCHER_ALL_USERS) ? "opacity-50" : ""}`}>
+                      <input
+                        type="checkbox"
+                        disabled={(form.assignedUserIds || []).includes(VOUCHER_ALL_USERS)}
+                        checked={(form.assignedUserIds || []).includes(u.id)}
+                        onChange={() => toggleUser(u.id)}
+                      />
                       <span>{u.name}</span>
                       <span className="text-xs text-text-muted truncate">{u.email}</span>
                     </label>

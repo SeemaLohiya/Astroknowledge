@@ -67,7 +67,7 @@ export function ItemNextStep({ itemType, itemId, paymentStatus, paymentId }: Ite
         <div className="rounded-xl border border-gold/25 bg-gold/5 px-4 py-3">
           <p className="mb-1 text-sm font-medium text-text-primary">{n.bookNext}</p>
           <p className="mb-3 text-xs text-text-muted">{n.onlineOnly}</p>
-          <Button href={`/dashboard/slots?service=${itemId}`} variant="secondary" size="sm">
+          <Button href={`/dashboard/services?tab=book&service=${itemId}`} variant="secondary" size="sm">
             <Calendar className="h-4 w-4" /> {d.bookConsultation}
           </Button>
         </div>

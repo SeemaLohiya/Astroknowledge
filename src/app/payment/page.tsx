@@ -92,7 +92,7 @@ function PaymentContent() {
     }
     clearCart();
     toast.success(p.paymentSuccess);
-    router.push("/dashboard/slots");
+    router.push("/dashboard/services?tab=book");
   };
 
   const handleUploadProof = async (file: File) => {
@@ -126,7 +126,7 @@ function PaymentContent() {
     clearCart();
     if (method === "razorpay") {
       toast.success(p.paymentSuccess);
-      router.push("/dashboard/slots");
+      router.push("/dashboard/services?tab=book");
     } else {
       toast.success(p.submittedVerification);
       router.push("/dashboard/products");
@@ -235,7 +235,7 @@ function PaymentContent() {
         <ShieldCheck className="mx-auto h-16 w-16 text-green-500 mb-4" />
         <h2 className="text-xl font-bold text-text-primary">{p.completeTitle}</h2>
         <p className="text-text-body mt-2">{p.completeDesc}</p>
-        <Button href="/dashboard/slots" variant="secondary" className="mt-6">{d.bookConsultation}</Button>
+        <Button href="/dashboard/services?tab=book" variant="secondary" className="mt-6">{d.bookConsultation}</Button>
       </div>
     );
   }

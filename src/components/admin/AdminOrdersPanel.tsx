@@ -5,9 +5,13 @@ import { PageTransition } from "@/components/animations/PageTransition";
 import { fetchJson } from "@/lib/fetch-json";
 import {
   BOOKING_ORDER_STATUSES,
+  CONSULTANCY_ORDER_STATUSES,
   bookingStatusLabel,
   bookingStatusNote,
+  consultancyStatusLabel,
+  consultancyStatusNote,
   isBookingItemType,
+  isConsultancyItemType,
 } from "@/lib/booking-order-status";
 import { CartItemType, Order, OrderStatus } from "@/lib/types";
 import { motion } from "framer-motion";
@@ -34,15 +38,24 @@ function resolveItemType(item: Order["items"][number]): CartItemType | null {
 }
 
 function statusesForType(itemType?: CartItemType): OrderStatus[] {
-  return isBookingItemType(itemType) ? BOOKING_ORDER_STATUSES : PRODUCT_STATUSES;
+  if (isBookingItemType(itemType)) return BOOKING_ORDER_STATUSES;
+  if (isConsultancyItemType(itemType)) return CONSULTANCY_ORDER_STATUSES;
+  return PRODUCT_STATUSES;
 }
 
 function statusLabel(status: OrderStatus, itemType?: CartItemType): string {
   if (isBookingItemType(itemType)) return bookingStatusLabel(status, itemType);
+  if (isConsultancyItemType(itemType)) return consultancyStatusLabel(status);
   return status;
 }
 
 function statusBadgeClass(status: OrderStatus, itemType?: CartItemType): string {
+  if (isConsultancyItemType(itemType)) {
+    if (status === "delivered") return "bg-green-500/20 text-green-700";
+    if (status === "processing" || status === "shipped") return "bg-blue-500/20 text-blue-700";
+    if (status === "cancelled") return "bg-red-500/20 text-red-600";
+    return "bg-gold/20 text-gold";
+  }
   if (isBookingItemType(itemType)) {
     if (status === "delivered") return "bg-green-500/20 text-green-700";
     if (status === "processing" || status === "shipped") return "bg-blue-500/20 text-blue-700";
@@ -102,7 +115,9 @@ export function AdminOrdersPanel({ itemType }: { itemType?: CartItemType }) {
   const updateStatus = async (id: string, status: OrderStatus) => {
     const note = isBookingItemType(itemType)
       ? bookingStatusNote(status, itemType)
-      : `Status updated to ${statusLabel(status, itemType)}`;
+      : isConsultancyItemType(itemType)
+        ? consultancyStatusNote(status)
+        : `Status updated to ${statusLabel(status, itemType)}`;
 
     const res = await fetch(`/api/orders/${id}`, {
       method: "PATCH",
@@ -134,13 +149,17 @@ export function AdminOrdersPanel({ itemType }: { itemType?: CartItemType }) {
             ? "Update pooja progress: Purchased → Team will connect → Pooja completed"
             : itemType === "healing"
               ? "Update healing progress: Purchased → Team will connect → Healing completed"
-              : "Status changes sync to the user's My Purchases dashboard"}
-          {itemType && !isBookingItemType(itemType) ? ` · filtered to ${itemType} items` : ""}
+              : itemType === "service"
+                ? "Update consultancy progress: Purchased → Booked → Done"
+                : "Status changes sync to the user's My Purchases dashboard"}
+          {itemType && !isBookingItemType(itemType) && itemType !== "service"
+            ? ` · filtered to ${itemType} items`
+            : ""}
         </p>
       </FadeIn>
 
-      <FadeIn className="mb-6 flex flex-wrap gap-3">
-        <div className="relative flex-1 min-w-[200px]">
+      <FadeIn className="mb-6">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
           <input
             value={search}
@@ -149,18 +168,6 @@ export function AdminOrdersPanel({ itemType }: { itemType?: CartItemType }) {
             className="w-full rounded-xl border border-gold/20 bg-orange/5 pl-9 pr-3 py-2.5 text-sm"
           />
         </div>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as "all" | OrderStatus)}
-          className="rounded-xl border border-gold/20 bg-orange/5 px-3 py-2.5 text-sm min-w-[180px]"
-        >
-          <option value="all">All statuses ({counts.all})</option>
-          {statuses.map((s) => (
-            <option key={s} value={s}>
-              {statusLabel(s, itemType)} ({counts[s] || 0})
-            </option>
-          ))}
-        </select>
       </FadeIn>
 
       <div className="mb-4 flex flex-wrap gap-2">

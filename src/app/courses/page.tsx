@@ -35,6 +35,8 @@ export default function CoursesPage() {
           <StaggerChildren className="grid gap-8 md:grid-cols-2">
               {courses.map((course, index) => {
                 const sessionDesc = localizedSessionDesc(course, lang);
+                const shortDesc = localizedDesc(course, lang) || "";
+                const fullDescription = [shortDesc, sessionDesc].filter(Boolean).join("\n\n");
                 return (
                   <StaggerItem key={course.id}>
                     <div className="group overflow-hidden rounded-2xl glass-card glass-card-hover">
@@ -58,29 +60,15 @@ export default function CoursesPage() {
                             {localizedTitle(course, lang)}
                           </h2>
                           <ExpandableText
-                            text={localizedDesc(course, lang) || ""}
+                            text={fullDescription}
                             maxLines={3}
-                            className="mt-2 text-sm text-text-body"
+                            maxChars={280}
+                            asParagraphs
+                            className="mt-2"
+                            paragraphClassName="text-sm text-text-body leading-relaxed"
                             showMoreLabel={lang === "hi" ? "और देखें" : "Show more"}
                             showLessLabel={lang === "hi" ? "कम देखें" : "Show less"}
                           />
-                          {sessionDesc && (
-                            <div className="mt-4 rounded-xl border border-gold/15 bg-orange/[0.04] p-4">
-                              <h3 className="mb-2 text-xs font-bold uppercase tracking-wide text-gold">{p.sessionDetails}</h3>
-                              <div className="space-y-2">
-                                {sessionDesc.split(/\n\n+/).filter(Boolean).map((para, i) => (
-                                  <ExpandableText
-                                    key={i}
-                                    text={para.trim()}
-                                    maxLines={2}
-                                    className="text-xs leading-relaxed text-text-body"
-                                    showMoreLabel={lang === "hi" ? "और देखें" : "Show more"}
-                                    showLessLabel={lang === "hi" ? "कम देखें" : "Show less"}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                          )}
                           <ul className="mt-3 space-y-1">
                             {localizedFeatures(course, lang).map((f) => (
                               <li key={f} className="flex items-center gap-2 text-xs text-text-muted">

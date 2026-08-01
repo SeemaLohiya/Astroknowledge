@@ -1,23 +1,38 @@
 "use client";
 
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
-import { isBookingItemType } from "@/lib/booking-order-status";
+import { isBookingItemType, isConsultancyItemType } from "@/lib/booking-order-status";
 import { CartItemType, Order } from "@/lib/types";
 import { Package } from "lucide-react";
 
 const PRODUCT_STATUS_ORDER: Order["status"][] = ["pending", "processing", "shipped", "delivered"];
 const BOOKING_STATUS_ORDER: Order["status"][] = ["pending", "processing", "delivered"];
 
+const CONSULTANCY_STATUS_ORDER: Order["status"][] = ["pending", "processing", "delivered"];
+
 export function OrderTracking({ order, itemType = "product" }: { order: Order; itemType?: CartItemType }) {
   const { c } = useLanguage();
   const d = c.dashboard;
   const isBooking = isBookingItemType(itemType);
-  const statusOrder = isBooking ? BOOKING_STATUS_ORDER : PRODUCT_STATUS_ORDER;
+  const isConsultancy = isConsultancyItemType(itemType);
+  const statusOrder = isConsultancy
+    ? CONSULTANCY_STATUS_ORDER
+    : isBooking
+      ? BOOKING_STATUS_ORDER
+      : PRODUCT_STATUS_ORDER;
   const currentIdx = statusOrder.indexOf(
-    order.status === "shipped" && isBooking ? "processing" : order.status
+    (order.status === "shipped" && (isBooking || isConsultancy) ? "processing" : order.status) as Order["status"]
   );
 
-  const labels: Record<Order["status"], string> = isBooking
+  const labels: Record<Order["status"], string> = isConsultancy
+    ? {
+        pending: d.serviceOrderPurchased,
+        processing: d.serviceOrderBooked,
+        shipped: d.serviceOrderBooked,
+        delivered: d.serviceOrderDone,
+        cancelled: d.orderCancelled,
+      }
+    : isBooking
     ? itemType === "healing"
       ? {
           pending: d.healingOrderPurchased,

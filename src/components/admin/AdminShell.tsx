@@ -31,7 +31,7 @@ import { useCallback, useEffect, useState } from "react";
 
 const navItems = [
   { href: "/admin", icon: LayoutDashboard, label: "Overview", exact: true },
-  { href: "/admin/bookings", icon: Calendar, label: "Bookings" },
+  { href: "/admin/bookings", icon: Calendar, label: "Consultations & Slots" },
   { href: "/admin/payments", icon: CreditCard, label: "Payments" },
   { href: "/admin/users", icon: Users, label: "Users" },
   { href: "/admin/support", icon: Headphones, label: "Support" },

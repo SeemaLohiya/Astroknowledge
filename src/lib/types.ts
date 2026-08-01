@@ -335,6 +335,7 @@ export interface UserPurchase {
   transactionRefId?: string;
   paymentProofImage?: string;
   adminComment?: string;
+  shippingAddress?: string;
   items: { id: string; itemType: CartItemType; name: string; price: number; quantity: number; image: string }[];
   total: number;
   createdAt: string;

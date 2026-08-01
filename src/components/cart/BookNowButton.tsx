@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/Button";
 import { CTA } from "@/lib/constants";
 import { useIsAdmin } from "@/lib/use-is-admin";
 import { useCartStore } from "@/lib/cart-store";
-import { LayoutDashboard } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { EmptyCartModal } from "./EmptyCartModal";
+import Link from "next/link";
 
 interface BookNowButtonProps {
   label?: string;
@@ -31,17 +31,13 @@ export function BookNowButton({
 
   if (isAdmin) {
     return (
-      <button
-        type="button"
-        title="Admin Dashboard"
-        onClick={() => {
-          onNavigate?.();
-          router.push("/admin");
-        }}
-        className={`inline-flex items-center justify-center rounded-full border border-gold/30 bg-gradient-to-br from-gold/15 to-orange/10 p-2.5 text-gold shadow-sm transition-all hover:scale-105 hover:border-gold/50 hover:shadow-md hover:shadow-gold/20 ${className || ""}`}
+      <Link
+        href="/admin"
+        onClick={() => onNavigate?.()}
+        className={`hidden text-sm font-semibold text-gold hover:underline lg:inline-flex ${className || ""}`}
       >
-        <LayoutDashboard className="h-5 w-5" />
-      </button>
+        Admin Dashboard
+      </Link>
     );
   }
 

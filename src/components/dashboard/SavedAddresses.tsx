@@ -24,7 +24,17 @@ const emptyForm = {
   isDefault: false,
 };
 
-export function SavedAddresses() {
+export function SavedAddresses({
+  selectable = false,
+  selectedId,
+  onSelect,
+  onAddressesChange,
+}: {
+  selectable?: boolean;
+  selectedId?: string;
+  onSelect?: (id: string) => void;
+  onAddressesChange?: (addresses: SavedAddress[]) => void;
+} = {}) {
   const { c } = useLanguage();
   const d = c.dashboard;
   const [addresses, setAddresses] = useState<SavedAddress[]>([]);
@@ -48,7 +58,13 @@ export function SavedAddresses() {
 
   const load = () => {
     void fetchJson<{ addresses?: SavedAddress[] }>("/api/addresses").then((res) => {
-      setAddresses(res.data?.addresses || []);
+      const list = res.data?.addresses || [];
+      setAddresses(list);
+      onAddressesChange?.(list);
+      if (selectable && onSelect && list.length && !selectedId) {
+        const def = list.find((a) => a.isDefault) || list[0];
+        if (def) onSelect(def.id);
+      }
     });
   };
 
@@ -136,7 +152,24 @@ export function SavedAddresses() {
 
       <div className="space-y-3">
         {addresses.map((addr) => (
-          <div key={addr.id} className="flex justify-between gap-3 rounded-xl border border-gold/15 bg-orange/5 p-4">
+          <div
+            key={addr.id}
+            role={selectable ? "button" : undefined}
+            tabIndex={selectable ? 0 : undefined}
+            onClick={selectable ? () => onSelect?.(addr.id) : undefined}
+            onKeyDown={
+              selectable
+                ? (e) => {
+                    if (e.key === "Enter" || e.key === " ") onSelect?.(addr.id);
+                  }
+                : undefined
+            }
+            className={`flex justify-between gap-3 rounded-xl border p-4 transition-colors ${
+              selectable && selectedId === addr.id
+                ? "border-gold bg-gold/10 ring-1 ring-gold/30"
+                : "border-gold/15 bg-orange/5"
+            } ${selectable ? "cursor-pointer hover:border-gold/40" : ""}`}
+          >
             <div>
               <p className="flex items-center gap-2 font-medium text-text-primary">
                 {addr.label}
@@ -164,10 +197,26 @@ export function SavedAddresses() {
               ) : null}
             </div>
             <div className="flex shrink-0 gap-2 self-start">
-              <button type="button" onClick={() => openEdit(addr)} className="text-gold hover:text-gold-bright" aria-label="Edit">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openEdit(addr);
+                }}
+                className="text-gold hover:text-gold-bright"
+                aria-label="Edit"
+              >
                 <Pencil className="h-4 w-4" />
               </button>
-              <button type="button" onClick={() => handleDelete(addr.id)} className="text-red-400 hover:text-red-600" aria-label="Delete">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  void handleDelete(addr.id);
+                }}
+                className="text-red-400 hover:text-red-600"
+                aria-label="Delete"
+              >
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>

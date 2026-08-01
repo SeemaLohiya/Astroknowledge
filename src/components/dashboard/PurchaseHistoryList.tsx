@@ -5,7 +5,7 @@ import { ItemNextStep } from "@/components/dashboard/ItemNextStep";
 import { OrderTracking } from "@/components/dashboard/OrderTracking";
 import { Button } from "@/components/ui/Button";
 import { SafeImage } from "@/components/ui/SafeImage";
-import { isBookingItemType } from "@/lib/booking-order-status";
+import { isBookingItemType, isConsultancyItemType } from "@/lib/booking-order-status";
 import { fetchJson } from "@/lib/fetch-json";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { getDisplayStatus, getStatusStyle } from "@/lib/purchase-display";
@@ -15,11 +15,14 @@ import {
   BookOpen,
   CreditCard,
   IndianRupee,
+  MapPin,
   Package,
+  Pencil,
   ShieldCheck,
   ShoppingBag,
   Sparkles,
 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 interface FlatItem {
@@ -44,6 +47,8 @@ const EXPLORE: Record<CartItemType, string> = {
   healing: "/healing",
 };
 
+const DELIVERY_ITEM_TYPES: CartItemType[] = ["product", "pooja"];
+
 interface PurchaseHistoryListProps {
   itemType: CartItemType;
   title: string;
@@ -53,6 +58,7 @@ interface PurchaseHistoryListProps {
   /** Extra content under each paid item (e.g. course resources) */
   renderExtra?: (ctx: { item: UserPurchase["items"][number]; purchase: UserPurchase }) => React.ReactNode;
   hideNextStep?: boolean;
+  hideHeader?: boolean;
 }
 
 export function PurchaseHistoryList({
@@ -63,6 +69,7 @@ export function PurchaseHistoryList({
   emptyLabel,
   renderExtra,
   hideNextStep,
+  hideHeader,
 }: PurchaseHistoryListProps) {
   const { lang, c } = useLanguage();
   const d = c.dashboard;
@@ -117,12 +124,14 @@ export function PurchaseHistoryList({
 
   return (
     <div>
-      <FadeIn>
-        <h1 className="mb-2 font-display text-2xl font-bold text-text-primary">
-          {title} {titleAccent ? <span className="text-gradient-gold">{titleAccent}</span> : null}
-        </h1>
-        {subtitle ? <p className="mb-6 text-sm text-text-muted">{subtitle}</p> : <div className="mb-6" />}
-      </FadeIn>
+      {!hideHeader && (
+        <FadeIn>
+          <h1 className="mb-2 font-display text-2xl font-bold text-text-primary">
+            {title} {titleAccent ? <span className="text-gradient-gold">{titleAccent}</span> : null}
+          </h1>
+          {subtitle ? <p className="mb-6 text-sm text-text-muted">{subtitle}</p> : <div className="mb-6" />}
+        </FadeIn>
+      )}
 
       {loading ? (
         <p className="py-12 text-center text-text-muted">{c.common.loading}</p>
@@ -186,6 +195,22 @@ export function PurchaseHistoryList({
                         <IndianRupee className="h-3.5 w-3.5" />
                         {(item.price * item.quantity).toLocaleString("en-IN")}
                       </p>
+                      {purchase.shippingAddress && DELIVERY_ITEM_TYPES.includes(item.itemType) && (
+                        <div className="mt-2 rounded-lg border border-gold/15 bg-white/60 px-3 py-2 text-xs text-text-body">
+                          <p className="mb-1 flex items-center gap-1 font-semibold text-text-primary">
+                            <MapPin className="h-3.5 w-3.5 text-gold" />
+                            Delivery address
+                          </p>
+                          <p className="whitespace-pre-line">{purchase.shippingAddress}</p>
+                          <Link
+                            href="/dashboard/profile"
+                            className="mt-1.5 inline-flex items-center gap-1 font-medium text-gold hover:underline"
+                          >
+                            <Pencil className="h-3 w-3" />
+                            Edit delivery address
+                          </Link>
+                        </div>
+                      )}
                       {purchase.adminComment && (
                         <p className="mt-2 rounded-lg bg-gold/10 px-3 py-2 text-xs text-text-body">
                           <span className="font-semibold text-gold">Admin note:</span> {purchase.adminComment}
@@ -202,7 +227,10 @@ export function PurchaseHistoryList({
                         paymentId={purchase.paymentId}
                       />
                     )}
-                    {linkedOrder && (item.itemType === "product" || isBookingItemType(item.itemType)) && (
+                    {linkedOrder &&
+                      (item.itemType === "product" ||
+                        isBookingItemType(item.itemType) ||
+                        isConsultancyItemType(item.itemType)) && (
                       <OrderTracking order={linkedOrder} itemType={item.itemType} />
                     )}
                     {renderExtra?.({ item, purchase })}

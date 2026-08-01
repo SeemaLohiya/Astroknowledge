@@ -12,6 +12,7 @@ function paymentToPurchase(p: PaymentRecord): UserPurchase {
     transactionRefId: p.transactionRefId,
     paymentProofImage: p.paymentProofImage,
     adminComment: p.adminComment,
+    shippingAddress: p.shippingAddress,
     items: p.items ?? [],
     total: p.amount,
     createdAt: p.createdAt,
