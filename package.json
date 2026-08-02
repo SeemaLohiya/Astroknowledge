@@ -16,6 +16,7 @@
     "db:provision:api": "node scripts/provision-atlas-api.mjs",
     "db:wire-render": "node scripts/configure-render-mongo.mjs",
     "seo:submit": "node scripts/submit-seo-indexing.mjs",
+    "seo:render": "node scripts/configure-render-seo.mjs",
     "deploy:live": "node scripts/deploy-live.mjs",
     "security:render": "node scripts/configure-render-security.mjs",
     "security:cloudflare": "node scripts/configure-cloudflare.mjs"

@@ -56,6 +56,18 @@ async function submitIndexNow(urlList) {
   }
 }
 
+async function pingGoogleSitemap() {
+  const pingUrl = `https://www.google.com/ping?sitemap=${encodeURIComponent(`${SITE_URL}/sitemap.xml`)}`;
+  try {
+    const res = await fetch(pingUrl, { signal: AbortSignal.timeout(20_000) });
+    const text = await res.text();
+    console.log(`Google sitemap ping: ${res.status} ${res.statusText}`);
+    if (text) console.log(text.slice(0, 200));
+  } catch (e) {
+    console.warn("Google sitemap ping failed:", e.message);
+  }
+}
+
 async function pingBingSitemap() {
   const pingUrl = `https://www.bing.com/ping?sitemap=${encodeURIComponent(`${SITE_URL}/sitemap.xml`)}`;
   try {
@@ -93,10 +105,14 @@ async function main() {
   }
 
   await submitIndexNow(urls);
+  await pingGoogleSitemap();
   await pingBingSitemap();
   await pingYandexSitemap();
 
-  console.log("Done. For Google, add the site in Search Console and request indexing for the homepage.");
+  console.log("\nGoogle Search Console checklist:");
+  console.log("  1. Sitemaps → add https://astroknowledge.in/sitemap.xml");
+  console.log("  2. URL Inspection → https://astroknowledge.in → Request indexing");
+  console.log("  3. URL Inspection → https://astroknowledge.in/best-astrologer-jaipur → Request indexing");
 }
 
 main().catch((e) => {
