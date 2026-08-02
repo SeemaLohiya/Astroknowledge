@@ -53,9 +53,12 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: [{ url: "/images/logo.png", type: "image/png", sizes: "512x512" }],
-    apple: [{ url: "/apple-touch-icon.png", type: "image/png", sizes: "180x180" }],
-    shortcut: "/images/logo.png",
+    icon: [
+      { url: "/images/logo.png?v=2", type: "image/png", sizes: "512x512" },
+      { url: "/favicon.ico?v=2", sizes: "32x32" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png?v=2", type: "image/png", sizes: "180x180" }],
+    shortcut: "/images/logo.png?v=2",
   },
   other: {
     "geo.region": "IN-RJ",
@@ -67,6 +70,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
+        <link rel="icon" href="/images/logo.png?v=2" type="image/png" sizes="512x512" />
+        <link rel="shortcut icon" href="/favicon.ico?v=2" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2" sizes="180x180" />
         <JsonLd />
         <link rel="alternate" hrefLang="en-IN" href={SITE.url} />
         <link rel="alternate" hrefLang="hi-IN" href={SITE.url} />
