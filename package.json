@@ -17,8 +17,6 @@
     "db:wire-render": "node scripts/configure-render-mongo.mjs",
     "seo:submit": "node scripts/submit-seo-indexing.mjs",
     "deploy:live": "node scripts/deploy-live.mjs",
-    "deploy:railway": "node scripts/trigger-railway-deploy.mjs",
-    "db:wire-railway": "node scripts/configure-railway.mjs",
     "security:render": "node scripts/configure-render-security.mjs",
     "security:cloudflare": "node scripts/configure-cloudflare.mjs"
   },

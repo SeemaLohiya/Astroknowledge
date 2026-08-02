@@ -1,6 +1,6 @@
 /**
- * Deploy to Railway, wait for site, then ping search engines.
- * Usage: node scripts/deploy-live.mjs
+ * Deploy to Render, wait for site, then ping search engines.
+ * Usage: RENDER_API_KEY=... node scripts/deploy-live.mjs
  */
 import { spawn } from "child_process";
 import { dirname, join } from "path";
@@ -37,8 +37,8 @@ async function waitForSite(maxAttempts = 24) {
   console.warn("Site not confirmed live yet; submitting indexing anyway.");
 }
 
-await runNode(join(__dirname, "trigger-railway-deploy.mjs"));
-console.log("Waiting 90s for Railway build to start...");
+await runNode(join(__dirname, "trigger-render-deploy.mjs"));
+console.log("Waiting 90s for Render build to start...");
 await new Promise((r) => setTimeout(r, 90_000));
 await waitForSite();
 await runNode(join(__dirname, "submit-seo-indexing.mjs"));

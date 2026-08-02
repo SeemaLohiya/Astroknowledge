@@ -1,13 +1,5 @@
 /**
- * Update GoDaddy DNS for astroknowledge.in → Railway.
- *
- * GoDaddy does not support CNAME at apex (@). This script configures:
- *   - CNAME www → Railway target
- *   - TXT _railway-verify.www → Railway ownership token
- *
- * For apex (astroknowledge.in), set forwarding manually in GoDaddy:
- *   https://dcc.godaddy.com/control/portfolio/astroknowledge.in/settings
- *   Forward to: https://www.astroknowledge.in (301 permanent)
+ * Update GoDaddy DNS for astroknowledge.in → Render.
  *
  * Requires GoDaddy API keys (https://developer.godaddy.com/keys):
  *   GODADDY_API_KEY=...
@@ -15,28 +7,12 @@
  *
  * Usage: node scripts/configure-godaddy-dns.mjs
  */
-import { spawnSync } from "child_process";
-import { dirname, join } from "path";
-import { fileURLToPath } from "url";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 const DOMAIN = process.env.GODADDY_DOMAIN || "astroknowledge.in";
 const KEY = process.env.GODADDY_API_KEY;
 const SECRET = process.env.GODADDY_API_SECRET;
-const WWW = `www.${DOMAIN}`;
+const RENDER_A = "216.24.57.1";
+const RENDER_CNAME = process.env.RENDER_SUBDOMAIN || "astroknowledge.onrender.com";
 const API = "https://api.godaddy.com/v1";
-
-function railwayDomainStatus() {
-  const result = spawnSync(
-    "railway",
-    ["domain", "status", WWW, "--service", process.env.RAILWAY_SERVICE || "astroknowledge", "--json"],
-    { cwd: join(__dirname, ".."), encoding: "utf8", shell: true }
-  );
-  if (result.status !== 0) {
-    throw new Error(result.stderr || "Run: railway domain www.astroknowledge.in");
-  }
-  return JSON.parse(result.stdout);
-}
 
 async function godaddy(method, path, body) {
   const res = await fetch(`${API}${path}`, {
@@ -56,34 +32,27 @@ async function main() {
   if (!KEY || !SECRET) {
     console.error("Missing GODADDY_API_KEY or GODADDY_API_SECRET.");
     console.error("Create keys at https://developer.godaddy.com/keys then run:");
-    console.error(
-      "  $env:GODADDY_API_KEY='your-key'; $env:GODADDY_API_SECRET='your-secret'; node scripts/configure-godaddy-dns.mjs"
-    );
+    console.error("  $env:GODADDY_API_KEY='your-key'; $env:GODADDY_API_SECRET='your-secret'; node scripts/configure-godaddy-dns.mjs");
     process.exit(1);
   }
 
-  const status = railwayDomainStatus();
-  const cname = status.domain.dnsRecords?.[0]?.requiredValue;
-  const verifyToken = status.domain.verification?.token;
-  const verifyHost = status.domain.verification?.dnsHost || "_railway-verify.www";
-  if (!cname || !verifyToken) {
-    throw new Error(`Add ${WWW} in Railway first: railway domain ${WWW}`);
-  }
-
-  console.log(`Configuring GoDaddy DNS for ${WWW} → Railway (${cname})...\n`);
+  console.log(`Configuring DNS for ${DOMAIN} → Render...\n`);
 
   const records = await godaddy("GET", `/domains/${DOMAIN}/records`);
   console.log(`Found ${records.length} existing records.`);
 
-  const stale = new Set(["216.24.57.1", "76.223.105.230", "13.248.243.5"]);
+  const parkingIps = new Set(["76.223.105.230", "13.248.243.5"]);
+  const parkingMarkers = new Set(["WebsiteBuilder Site"]);
   for (const r of records) {
     const remove =
       r.type === "AAAA" ||
-      (r.type === "A" && (r.name === "@" || r.name === "www") && stale.has(r.data)) ||
+      (r.type === "A" && r.name === "@" && (parkingIps.has(r.data) || parkingMarkers.has(r.data))) ||
+      (r.type === "A" && r.name === "www") ||
       (r.type === "CNAME" &&
         r.name === "www" &&
-        r.data !== cname &&
-        (r.data.includes("onrender.com") || r.data.includes("railway.app")));
+        r.data !== RENDER_CNAME &&
+        (r.data.includes("railway.app") || r.data.includes("onrender.com") || r.data === "@")) ||
+      (r.type === "TXT" && r.name.startsWith("_railway-verify"));
     if (remove) {
       console.log(`Removing ${r.type} ${r.name} → ${r.data}`);
       try {
@@ -94,25 +63,22 @@ async function main() {
     }
   }
 
-  console.log(`Setting CNAME www → ${cname}`);
-  await godaddy("PUT", `/domains/${DOMAIN}/records/CNAME/www`, [{ data: cname, ttl: 600 }]);
+  console.log(`Setting A @ → ${RENDER_A}`);
+  await godaddy("PUT", `/domains/${DOMAIN}/records/A/@`, [{ data: RENDER_A, ttl: 600 }]);
 
-  console.log(`Setting TXT ${verifyHost} → ${verifyToken}`);
-  await godaddy("PUT", `/domains/${DOMAIN}/records/TXT/${verifyHost}`, [{ data: verifyToken, ttl: 600 }]);
+  console.log(`Setting CNAME www → ${RENDER_CNAME}`);
+  await godaddy("PUT", `/domains/${DOMAIN}/records/CNAME/www`, [{ data: RENDER_CNAME, ttl: 600 }]);
 
   const updated = await godaddy("GET", `/domains/${DOMAIN}/records`);
   console.log("\nCurrent DNS records:");
   for (const r of updated) {
     if (["A", "CNAME", "TXT"].includes(r.type) && (r.name === "@" || r.name === "www" || r.name.startsWith("_railway"))) {
-      console.log(`  ${r.type.padEnd(6)} ${(r.name || "@").padEnd(22)} → ${r.data}`);
+      console.log(`  ${r.type.padEnd(6)} ${(r.name || "@").padEnd(20)} → ${r.data}`);
     }
   }
 
   console.log("\nDone. DNS may take 5–60 minutes to propagate.");
-  console.log("Railway will issue SSL once DNS is verified.");
-  console.log("\nManual step for apex domain (GoDaddy does not support CNAME at @):");
-  console.log(`  Forward https://${DOMAIN} → https://${WWW} (301 permanent)`);
-  console.log(`  https://dcc.godaddy.com/control/portfolio/${DOMAIN}/settings`);
+  console.log("Then run: node scripts/setup-custom-domain.mjs");
 }
 
 main().catch((e) => {
