@@ -1,6 +1,8 @@
 import { CartItem, Voucher } from "./types";
 import { vouchersStore } from "./vouchers-store";
 import { isVoucherAssignedToUser } from "./voucher-users";
+import { isVoucherExhausted, isVoucherUsedByUser } from "./voucher-availability";
+import { paymentsStore } from "./payments-store";
 
 export interface VoucherApplyResult {
   voucher: Voucher;
@@ -29,8 +31,12 @@ export async function validateVoucherForUser(
     throw new Error("This voucher is not assigned to your account");
   }
   if (!isWithinDateRange(voucher)) throw new Error("This voucher has expired or is not yet valid");
-  if (voucher.usageLimit && voucher.usedCount >= voucher.usageLimit) {
+  if (isVoucherExhausted(voucher)) {
     throw new Error("This voucher has reached its usage limit");
+  }
+  const payments = await paymentsStore.getByUser(userId);
+  if (isVoucherUsedByUser(voucher, payments)) {
+    throw new Error("You have already used this voucher");
   }
   if (voucher.minOrderAmount && subtotal < voucher.minOrderAmount) {
     throw new Error(`Minimum order amount is ₹${voucher.minOrderAmount}`);

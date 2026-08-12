@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { contentStore } from "@/lib/content-store";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   return NextResponse.json(
     { content: await contentStore.get() },
-    { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } }
+    { headers: { "Cache-Control": "no-store, no-cache, must-revalidate" } }
   );
 }
 

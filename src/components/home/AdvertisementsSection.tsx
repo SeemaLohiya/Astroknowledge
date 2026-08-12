@@ -58,12 +58,18 @@ function AdFrame({ ad, lang, compact }: { ad: Advertisement; lang: "en" | "hi"; 
       <div className="relative overflow-hidden rounded-2xl border border-gold/30 bg-gradient-to-br from-white via-cream to-orange/10 shadow-lg shadow-gold/15">
         <div className="ad-frame-shimmer pointer-events-none absolute inset-0 z-10" />
 
-        <div className={`relative overflow-hidden ${compact ? "aspect-[21/9] sm:aspect-[2.4/1]" : "aspect-[16/9]"}`}>
-          <div className="ad-ken-burns ad-ken-burns-0 absolute inset-0">
+        <div className={`relative overflow-hidden bg-gradient-to-br from-cream via-white to-orange/5 ${compact ? "aspect-[16/9]" : "aspect-[16/9]"}`}>
+          <div className="absolute inset-0 flex items-center justify-center p-1 sm:p-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={ad.image} alt={title} loading="lazy" decoding="async" className="h-full w-full object-cover" />
+            <img
+              src={ad.image}
+              alt={title}
+              loading="lazy"
+              decoding="async"
+              className="max-h-full max-w-full object-contain"
+            />
           </div>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
           <div className="absolute left-3 top-3 z-20 flex items-center gap-1 rounded-full border border-white/25 bg-black/40 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
             <Zap className="h-2.5 w-2.5 animate-pulse text-amber-300" />
@@ -84,10 +90,14 @@ function AdFrame({ ad, lang, compact }: { ad: Advertisement; lang: "en" | "hi"; 
   );
 }
 
-export function AdvertisementsSection() {
+type Props = {
+  initialAds?: Advertisement[];
+};
+
+export function AdvertisementsSection({ initialAds = [] }: Props) {
   const { lang } = useLanguage();
-  const [ads, setAds] = useState<Advertisement[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [ads, setAds] = useState<Advertisement[]>(initialAds);
+  const [loading, setLoading] = useState(!initialAds.length);
 
   useEffect(() => {
     let cancelled = false;
@@ -97,7 +107,7 @@ export function AdvertisementsSection() {
         if (!cancelled) setAds(d.items ?? []);
       })
       .catch(() => {
-        if (!cancelled) setAds([]);
+        if (!cancelled && !initialAds.length) setAds([]);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -105,14 +115,14 @@ export function AdvertisementsSection() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [initialAds.length]);
 
-  if (loading) {
+  if (loading && !ads.length) {
     return (
-      <section className="ad-section relative overflow-hidden py-8 md:py-10">
+      <section className="ad-section relative overflow-hidden py-6 md:py-8">
         <div className="mx-auto max-w-screen-2xl px-4">
           <div className="mx-auto h-6 w-40 animate-pulse rounded-full bg-gold/20" />
-          <div className="mt-5 h-40 animate-pulse rounded-2xl bg-gold/10" />
+          <div className="mt-4 h-48 animate-pulse rounded-2xl bg-gold/10" />
         </div>
       </section>
     );
@@ -123,7 +133,7 @@ export function AdvertisementsSection() {
   const singleAd = ads.length === 1;
 
   return (
-    <section className="ad-section relative overflow-hidden py-8 md:py-10">
+    <section className="ad-section relative overflow-hidden py-6 md:py-8">
       <div className="ad-section-bg pointer-events-none absolute inset-0" />
       <div className="ad-section-grid pointer-events-none absolute inset-0 opacity-20" />
 
@@ -139,7 +149,7 @@ export function AdvertisementsSection() {
           }
         />
 
-        <FadeIn className="mt-6">
+        <FadeIn className="mt-5">
           {singleAd ? (
             <>
               <div className="mb-3 flex flex-wrap justify-center gap-2 lg:hidden">
@@ -149,7 +159,7 @@ export function AdvertisementsSection() {
                   </span>
                 ))}
               </div>
-              <div className="grid grid-cols-1 items-center gap-4 lg:grid-cols-[1fr_minmax(0,2.2fr)_1fr]">
+              <div className="grid grid-cols-1 items-center gap-4 lg:grid-cols-[1fr_minmax(0,2fr)_1fr]">
                 <SideDecor side="left" />
                 <AdFrame ad={ads[0]} lang={lang} compact />
                 <SideDecor side="right" />
@@ -168,7 +178,7 @@ export function AdvertisementsSection() {
           )}
         </FadeIn>
 
-        <FadeIn delay={0.1} className="mt-4 flex flex-wrap justify-center gap-2">
+        <FadeIn delay={0.1} className="mt-3 flex flex-wrap justify-center gap-2">
           {ads.map((ad) => (
             <span
               key={ad.id}

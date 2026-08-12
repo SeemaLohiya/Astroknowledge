@@ -12,7 +12,7 @@ export async function GET() {
     .sort((a, b) => a.order - b.order);
   return NextResponse.json(
     { items },
-    { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } }
+    { headers: { "Cache-Control": "no-store, no-cache, must-revalidate" } }
   );
 }
 

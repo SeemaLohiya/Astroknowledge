@@ -12,6 +12,7 @@ interface ImageUploadFieldProps {
   label?: string;
   hint?: string;
   animated?: boolean;
+  previewFit?: "cover" | "contain";
 }
 
 export function ImageUploadField({
@@ -20,6 +21,7 @@ export function ImageUploadField({
   label = "Photo",
   hint = "Upload a clear photo (JPG/PNG/WebP, max 4MB). Then click Save on the form to publish it.",
   animated = false,
+  previewFit = "cover",
 }: ImageUploadFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -95,7 +97,7 @@ export function ImageUploadField({
               src={value}
               alt="Preview"
               fill
-              className={`object-cover ${justUploaded && animated ? "upload-ken-burns" : ""}`}
+              className={`${previewFit === "contain" ? "object-contain p-2" : "object-cover"} ${justUploaded && animated ? "upload-ken-burns" : ""}`}
             />
             {justUploaded && animated ? (
               <div className="upload-sparkle pointer-events-none absolute inset-0 z-10" />

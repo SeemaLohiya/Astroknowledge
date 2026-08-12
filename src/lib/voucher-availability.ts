@@ -1,7 +1,7 @@
 import { paymentsStore } from "./payments-store";
 import { PaymentRecord, Voucher } from "./types";
 
-const USED_STATUSES = new Set<PaymentRecord["status"]>(["paid", "awaiting_approval"]);
+const REDEEMED_STATUSES = new Set<PaymentRecord["status"]>(["pending", "paid", "awaiting_approval"]);
 
 export function isVoucherExhausted(voucher: Voucher) {
   return Boolean(voucher.usageLimit && voucher.usedCount >= voucher.usageLimit);
@@ -10,7 +10,7 @@ export function isVoucherExhausted(voucher: Voucher) {
 export function isVoucherUsedByUser(voucher: Voucher, payments: PaymentRecord[]) {
   return payments.some(
     (p) =>
-      USED_STATUSES.has(p.status) &&
+      REDEEMED_STATUSES.has(p.status) &&
       (p.voucherId === voucher.id || p.voucherCode?.toUpperCase() === voucher.code.toUpperCase())
   );
 }

@@ -32,7 +32,7 @@ export default function AdminContentPage() {
   const [adSaving, setAdSaving] = useState(false);
 
   const load = () => {
-    void fetchJson<{ content?: EditableSiteContent }>("/api/content").then((d) => {
+    void fetchJson<{ content?: EditableSiteContent }>("/api/content", { cache: "no-store" }).then((d) => {
       if (d.data?.content) setContent(d.data.content);
     });
   };
@@ -81,12 +81,13 @@ export default function AdminContentPage() {
           body: JSON.stringify(payload),
         }
       );
-      if (!res.ok) throw new Error();
-      toast.success(isNew ? "Advertisement added" : "Advertisement updated");
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) throw new Error(data.error || "Failed to save advertisement");
+      toast.success(isNew ? "Advertisement added — visible on homepage now" : "Advertisement updated");
       setEditingAd(null);
       load();
-    } catch {
-      toast.error("Failed to save advertisement");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to save advertisement");
     } finally {
       setAdSaving(false);
     }
@@ -294,6 +295,8 @@ export default function AdminContentPage() {
                 value={editingAd.image}
                 onChange={(url) => setEditingAd({ ...editingAd, image: url })}
                 animated
+                previewFit="contain"
+                hint="Upload a clear banner image (JPG/PNG/WebP, max 4MB). Full image will be shown — click Save advertisement to publish."
               />
               <div className="flex flex-wrap gap-2">
                 <button
@@ -317,7 +320,7 @@ export default function AdminContentPage() {
                 <div className="relative aspect-video bg-cream">
                   {ad.image ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={ad.image} alt={ad.title} className="h-full w-full object-cover" />
+                    <img src={ad.image} alt={ad.title} className="h-full w-full object-contain p-1" />
                   ) : (
                     <div className="flex h-full items-center justify-center text-xs text-text-muted">No image</div>
                   )}

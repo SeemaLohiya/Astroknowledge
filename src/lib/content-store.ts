@@ -8,7 +8,7 @@ import { readJsonFile, writeJsonFile } from "./json-store";
 import { defaultAcharyaImage, withBrandingDefaults } from "./site-branding";
 import { EditableSiteContent } from "./types";
 
-const CONTENT_TTL_MS = 120_000;
+const CONTENT_TTL_MS = isRemotePersistEnabled() ? 5_000 : 120_000;
 
 let contentCache: EditableSiteContent | null = null;
 let contentCacheTime = 0;
@@ -87,6 +87,12 @@ async function save(data: EditableSiteContent) {
 
 export const contentStore = {
   get: async () => load(),
+
+  invalidate: () => {
+    contentCache = null;
+    contentCacheTime = 0;
+    contentPromise = null;
+  },
 
   update: async (data: EditableSiteContent) => {
     const normalized = normalizeContent(data);

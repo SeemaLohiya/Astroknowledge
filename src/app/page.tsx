@@ -1,4 +1,4 @@
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 import type { Metadata } from "next";
 import { SectionPartition } from "@/components/animations/SectionPartition";
 import { ExploreOfferingsSection } from "@/components/home/ExploreOfferingsSection";
@@ -13,6 +13,9 @@ import { LazySection } from "@/components/animations/LazySection";
 import { SITE } from "@/lib/constants";
 import { DEFAULT_DESCRIPTION, pageMetadata } from "@/lib/seo";
 import { siteContent } from "@/lib/i18n/site-content";
+import { contentStore } from "@/lib/content-store";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = pageMetadata({
   title: `Best Vedic Astrologer in Jaipur | ${SITE.acharya} — ${SITE.name}`,
@@ -21,13 +24,13 @@ export const metadata: Metadata = pageMetadata({
   image: SITE.acharyaImage,
 });
 
-const ServicesSection = dynamic(() => import("@/components/home/ServicesSection").then((m) => ({ default: m.ServicesSection })), { loading: () => null });
-const CoursesSection = dynamic(() => import("@/components/home/CoursesSection").then((m) => ({ default: m.CoursesSection })), { loading: () => null });
-const ProductsSection = dynamic(() => import("@/components/home/ProductsSection").then((m) => ({ default: m.ProductsSection })), { loading: () => null });
-const ProblemsSection = dynamic(() => import("@/components/home/ProblemsSection").then((m) => ({ default: m.ProblemsSection })), { loading: () => null });
-const AchievementsSection = dynamic(() => import("@/components/home/AchievementsSection").then((m) => ({ default: m.AchievementsSection })), { loading: () => null });
-const ReviewsSection = dynamic(() => import("@/components/home/ReviewsSection").then((m) => ({ default: m.ReviewsSection })), { loading: () => null });
-const CosmicElementsSection = dynamic(
+const ServicesSection = nextDynamic(() => import("@/components/home/ServicesSection").then((m) => ({ default: m.ServicesSection })), { loading: () => null });
+const CoursesSection = nextDynamic(() => import("@/components/home/CoursesSection").then((m) => ({ default: m.CoursesSection })), { loading: () => null });
+const ProductsSection = nextDynamic(() => import("@/components/home/ProductsSection").then((m) => ({ default: m.ProductsSection })), { loading: () => null });
+const ProblemsSection = nextDynamic(() => import("@/components/home/ProblemsSection").then((m) => ({ default: m.ProblemsSection })), { loading: () => null });
+const AchievementsSection = nextDynamic(() => import("@/components/home/AchievementsSection").then((m) => ({ default: m.AchievementsSection })), { loading: () => null });
+const ReviewsSection = nextDynamic(() => import("@/components/home/ReviewsSection").then((m) => ({ default: m.ReviewsSection })), { loading: () => null });
+const CosmicElementsSection = nextDynamic(
   () => import("@/components/home/CosmicElementsSection").then((m) => m.CosmicElementsSection),
   { loading: () => null }
 );
@@ -52,7 +55,12 @@ function HomeFaqJsonLd() {
   );
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const content = await contentStore.get();
+  const activeAds = (content.advertisements ?? [])
+    .filter((a) => a.active)
+    .sort((a, b) => a.order - b.order);
+
   return (
     <PageTransition>
       <HomeFaqJsonLd />
@@ -70,10 +78,14 @@ export default function HomePage() {
         <SectionBand variant="gold">
           <TrustBadges />
         </SectionBand>
-        <SectionPartition />
-        <SectionBand variant="coral">
-          <AdvertisementsSection />
-        </SectionBand>
+        {activeAds.length > 0 ? (
+          <>
+            <SectionPartition />
+            <SectionBand variant="coral">
+              <AdvertisementsSection initialAds={activeAds} />
+            </SectionBand>
+          </>
+        ) : null}
         <SectionPartition />
         <LazySection minHeight="200px" revealVariant="fade-up">
           <SectionBand variant="sky">
