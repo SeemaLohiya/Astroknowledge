@@ -11,6 +11,7 @@ interface ImageUploadFieldProps {
   onChange: (url: string) => void;
   label?: string;
   hint?: string;
+  animated?: boolean;
 }
 
 export function ImageUploadField({
@@ -18,11 +19,13 @@ export function ImageUploadField({
   onChange,
   label = "Photo",
   hint = "Upload a clear photo (JPG/PNG/WebP, max 4MB). Then click Save on the form to publish it.",
+  animated = false,
 }: ImageUploadFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [showPath, setShowPath] = useState(false);
+  const [justUploaded, setJustUploaded] = useState(false);
 
   const handleUpload = useCallback(
     async (file: File) => {
@@ -42,6 +45,10 @@ export function ImageUploadField({
         const data = await parseResponseJson<{ url?: string; error?: string }>(res);
         if (!res.ok || !data?.url) throw new Error(data?.error || "Upload failed");
         onChange(data.url);
+        if (animated) {
+          setJustUploaded(true);
+          setTimeout(() => setJustUploaded(false), 2400);
+        }
         toast.success("Photo ready — click Save below to publish");
       } catch (e) {
         toast.error(e instanceof Error ? e.message : "Upload failed");
@@ -49,7 +56,7 @@ export function ImageUploadField({
         setUploading(false);
       }
     },
-    [onChange]
+    [onChange, animated]
   );
 
   return (
@@ -73,6 +80,8 @@ export function ImageUploadField({
           if (file) void handleUpload(file);
         }}
         className={`relative mb-3 flex h-44 w-full flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed transition-colors disabled:opacity-50 ${
+          justUploaded && animated ? "upload-flash border-gold shadow-lg shadow-gold/30" : ""
+        } ${
           dragOver
             ? "border-gold bg-gold/15"
             : value
@@ -82,7 +91,15 @@ export function ImageUploadField({
       >
         {value ? (
           <>
-            <SafeImage src={value} alt="Preview" fill className="object-cover" />
+            <SafeImage
+              src={value}
+              alt="Preview"
+              fill
+              className={`object-cover ${justUploaded && animated ? "upload-ken-burns" : ""}`}
+            />
+            {justUploaded && animated ? (
+              <div className="upload-sparkle pointer-events-none absolute inset-0 z-10" />
+            ) : null}
             <span className="absolute inset-x-0 bottom-0 bg-black/55 px-3 py-2 text-center text-xs font-semibold text-white">
               {uploading ? "Uploading…" : "Click or drop to replace photo"}
             </span>

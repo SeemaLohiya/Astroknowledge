@@ -177,7 +177,7 @@ export function productionCsp() {
     "img-src 'self' data: blob: https:",
     "font-src 'self' data:",
     "connect-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://lumberjack.razorpay.com",
-    "frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com",
+    "frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://www.openstreetmap.org https://openstreetmap.org https://www.google.com https://maps.google.com",
     "upgrade-insecure-requests",
   ].join("; ");
 }
@@ -190,6 +190,6 @@ export function developmentCsp() {
     "img-src 'self' data: blob: https: http:",
     "font-src 'self' data:",
     "connect-src 'self' https: http: ws: wss:",
-    "frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com",
+    "frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://www.openstreetmap.org https://openstreetmap.org https://www.google.com https://maps.google.com",
   ].join("; ");
 }
