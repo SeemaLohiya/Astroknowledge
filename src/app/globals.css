@@ -2574,9 +2574,12 @@ textarea::placeholder {
   animation: ad-pill-float 4s ease-in-out infinite;
 }
 
-.ad-pill:nth-child(2) { animation-delay: -1s; }
-.ad-pill:nth-child(3) { animation-delay: -2s; }
-.ad-pill:nth-child(4) { animation-delay: -3s; }
+.ad-side-pill {
+  animation: ad-pill-float 4s ease-in-out infinite;
+}
+
+.ad-side-pill:nth-child(2) { animation-delay: -1.3s; }
+.ad-side-pill:nth-child(3) { animation-delay: -2.6s; }
 
 @property --ad-angle {
   syntax: "<angle>";
