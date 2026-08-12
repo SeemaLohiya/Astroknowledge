@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["mongoose"],
   images: {
     formats: ["image/webp"],
+    qualities: [65, 70, 75, 90],
     deviceSizes: [384, 640, 750, 1080, 1200],
     imageSizes: [32, 48, 64, 96, 128, 256],
     minimumCacheTTL: 604800,

@@ -32,7 +32,10 @@ function normalizeContent(data: EditableSiteContent): EditableSiteContent {
   const withCerts = data.certifications?.length
     ? data
     : { ...data, certifications: buildSeedCertifications() };
-  return withBrandingDefaults(withCerts);
+  return {
+    ...withBrandingDefaults(withCerts),
+    advertisements: withCerts.advertisements ?? [],
+  };
 }
 
 async function load(): Promise<EditableSiteContent> {

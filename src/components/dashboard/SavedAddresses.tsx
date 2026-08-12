@@ -2,6 +2,13 @@
 
 import { Button } from "@/components/ui/Button";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
+import {
+  CITY_OTHERS_VALUE,
+  isValidIndianPhone,
+  isValidIndianPincode,
+  normalizePhoneInput,
+  normalizePincodeInput,
+} from "@/lib/address-validation";
 import { COUNTRIES, getCities, getStates } from "@/lib/location-data";
 import { withSelectedOption } from "@/lib/select-options";
 import { fetchJson } from "@/lib/fetch-json";
@@ -42,19 +49,19 @@ export function SavedAddresses({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
-  const [stateFilter, setStateFilter] = useState("");
-  const [cityFilter, setCityFilter] = useState("");
+  const [cityIsOther, setCityIsOther] = useState(false);
+  const [customCity, setCustomCity] = useState("");
 
   const states = useMemo(() => getStates(form.country), [form.country]);
   const cities = useMemo(() => getCities(form.state), [form.state]);
-  const filteredStates = useMemo(
-    () => withSelectedOption(states.filter((s) => s.toLowerCase().includes(stateFilter.toLowerCase())), form.state),
-    [states, stateFilter, form.state]
+  const stateOptions = useMemo(
+    () => withSelectedOption(states, form.state),
+    [states, form.state]
   );
-  const filteredCities = useMemo(
-    () => withSelectedOption(cities.filter((city) => city.toLowerCase().includes(cityFilter.toLowerCase())), form.city),
-    [cities, cityFilter, form.city]
-  );
+  const cityOptions = useMemo(() => {
+    const list = withSelectedOption(cities, cityIsOther ? "" : form.city);
+    return list.includes("Others") ? list : [...list, "Others"];
+  }, [cities, form.city, cityIsOther]);
 
   const load = () => {
     void fetchJson<{ addresses?: SavedAddress[] }>("/api/addresses").then((res) => {
@@ -75,10 +82,14 @@ export function SavedAddresses({
   const openCreate = () => {
     setEditingId(null);
     setForm(emptyForm);
+    setCityIsOther(false);
+    setCustomCity("");
     setShowForm(true);
   };
 
   const openEdit = (addr: SavedAddress) => {
+    const stateCities = getCities(addr.state || "");
+    const isOther = Boolean(addr.city && !stateCities.includes(addr.city));
     setEditingId(addr.id);
     setForm({
       label: addr.label || "Home",
@@ -88,30 +99,53 @@ export function SavedAddresses({
       line2: addr.line2 || "",
       country: addr.country || "India",
       state: addr.state || "",
-      city: addr.city || "",
+      city: isOther ? CITY_OTHERS_VALUE : addr.city || "",
       pincode: addr.pincode || "",
       locationLink: addr.locationLink || "",
       isDefault: !!addr.isDefault,
     });
+    setCityIsOther(isOther);
+    setCustomCity(isOther ? addr.city || "" : "");
     setShowForm(true);
   };
 
   const saveAddress = async () => {
-    if (!form.country || !form.state || !form.city) {
-      toast.error("Please select country, state and city");
+    if (!form.country || !form.state) {
+      toast.error("Please select country and state");
+      return;
+    }
+    const resolvedCity = cityIsOther ? customCity.trim() : form.city;
+    if (!resolvedCity) {
+      toast.error("Please select or enter your city");
+      return;
+    }
+    if (!isValidIndianPhone(form.phone)) {
+      toast.error("Please enter a valid 10-digit mobile number");
+      return;
+    }
+    if (!isValidIndianPincode(form.pincode)) {
+      toast.error("Please enter a valid 6-digit pincode");
       return;
     }
     setSaving(true);
     try {
+      const payload = {
+        ...form,
+        phone: normalizePhoneInput(form.phone),
+        pincode: normalizePincodeInput(form.pincode),
+        city: resolvedCity,
+      };
       const res = await fetch(editingId ? `/api/addresses/${editingId}` : "/api/addresses", {
         method: editingId ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) throw new Error(data.error || d.failedSave);
       toast.success(d.addressSaved);
       setForm(emptyForm);
+      setCityIsOther(false);
+      setCustomCity("");
       setEditingId(null);
       setShowForm(false);
       load();
@@ -253,16 +287,22 @@ export function SavedAddresses({
             />
             <input
               required
-              placeholder={d.phone}
+              type="tel"
+              inputMode="numeric"
+              maxLength={10}
+              placeholder={`${d.phone} (10 digits)`}
               value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              onChange={(e) => setForm({ ...form, phone: normalizePhoneInput(e.target.value) })}
               className="rounded-xl border border-gold/20 bg-orange/5 px-3 py-2 text-sm"
             />
             <input
               required
-              placeholder={d.pincode}
+              type="text"
+              inputMode="numeric"
+              maxLength={6}
+              placeholder={`${d.pincode} (6 digits)`}
               value={form.pincode}
-              onChange={(e) => setForm({ ...form, pincode: e.target.value })}
+              onChange={(e) => setForm({ ...form, pincode: normalizePincodeInput(e.target.value) })}
               className="rounded-xl border border-gold/20 bg-orange/5 px-3 py-2 text-sm"
             />
           </div>
@@ -305,24 +345,18 @@ export function SavedAddresses({
             </div>
             <div>
               <label className="mb-1 block text-xs text-text-muted">State *</label>
-              <input
-                type="search"
-                placeholder="Type to filter states..."
-                value={stateFilter}
-                onChange={(e) => setStateFilter(e.target.value)}
-                className="mb-2 w-full rounded-lg border border-gold/15 bg-white px-3 py-1.5 text-xs"
-              />
               <select
                 required
                 value={form.state}
                 onChange={(e) => {
-                  setStateFilter("");
                   setForm({ ...form, state: e.target.value, city: "" });
+                  setCityIsOther(false);
+                  setCustomCity("");
                 }}
                 className={selectCls}
               >
                 <option value="">Select state</option>
-                {filteredStates.map((s) => (
+                {stateOptions.map((s) => (
                   <option key={s} value={s}>
                     {s}
                   </option>
@@ -331,31 +365,38 @@ export function SavedAddresses({
             </div>
             <div>
               <label className="mb-1 block text-xs text-text-muted">City *</label>
-              <input
-                type="search"
-                placeholder="Type to filter cities..."
-                value={cityFilter}
-                onChange={(e) => setCityFilter(e.target.value)}
-                className="mb-2 w-full rounded-lg border border-gold/15 bg-white px-3 py-1.5 text-xs"
-                disabled={!form.state}
-              />
               <select
                 required
-                value={form.city}
+                value={cityIsOther ? CITY_OTHERS_VALUE : form.city}
                 onChange={(e) => {
-                  setCityFilter("");
-                  setForm({ ...form, city: e.target.value });
+                  if (e.target.value === CITY_OTHERS_VALUE) {
+                    setCityIsOther(true);
+                    setForm({ ...form, city: CITY_OTHERS_VALUE });
+                  } else {
+                    setCityIsOther(false);
+                    setCustomCity("");
+                    setForm({ ...form, city: e.target.value });
+                  }
                 }}
                 className={selectCls}
                 disabled={!form.state}
               >
                 <option value="">Select city</option>
-                {filteredCities.map((city) => (
-                  <option key={city} value={city}>
+                {cityOptions.map((city) => (
+                  <option key={city} value={city === "Others" ? CITY_OTHERS_VALUE : city}>
                     {city}
                   </option>
                 ))}
               </select>
+              {cityIsOther && (
+                <input
+                  required
+                  placeholder="Type your city name"
+                  value={customCity}
+                  onChange={(e) => setCustomCity(e.target.value)}
+                  className="mt-2 w-full rounded-xl border border-gold/20 bg-orange/5 px-3 py-2 text-sm"
+                />
+              )}
             </div>
           </div>
 

@@ -70,6 +70,7 @@ export interface SiteContentLang {
     contactUs: string;
     mission: string;
     terms: string;
+    ourPolicies: string;
     privacy: string;
     shipping: string;
     refund: string;
@@ -276,7 +277,8 @@ export const siteContent: Record<Lang, SiteContentLang> = {
       quickLinks: "Quick Links",
       contactUs: "Contact Us",
       mission: "",
-      terms: "Terms",
+      terms: "Terms & Conditions",
+      ourPolicies: "Our Policies",
       privacy: "Privacy",
       shipping: "Shipping",
       refund: "Refund",
@@ -488,7 +490,8 @@ export const siteContent: Record<Lang, SiteContentLang> = {
       quickLinks: "त्वरित लिंक",
       contactUs: "संपर्क करें",
       mission: "",
-      terms: "नियम",
+      terms: "नियम और शर्तें",
+      ourPolicies: "हमारी नीतियां",
       privacy: "गोपनीयता",
       shipping: "शिपिंग",
       refund: "रिफंड",

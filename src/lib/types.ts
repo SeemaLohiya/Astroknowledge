@@ -169,6 +169,17 @@ export interface AchievementPhoto {
   description?: string;
 }
 
+export interface Advertisement {
+  id: string;
+  title: string;
+  titleHindi?: string;
+  image: string;
+  link?: string;
+  badge?: string;
+  active: boolean;
+  order: number;
+}
+
 export interface CertificationEntry {
   id: string;
   title: string;
@@ -309,6 +320,7 @@ export interface EditableSiteContent {
   faqs: { en: { q: string; a: string }[]; hi: { q: string; a: string }[] };
   reviews: Review[];
   achievementPhotos: AchievementPhoto[];
+  advertisements?: Advertisement[];
   certifications: CertificationEntry[];
   problemCategories: ProblemCategory[];
   /** Homepage / about expert portrait — editable in admin Shop & Photos */

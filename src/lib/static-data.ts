@@ -26,6 +26,7 @@ export const staticContent: EditableSiteContent = {
   },
   reviews: [...reviews],
   achievementPhotos: [...achievementPhotos],
+  advertisements: [],
   certifications: buildSeedCertifications(),
   problemCategories: [...problemCategories],
   acharyaImage: defaultAcharyaImage(),

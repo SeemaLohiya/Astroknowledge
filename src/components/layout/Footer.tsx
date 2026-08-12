@@ -11,9 +11,11 @@ import {
   BookOpen,
   Calendar,
   ExternalLink,
+  FileText,
   Mail,
   MapPin,
   Phone,
+  ScrollText,
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
@@ -25,6 +27,8 @@ const QUICK_LINKS = [
   { label: "Book Consultation", href: "/dashboard/services?tab=book", icon: Calendar },
   { label: "About Us", href: "/about", icon: ArrowRight },
   { label: "Contact", href: "/contact", icon: Mail },
+  { label: "Terms & Conditions", href: "/terms", icon: ScrollText },
+  { label: "Our Policies", href: "/our-policies", icon: FileText },
 ];
 
 export function Footer() {
@@ -186,8 +190,8 @@ export function Footer() {
             <Link href="/terms" className="hover:text-gold">
               {c.footer.terms}
             </Link>
-            <Link href="/privacy" className="hover:text-gold">
-              {c.footer.privacy}
+            <Link href="/our-policies" className="hover:text-gold">
+              {c.footer.ourPolicies}
             </Link>
             <Link href="/shipping" className="hover:text-gold">
               {c.footer.shipping}

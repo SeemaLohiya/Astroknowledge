@@ -18,13 +18,14 @@ interface PageBannerProps {
   breadcrumbs?: Crumb[];
   aside?: React.ReactNode;
   className?: string;
+  alignLeft?: boolean;
 }
 
-export function PageBanner({ title, titleAccent, subtitle, breadcrumbs, aside, className }: PageBannerProps) {
+export function PageBanner({ title, titleAccent, subtitle, breadcrumbs, aside, className, alignLeft }: PageBannerProps) {
   return (
     <div className={`relative overflow-hidden border-b border-gold/10 bg-gradient-to-b from-orange/5 to-transparent py-12 md:py-16 ${className ?? ""}`}>
       <SectionBackdrop variant="soft" />
-      <div className="relative mx-auto max-w-7xl px-4">
+      <div className="relative mx-auto w-full max-w-7xl px-4 md:px-6 lg:px-8">
         {breadcrumbs && breadcrumbs.length > 0 && (
           <nav className="mb-6 flex flex-wrap items-center gap-1 text-xs text-text-muted" aria-label="Breadcrumb">
             {breadcrumbs.map((crumb, i) => (
@@ -42,8 +43,12 @@ export function PageBanner({ title, titleAccent, subtitle, breadcrumbs, aside, c
           </nav>
         )}
 
-        <FadeIn className={`flex flex-col gap-8 ${aside ? "lg:flex-row lg:items-center" : "items-center text-center"}`}>
-          <div className={aside ? "flex-1 text-center lg:text-left" : "max-w-3xl"}>
+        <FadeIn
+          className={`flex w-full flex-col gap-8 ${
+            aside ? "lg:flex-row lg:items-center" : alignLeft ? "items-start text-left" : "items-center text-center"
+          }`}
+        >
+          <div className={aside ? "flex-1 text-center lg:text-left" : alignLeft ? "w-full" : "max-w-3xl"}>
             <h1 className="font-display text-3xl font-bold text-text-primary md:text-4xl lg:text-5xl">
               {title}{" "}
               {titleAccent ? <ShimmerText className="text-gradient-gold">{titleAccent}</ShimmerText> : null}

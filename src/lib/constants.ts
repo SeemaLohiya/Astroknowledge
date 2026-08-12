@@ -18,6 +18,10 @@ export const SITE = {
   email: "astroknowledge01@gmail.com",
   address: "Jaipur, Rajasthan, India",
   mapsUrl: "https://maps.app.goo.gl/QPVC4p5i9rY6PDcQ6",
+  mapsEmbedUrl:
+    "https://www.google.com/maps?q=Jaipur,+Rajasthan,+India&z=14&hl=en&output=embed",
+  mapsOsmEmbedUrl:
+    "https://www.openstreetmap.org/export/embed.html?bbox=75.76%2C26.88%2C75.82%2C26.94&layer=mapnik&marker=26.9124%2C75.7873",
   experience: "12",
   clients: "75,000+",
   reviews: "75,000+",

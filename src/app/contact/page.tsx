@@ -9,6 +9,7 @@ import { SITE, telLink, whatsappLink } from "@/lib/constants";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { motion } from "framer-motion";
 import { Clock, ExternalLink, Mail, MapPin, Phone } from "lucide-react";
+import { ContactMap } from "@/components/contact/ContactMap";
 import { WhatsAppIcon } from "@/components/ui/SocialIcons";
 
 export default function ContactPage() {
@@ -75,25 +76,7 @@ export default function ContactPage() {
             </FadeIn>
 
             <FadeIn delay={0.15}>
-              <div className="overflow-hidden rounded-2xl glass-card shadow-lg shadow-orange/5">
-                <iframe
-                  title="AstroKnowledge Location"
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3557.5!2d75.7873!3d26.9124!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjbCsDU0JzQ0LjciTiA3NcKwNDcnMTQuMyJF!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
-                  className="h-80 w-full border-0 lg:min-h-[420px] lg:h-full"
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
-                <div className="border-t border-gold/10 p-4 text-center">
-                  <a
-                    href={SITE.mapsUrl}
-                    target="_blank"
-                    rel="noopener"
-                    className="inline-flex items-center gap-1 text-sm font-medium text-gold hover:underline"
-                  >
-                    <MapPin className="h-4 w-4" /> {c.contact.openMaps}
-                  </a>
-                </div>
-              </div>
+              <ContactMap />
             </FadeIn>
           </div>
         </div>

@@ -2,6 +2,7 @@ import dynamic from "next/dynamic";
 import type { Metadata } from "next";
 import { SectionPartition } from "@/components/animations/SectionPartition";
 import { ExploreOfferingsSection } from "@/components/home/ExploreOfferingsSection";
+import { AdvertisementsSection } from "@/components/home/AdvertisementsSection";
 import { FAQSection } from "@/components/home/FAQSection";
 import { HeroSection } from "@/components/home/HeroSection";
 import { HomeStatsSection } from "@/components/home/HomeStatsSection";
@@ -68,6 +69,10 @@ export default function HomePage() {
         <SectionPartition variant="subtle" />
         <SectionBand variant="gold">
           <TrustBadges />
+        </SectionBand>
+        <SectionPartition />
+        <SectionBand variant="coral">
+          <AdvertisementsSection />
         </SectionBand>
         <SectionPartition />
         <LazySection minHeight="200px" revealVariant="fade-up">

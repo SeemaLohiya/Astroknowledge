@@ -1,17 +1,11 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
-import { vouchersStore } from "@/lib/vouchers-store";
+import { getAvailableVouchersForUser } from "@/lib/voucher-availability";
 
 export async function GET() {
   const session = await getSession();
   if (!session) return NextResponse.json({ vouchers: [] });
 
-  const now = new Date();
-  const vouchers = (await vouchersStore.getForUser(session.userId)).filter((v) => {
-    const until = new Date(v.validUntil);
-    until.setHours(23, 59, 59, 999);
-    return v.active && now <= until && now >= new Date(v.validFrom);
-  });
-
+  const vouchers = await getAvailableVouchersForUser(session.userId);
   return NextResponse.json({ vouchers });
 }

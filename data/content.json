@@ -374,5 +374,15 @@
       "subtitle": "Sound & Breath-Based Predictive Science"
     }
   ],
-  "acharyaImage": "/images/seema-lohiya.png"
+  "acharyaImage": "/images/seema-lohiya.png",
+  "advertisements": [
+    {
+      "id": "ad-1786528349731",
+      "title": "New Astrology Award 2026",
+      "image": "/images/uploads/uploads-1786528393370-29cbfd84.webp",
+      "badge": "Event",
+      "active": true,
+      "order": 0
+    }
+  ]
 }

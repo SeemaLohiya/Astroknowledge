@@ -12,12 +12,13 @@ import { parseResponseJson } from "@/lib/fetch-json";
 import { CartItem, Voucher } from "@/lib/types";
 import { SafeImage } from "@/components/ui/SafeImage";
 import { SavedAddresses } from "@/components/dashboard/SavedAddresses";
-import { Gift, IndianRupee, Tag } from "lucide-react";
+import { Gift, IndianRupee, Info, Tag } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { fetchJson } from "@/lib/fetch-json";
+import { isValidIndianPhone, normalizePhoneInput } from "@/lib/address-validation";
 
 async function proceedToPayment(
   form: { userName: string; userPhone: string; userEmail: string },
@@ -151,6 +152,10 @@ export default function CheckoutPage() {
       toast.error(ch.namePhoneRequired);
       return;
     }
+    if (!isValidIndianPhone(resolvedForm.userPhone)) {
+      toast.error("Please enter a valid 10-digit mobile number");
+      return;
+    }
     if (needsDeliveryAddress && !selectedAddressId) {
       toast.error("Please select a delivery address for products or pooja");
       return;
@@ -204,8 +209,9 @@ export default function CheckoutPage() {
             <FadeIn className="rounded-2xl glass-card p-6 space-y-4">
               <h2 className="font-semibold text-text-primary">{ch.yourAccount}</h2>
               {hasProducts && (
-                <p className="rounded-xl border border-gold/20 bg-gold/5 px-3 py-2 text-xs text-text-body">
-                  Please confirm your name, phone, and delivery address for product orders.
+                <p className="-mt-1 mb-1 flex items-start gap-2 text-xs leading-relaxed text-text-muted">
+                  <Info className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
+                  <span>Please confirm your name, phone, and delivery address for product orders.</span>
                 </p>
               )}
               <div>
@@ -213,8 +219,16 @@ export default function CheckoutPage() {
                 <input required value={resolvedForm.userName} onChange={(e) => setForm({ ...form, userName: e.target.value })} className="w-full rounded-xl border border-gold/20 bg-orange/5 px-4 py-3 text-sm" />
               </div>
               <div>
-                <label className="block text-xs text-text-muted mb-1">{ch.phone} *</label>
-                <input required type="tel" value={resolvedForm.userPhone} onChange={(e) => setForm({ ...form, userPhone: e.target.value })} className="w-full rounded-xl border border-gold/20 bg-orange/5 px-4 py-3 text-sm" />
+                <label className="block text-xs text-text-muted mb-1">{ch.phone} * (10 digits)</label>
+                <input
+                  required
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={10}
+                  value={resolvedForm.userPhone}
+                  onChange={(e) => setForm({ ...form, userPhone: normalizePhoneInput(e.target.value) })}
+                  className="w-full rounded-xl border border-gold/20 bg-orange/5 px-4 py-3 text-sm"
+                />
               </div>
               <div>
                 <label className="block text-xs text-text-muted mb-1">{ch.email} *</label>
